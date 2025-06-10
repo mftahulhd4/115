@@ -1,0 +1,11 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.table th.kolom-foto,
+.table td.kolom-foto {
+    width: 80px; /* Atau sesuaikan */
+    min-width: 80px; /* Mencegah kolom menjadi terlalu sempit */
+    text-align: center; /* Opsional, untuk menengahkan gambar */
+    vertical-align: middle; /* Opsional, untuk menengahkan gambar secara vertikal */
+}
