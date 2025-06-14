@@ -1,110 +1,79 @@
-@extends('layouts.app')
+<x-app-layout>
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+            {{ __('Edit Izin untuk: ') . $perizinan->santri->nama_lengkap }}
+        </h2>
+    </x-slot>
 
-@section('title', 'Edit Data Perizinan')
-
-@section('content')
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-10">
-            <div class="card shadow-sm">
-                <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0">Formulir Edit Izin Santri</h4>
-                </div>
-                <div class="card-body">
-                    @if ($errors->any())
-                        <div class="alert alert-danger">
-                            <ul class="mb-0">
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endif
-
-                    <form action="{{ route('perizinan.update', $perizinan->id) }}" method="POST">
+    <div class="py-12">
+        <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
+            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 text-gray-900 dark:text-gray-100">
+                    <form action="{{ route('perizinan.update', $perizinan->id) }}" method="POST" class="space-y-6">
                         @csrf
-                        @method('PUT') {{-- Metode HTTP untuk update --}}
+                        @method('PUT')
+                        
+                        <input type="hidden" name="santri_id" value="{{ $perizinan->santri_id }}">
 
-                        {{-- Bagian Data Santri (Read-only) --}}
-                        <fieldset class="mb-4 p-3 border rounded">
-                            <legend class="w-auto px-2 h6">Data Santri (Tidak Dapat Diubah)</legend>
-                            @if ($perizinan->santri)
-                                <div class="row align-items-center">
-                                    <div class="col-md-2 text-center mb-3 mb-md-0">
-                                        @if ($perizinan->santri->foto)
-                                            <img src="{{ asset('storage/' . $perizinan->santri->foto) }}" alt="Foto {{ $perizinan->santri->nama_lengkap }}" class="img-thumbnail" style="width: 100px; height: 100px; object-fit: cover;">
-                                        @else
-                                            <img src="{{ asset('images/default_avatar.png') }}" alt="Foto Santri" class="img-thumbnail" style="width: 100px; height: 100px; object-fit: cover;">
-                                        @endif
+                        {{-- =============================================== --}}
+                        {{-- BAGIAN DETAIL SANTRI (DENGAN LAYOUT BARU) --}}
+                        {{-- =============================================== --}}
+                        <div class="p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+                            <h3 class="font-semibold text-lg mb-4">Detail Santri (Tidak Dapat Diubah)</h3>
+                            <div class="flex items-start space-x-4">
+                                {{-- Foto di Kiri --}}
+                                <img class="h-24 w-24 rounded-lg object-cover flex-shrink-0" src="{{ optional($perizinan->santri)->foto ? asset('storage/' . $perizinan->santri->foto) : '/images/default-avatar.png' }}" alt="Foto Santri">
+                                
+                                {{-- Detail Teks di Kanan dengan Grid --}}
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 flex-grow">
+                                    <div class="sm:col-span-2">
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">Nama Lengkap</p>
+                                        <p class="font-bold text-lg">{{ $perizinan->santri->nama_lengkap }}</p>
                                     </div>
-                                    <div class="col-md-10">
-                                        <h5>{{ $perizinan->santri->nama_lengkap }}</h5>
-                                        <p class="mb-1"><strong>Kamar:</strong> {{ $perizinan->santri->kamar ?? '-' }}</p>
-                                        <p class="mb-0"><strong>Pendidikan:</strong> {{ $perizinan->santri->pendidikan_terakhir ?? '-' }}</p>
+                                    <div>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">Jenis Kelamin</p>
+                                        <p class="font-semibold">{{ $perizinan->santri->jenis_kelamin }}</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">Pendidikan</p>
+                                        <p class="font-semibold">{{ $perizinan->santri->pendidikan }}</p>
                                     </div>
                                 </div>
-                            @else
-                                <p class="text-danger">Data santri tidak ditemukan.</p>
-                            @endif
-                        </fieldset>
-
-                        {{-- Bagian Detail Perizinan (Editable) --}}
-                        <fieldset class="mb-3 p-3 border rounded">
-                            <legend class="w-auto px-2 h6">Detail Perizinan</legend>
-                            <div class="mb-3">
-                                <label for="kepentingan_izin" class="form-label">Kepentingan/Alasan Izin <span class="text-danger">*</span></label>
-                                <textarea class="form-control @error('kepentingan_izin') is-invalid @enderror" id="kepentingan_izin" name="kepentingan_izin" rows="3" required>{{ old('kepentingan_izin', $perizinan->kepentingan_izin) }}</textarea>
-                                @error('kepentingan_izin')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
                             </div>
+                        </div>
 
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="tanggal_izin" class="form-label">Tanggal Mulai Izin <span class="text-danger">*</span></label>
-                                    <input type="date" class="form-control @error('tanggal_izin') is-invalid @enderror" id="tanggal_izin" name="tanggal_izin" value="{{ old('tanggal_izin', $perizinan->tanggal_izin ? $perizinan->tanggal_izin->format('Y-m-d') : '') }}" required>
-                                    @error('tanggal_izin')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
+                        <hr class="dark:border-gray-700">
+
+                        {{-- Bagian Detail Izin (Bisa Diedit) --}}
+                        <div class="space-y-6">
+                            <div>
+                                <label for="kepentingan_izin" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Keperluan Izin</label>
+                                <textarea name="kepentingan_izin" id="kepentingan_izin" rows="3" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200">{{ old('kepentingan_izin', $perizinan->kepentingan_izin) }}</textarea>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label for="tanggal_izin" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tanggal Izin</label>
+                                    <input type="date" name="tanggal_izin" id="tanggal_izin" value="{{ old('tanggal_izin', \Carbon\Carbon::parse($perizinan->tanggal_izin)->format('Y-m-d')) }}" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200" style="color-scheme: dark;">
                                 </div>
-                                <div class="col-md-6 mb-3">
-                                    <label for="tanggal_kembali_rencana" class="form-label">Rencana Tanggal Kembali <span class="text-danger">*</span></label>
-                                    <input type="date" class="form-control @error('tanggal_kembali_rencana') is-invalid @enderror" id="tanggal_kembali_rencana" name="tanggal_kembali_rencana" value="{{ old('tanggal_kembali_rencana', $perizinan->tanggal_kembali_rencana ? $perizinan->tanggal_kembali_rencana->format('Y-m-d') : '') }}" required>
-                                    @error('tanggal_kembali_rencana')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
+                                <div>
+                                    <label for="tanggal_kembali_rencana" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Rencana Tanggal Kembali</label>
+                                    <input type="date" name="tanggal_kembali_rencana" id="tanggal_kembali_rencana" value="{{ old('tanggal_kembali_rencana', \Carbon\Carbon::parse($perizinan->tanggal_kembali_rencana)->format('Y-m-d')) }}" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200" style="color-scheme: dark;">
                                 </div>
                             </div>
-
-                            <div class="mb-3">
-                                <label for="tanggal_kembali_aktual" class="form-label">Tanggal Aktual Kembali</label>
-                                <input type="date" class="form-control @error('tanggal_kembali_aktual') is-invalid @enderror" id="tanggal_kembali_aktual" name="tanggal_kembali_aktual" value="{{ old('tanggal_kembali_aktual', $perizinan->tanggal_kembali_aktual ? $perizinan->tanggal_kembali_aktual->format('Y-m-d') : '') }}">
-                                @error('tanggal_kembali_aktual')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
+                            <div>
+                                <label for="keterangan_tambahan" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Keterangan Tambahan (Opsional)</label>
+                                <input type="text" name="keterangan_tambahan" id="keterangan_tambahan" value="{{ old('keterangan_tambahan', $perizinan->keterangan_tambahan) }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200">
                             </div>
+                        </div>
 
-                            <div class="mb-3">
-                                <label for="keterangan" class="form-label">Keterangan Tambahan</label>
-                                <textarea class="form-control @error('keterangan') is-invalid @enderror" id="keterangan" name="keterangan" rows="2">{{ old('keterangan', $perizinan->keterangan) }}</textarea>
-                                @error('keterangan')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </fieldset>
-
-                        <div class="d-flex justify-content-end mt-4">
-                            <a href="{{ route('perizinan.show', $perizinan->id) }}" class="btn btn-outline-secondary me-2">
-                                <i class="bi bi-x-circle"></i> Batal
-                            </a>
-                            <button type="submit" class="btn btn-primary">
-                                <i class="bi bi-save-fill"></i> Update Izin
-                            </button>
+                        {{-- Tombol Aksi --}}
+                        <div class="flex items-center justify-end space-x-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                            <a href="{{ route('perizinan.index') }}" class="inline-flex items-center px-4 py-2 bg-gray-300 dark:bg-gray-600 border border-transparent rounded-md font-semibold text-xs text-gray-800 dark:text-gray-200 uppercase tracking-widest hover:bg-gray-400 dark:hover:bg-gray-500">Batal</a>
+                            <button type="submit" class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700">Perbarui</button>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
     </div>
-</div>
-@endsection
+</x-app-layout>

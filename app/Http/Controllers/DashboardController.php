@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Santri; // Pastikan model Santri di-import
+use App\Models\Santri;
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
@@ -12,26 +12,18 @@ class DashboardController extends Controller
      */
     public function index()
     {
-        // Mengambil jumlah santri berdasarkan status
+        // Menghitung jumlah santri berdasarkan statusnya masing-masing
         $jumlahSantriAktif = Santri::where('status_santri', 'Aktif')->count();
-        $jumlahAlumni = Santri::where('status_santri', 'Alumni')->count();
         $jumlahSantriBaru = Santri::where('status_santri', 'Baru')->count();
         $jumlahPengurus = Santri::where('status_santri', 'Pengurus')->count();
-        
-        // Opsional: Total semua entri santri
-        $totalSantri = Santri::count();
+        $jumlahAlumni = Santri::where('status_santri', 'Alumni')->count();
 
-        // Kirim data ke view dashboard
+        // Kirim semua data yang sudah dihitung ke view 'dashboard'
         return view('dashboard', [
             'jumlahSantriAktif' => $jumlahSantriAktif,
-            'jumlahAlumni' => $jumlahAlumni,
             'jumlahSantriBaru' => $jumlahSantriBaru,
             'jumlahPengurus' => $jumlahPengurus,
-            'totalSantri' => $totalSantri, // Anda bisa gunakan ini jika mau
+            'jumlahAlumni' => $jumlahAlumni,
         ]);
     }
-
-    // Metode lain seperti create, store, dll. tidak kita perlukan untuk DashboardController sederhana ini,
-    // jadi bisa dihapus jika ter-generate otomatis oleh 'make:controller --resource'.
-    // Jika Anda hanya menjalankan 'make:controller DashboardController', hanya index() yang perlu Anda buat.
 }

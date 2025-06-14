@@ -13,15 +13,19 @@ return new class extends Migration
     {
         Schema::create('tagihans', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('santri_id')->constrained('santris')->onDelete('cascade'); // Relasi ke santri
-            $table->string('jenis_tagihan'); // Contoh: SPP Januari, Uang Buku, dll.
-            $table->decimal('nominal_tagihan', 15, 2); // Nominal dengan 2 angka desimal
-            $table->date('tanggal_tagihan'); // Tanggal tagihan ini dibuat/diberlakukan
-            $table->date('tanggal_jatuh_tempo')->nullable();
-            $table->text('keterangan')->nullable();
-            $table->enum('status_tagihan', ['Belum Lunas', 'Lunas', 'Sebagian Dibayar', 'Dibatalkan'])->default('Belum Lunas');
-            $table->date('tanggal_pembayaran')->nullable(); // Tanggal kapan pembayaran (lunas/sebagian) dilakukan
-            $table->decimal('jumlah_dibayar', 15, 2)->nullable(); // Jumlah yang sudah dibayar jika statusnya 'Sebagian Dibayar'
+            $table->unsignedBigInteger('santri_id');
+            $table->foreign('santri_id')->references('id')->on('santris')->onDelete('cascade');
+
+            $table->string('jenis_tagihan');
+            $table->decimal('nominal', 15, 2);
+            $table->date('tanggal_tagihan');
+            $table->date('tanggal_jatuh_tempo');
+            $table->date('tanggal_pelunasan')->nullable();
+            $table->enum('status', ['Lunas', 'Belum Lunas', 'Jatuh Tempo'])->default('Belum Lunas');
+            
+            // TAMBAHKAN KOLOM INI
+            $table->text('keterangan_tambahan')->nullable();
+
             $table->timestamps();
         });
     }

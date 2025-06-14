@@ -1,138 +1,46 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-<head>
-    <meta charset="utf-f">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Selamat Datang di Sistem Manajemen Pesantren Nurul Amin</title>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Selamat Datang - Aplikasi Pesantren Nurul Amin</title>
+        <link rel="preconnect" href="https://fonts.bunny.net">
+        <link href="https://fonts.bunny.net/css?family=figtree:400,600&display=swap" rel="stylesheet" />
+        @vite(['resources/css/app.css'])
+        <style>
+            .welcome-background {
+                background-color: #0c1a32;
+                background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cg fill-rule='evenodd'%3E%3Cg fill='%231e293b' fill-opacity='0.4'%3E%3Cpath opacity='.5' d='M96 95h4v1h-4v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9zm-1 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            }
+        </style>
+    </head>
+    <body class="antialiased">
+        <div class="relative sm:flex sm:justify-center sm:items-center min-h-screen welcome-background selection:bg-emerald-500 selection:text-white">
+            @if (Route::has('login'))
+                <div class="sm:fixed sm:top-0 sm:right-0 p-6 text-right z-10">
+                    @auth
+                        <a href="{{ url('/dashboard') }}" class="font-semibold text-gray-300 hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-emerald-500">Dashboard</a>
+                    @else
+                        <a href="{{ route('login') }}" class="font-semibold text-gray-300 hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-emerald-500">Log in</a>
+                    @endauth
+                </div>
+            @endif
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+            <div class="max-w-7xl mx-auto p-6 lg:p-8">
+                <div class="flex justify-center">
+                    <h1 class="text-5xl font-bold text-white">Pesantren Nurul Amin</h1>
+                </div>
 
-    {{-- Menggunakan font Google Fonts (Poppins) --}}
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+                <div class="mt-8 text-center">
+                    <p class="mt-4 text-lg text-gray-400">Sistem Informasi Manajemen Santri, Perizinan, dan Keuangan</p>
+                </div>
 
-    {{-- <link href="{{ asset('css/style.css') }}" rel="stylesheet"> --}} {{-- Aktifkan jika Anda punya style global kustom --}}
-
-    <style>
-        body {
-            font-family: 'Poppins', sans-serif; /* Menggunakan Poppins */
-            background-color: #f8f9fa; /* Warna latar yang lebih lembut */
-            color: #333;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            margin: 0;
-        }
-        .welcome-hero {
-            background-color: #004d40; /* Warna hijau tua yang lebih elegan */
-            color: white;
-            padding: 4rem 2rem; /* Padding lebih besar */
-            text-align: center;
-            border-bottom-left-radius: 0; /* Menghilangkan radius agar lebih modern */
-            border-bottom-right-radius: 0;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
-        .welcome-hero .logo-placeholder {
-            max-height: 80px; /* Sesuaikan jika ada logo */
-            margin-bottom: 1.5rem;
-        }
-        .welcome-hero h1 {
-            font-weight: 700;
-            font-size: 2.75rem; /* Sedikit disesuaikan */
-            margin-bottom: 0.75rem;
-        }
-        .welcome-hero p.subtitle {
-            font-size: 1.25rem; /* Sedikit lebih besar */
-            opacity: 0.9;
-            font-weight: 300;
-            max-width: 700px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-        .main-content-wrapper {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 3rem 1rem; /* Padding untuk konten utama */
-        }
-        .main-content {
-            background-color: #fff;
-            padding: 2.5rem;
-            border-radius: 8px;
-            box-shadow: 0 6px 18px rgba(0,0,0,0.1);
-            max-width: 600px; /* Batasi lebar konten agar lebih fokus */
-            width: 100%;
-        }
-        .main-content p.lead {
-            font-size: 1.1rem;
-            color: #555;
-            line-height: 1.7;
-        }
-        .action-buttons .btn-login {
-            font-size: 1.15rem; /* Ukuran font tombol login */
-            padding: 0.8rem 2.5rem; /* Padding tombol login */
-            background-color: #00796b; /* Warna hijau tombol yang konsisten */
-            border-color: #00796b;
-            font-weight: 600;
-            transition: background-color 0.3s ease, border-color 0.3s ease;
-        }
-        .action-buttons .btn-login:hover {
-            background-color: #00695c;
-            border-color: #00695c;
-        }
-        .action-buttons .btn-login i {
-            margin-right: 8px; /* Jarak ikon dari teks */
-        }
-        .welcome-footer {
-            padding: 2rem 0;
-            font-size: 0.9rem;
-            color: #777;
-            background-color: #e9ecef; /* Latar footer yang sedikit berbeda */
-            border-top: 1px solid #dee2e6;
-        }
-        /* Untuk membuat footer tetap di bawah jika konten sedikit */
-        html {
-            height: 100%;
-        }
-    </style>
-</head>
-<body>
-    <header class="welcome-hero">
-        {{-- Jika ada logo, tempatkan di sini --}}
-        {{-- <img src="{{ asset('images/logo_pesantren.png') }}" alt="Logo Pesantren" class="logo-placeholder"> --}}
-        <h1>Sistem Manajemen Pesantren Nurul Amin</h1>
-        <p class="subtitle">Efisiensi Administrasi dan Pelayanan untuk Kemajuan Bersama.</p>
-    </header>
-
-    <div class="main-content-wrapper">
-        <main class="main-content text-center">
-            <p class="lead mb-5">
-                Akses sistem untuk mengelola data santri, perizinan, tagihan, dan berbagai administrasi pesantren lainnya dengan lebih mudah dan terstruktur.
-            </p>
-            <div class="action-buttons">
-                @if (Route::has('login'))
-                    <a href="{{ route('login') }}" class="btn btn-success btn-lg shadow-sm btn-login">
-                        <i class="bi bi-box-arrow-in-right"></i> Login
+                <div class="mt-10 flex justify-center">
+                    <a href="{{ route('login') }}" class="rounded-md bg-emerald-600 px-10 py-4 text-center font-semibold text-white shadow-sm hover:bg-emerald-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600">
+                        Masuk ke Aplikasi
                     </a>
-                @endif
-                {{--
-                @if (Route::has('register'))
-                    <a href="{{ route('register') }}" class="btn btn-outline-success btn-lg shadow-sm">
-                        <i class="bi bi-person-plus-fill"></i> Register
-                    </a>
-                @endif
-                --}}
+                </div>
             </div>
-        </main>
-    </div>
-
-    <footer class="welcome-footer text-center">
-        &copy; {{ date('Y') }} Pondok Pesantren Nurul Amin. Sumberejo, Besuki, Situbondo.
-    </footer>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-</body>
+        </div>
+    </body>
 </html>

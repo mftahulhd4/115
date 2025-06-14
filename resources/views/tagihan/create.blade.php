@@ -1,306 +1,136 @@
-@extends('layouts.app')
+<x-app-layout>
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+            {{ __('Buat Tagihan Baru') }}
+        </h2>
+    </x-slot>
 
-@section('title', 'Formulir Tagihan Santri Baru')
-
-@push('styles')
-<style>
-    .autocomplete-suggestions {
-        border: 1px solid #ddd;
-        max-height: 150px;
-        overflow-y: auto;
-        position: absolute;
-        background-color: #fff;
-        z-index: 999; /* Pastikan z-index cukup tinggi */
-        width: calc(100% - 2px); /* Menyesuaikan lebar input */
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-    .autocomplete-suggestion {
-        padding: 8px 12px;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-    }
-    .autocomplete-suggestion:hover {
-        background-color: #e9ecef;
-    }
-    .autocomplete-suggestion img {
-        width: 35px;
-        height: 35px;
-        object-fit: cover;
-        margin-right: 10px;
-        border-radius: 50%;
-        border: 1px solid #eee;
-    }
-    .autocomplete-suggestion .santri-name {
-        font-weight: 500;
-    }
-    .autocomplete-suggestion .santri-details {
-        font-size: 0.85em;
-        color: #6c757d;
-        margin-left: auto;
-        padding-left: 10px;
-    }
-    .loading-indicator, .no-results-indicator {
-        padding: 8px 12px;
-        color: #6c757d;
-    }
-</style>
-@endpush
-
-@section('content')
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-10">
-            <div class="card shadow-sm">
-                <div class="card-header bg-success text-white">
-                    <h4 class="mb-0">Formulir Tagihan Santri</h4>
-                </div>
-                <div class="card-body">
-                    @if ($errors->any())
-                        <div class="alert alert-danger">
-                            <h5 class="alert-heading">Oops! Ada kesalahan:</h5>
-                            <ul class="mb-0">
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endif
-
-                    <form action="{{ route('tagihan.store') }}" method="POST">
+    <div class="py-12">
+        <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
+            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                {{-- Data URL dilempar langsung ke Alpine.js saat inisialisasi --}}
+                <div class="p-6 text-gray-900 dark:text-gray-100" x-data="tagihanForm('{{ route('tagihan.searchSantri') }}')">
+                    <form action="{{ route('tagihan.store') }}" method="POST" class="space-y-6">
                         @csrf
+                        <input type="hidden" name="santri_id" x-model="santri.id">
 
-                        <fieldset class="mb-4 p-3 border rounded">
-                            <legend class="w-auto px-2 h6">Data Santri</legend>
-                            <div class="mb-3 position-relative">
-                                <label for="search_santri_nama" class="form-label">Cari Nama Santri <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control @error('santri_id') is-invalid @enderror" id="search_santri_nama" placeholder="Ketik nama santri (min. 2 karakter)..." autocomplete="off" value="{{ old('temp_santri_nama_display') }}">
-                                <div id="santri_suggestions" class="autocomplete-suggestions" style="display: none;"></div>
-                                <input type="hidden" name="santri_id" id="santri_id" value="{{ old('santri_id') }}" required>
-                                @error('santri_id')
-                                    <div class="text-danger mt-1" style="font-size: 0.875em;">{{ $message }}</div>
-                                @enderror
+                        {{-- Bagian Pencarian Santri --}}
+                        <div>
+                            <label for="search_santri" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Cari Nama Santri</label>
+                            <div class="relative">
+                                <input type="text" id="search_santri" x-model="searchTerm" @input.debounce.300ms="search()" @focus="showResults = true" autocomplete="off" class="mt-1 block w-full form-input rounded-md shadow-sm dark:bg-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-600 focus:border-indigo-500 focus:ring-indigo-500" placeholder="Ketik nama santri (min 2 huruf)...">
+                                <div x-show="showResults" @click.away="showResults = false" class="absolute z-10 w-full bg-white dark:bg-gray-700 rounded-md shadow-lg mt-1 border dark:border-gray-600" x-cloak>
+                                    <div x-show="isLoading" class="p-3 text-gray-500">Mencari...</div>
+                                    <ul x-show="!isLoading">
+                                        <template x-if="searchResults.length > 0">
+                                            <template x-for="result in searchResults" :key="result.id">
+                                                <li @click="selectSantri(result)" class="flex items-center p-3 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600">
+                                                    <img :src="result.foto ? `/storage/${result.foto}` : `/images/default-avatar.png`" alt="Foto" class="h-10 w-10 rounded-full object-cover mr-4">
+                                                    <span class="font-medium text-gray-800 dark:text-gray-200" x-text="result.nama_lengkap"></span>
+                                                </li>
+                                            </template>
+                                        </template>
+                                        <template x-if="searchResults.length === 0 && searchTerm.length > 1">
+                                            <li class="p-3 text-gray-500">Santri tidak ditemukan.</li>
+                                        </template>
+                                    </ul>
+                                </div>
                             </div>
+                            @error('santri_id') <span class="text-red-500 text-sm mt-1">Anda harus memilih santri dari hasil pencarian.</span> @enderror
+                        </div>
 
-                            <div class="row">
-                                <div class="col-md-3 text-center mb-3">
-                                    <img id="santri_foto_preview" src="{{ old('temp_santri_foto_path', asset('images/default_avatar.png')) }}" alt="Foto Santri" class="img-thumbnail" style="width: 120px; height: 120px; object-fit: cover;">
-                                </div>
-                                <div class="col-md-9">
-                                    <div class="mb-2 row"><label class="col-sm-4 col-form-label">Nama Lengkap:</label><div class="col-sm-8"><input type="text" readonly class="form-control-plaintext" id="santri_nama_display" value="{{ old('temp_santri_nama_display', '-') }}"></div></div>
-                                    <div class="mb-2 row"><label class="col-sm-4 col-form-label">Tanggal Lahir:</label><div class="col-sm-8"><input type="text" readonly class="form-control-plaintext" id="santri_tanggal_lahir" value="{{ old('temp_santri_tanggal_lahir', '-') }}"></div></div>
-                                    <div class="mb-2 row"><label class="col-sm-4 col-form-label">Jenis Kelamin:</label><div class="col-sm-8"><input type="text" readonly class="form-control-plaintext" id="santri_jenis_kelamin" value="{{ old('temp_santri_jenis_kelamin', '-') }}"></div></div>
-                                    <div class="mb-2 row"><label class="col-sm-4 col-form-label">Pendidikan:</label><div class="col-sm-8"><input type="text" readonly class="form-control-plaintext" id="santri_pendidikan" value="{{ old('temp_santri_pendidikan', '-') }}"></div></div>
-                                    <div class="mb-2 row"><label class="col-sm-4 col-form-label">Kamar:</label><div class="col-sm-8"><input type="text" readonly class="form-control-plaintext" id="santri_kamar" value="{{ old('temp_santri_kamar', '-') }}"></div></div>
-                                </div>
+                        {{-- Panel Detail Santri --}}
+                        <div class="p-4 border border-gray-200 dark:border-gray-700 rounded-lg space-y-4">
+                            <h3 class="font-semibold text-lg">Detail Santri Terpilih</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div><p class="text-sm text-gray-500 dark:text-gray-400">Nama Lengkap</p><p class="mt-1 font-semibold" x-text="santri.nama_lengkap"></p></div>
+                                <div><p class="text-sm text-gray-500 dark:text-gray-400">Jenis Kelamin</p><p class="mt-1 font-semibold" x-text="santri.jenis_kelamin"></p></div>
+                                <div><p class="text-sm text-gray-500 dark:text-gray-400">Tempat, Tanggal Lahir</p><p class="mt-1 font-semibold" x-text="santri.ttl"></p></div>
+                                <div><p class="text-sm text-gray-500 dark:text-gray-400">Alamat</p><p class="mt-1 font-semibold" x-text="santri.alamat"></p></div>
+                                <div class="md:col-span-2"><p class="text-sm text-gray-500 dark:text-gray-400">Pendidikan</p><p class="mt-1 font-semibold" x-text="santri.pendidikan"></p></div>
                             </div>
-                            <input type="hidden" id="temp_santri_foto_path" name="temp_santri_foto_path" value="{{ old('temp_santri_foto_path') }}">
-                            <input type="hidden" name="temp_santri_nama_display" id="hidden_santri_nama_display" value="{{ old('temp_santri_nama_display') }}">
-                            <input type="hidden" name="temp_santri_tanggal_lahir" id="hidden_santri_tanggal_lahir" value="{{ old('temp_santri_tanggal_lahir') }}">
-                            <input type="hidden" name="temp_santri_jenis_kelamin" id="hidden_santri_jenis_kelamin" value="{{ old('temp_santri_jenis_kelamin') }}">
-                            <input type="hidden" name="temp_santri_pendidikan" id="hidden_santri_pendidikan" value="{{ old('temp_santri_pendidikan') }}">
-                            <input type="hidden" name="temp_santri_kamar" id="hidden_santri_kamar" value="{{ old('temp_santri_kamar') }}">
-                        </fieldset>
+                        </div>
+                        <hr class="dark:border-gray-700">
 
-                        <fieldset class="mb-3 p-3 border rounded">
-                            <legend class="w-auto px-2 h6">Detail Tagihan</legend>
-                            <div class="mb-3">
-                                <label for="jenis_tagihan" class="form-label">Jenis Tagihan <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control @error('jenis_tagihan') is-invalid @enderror" id="jenis_tagihan" name="jenis_tagihan" value="{{ old('jenis_tagihan') }}" placeholder="Contoh: SPP Bulan ..., Uang Buku, dll." required>
-                                @error('jenis_tagihan') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                        {{-- Input Spesifik Tagihan --}}
+                        <div class="space-y-6" x-data="{ status: '{{ old('status', 'Belum Lunas') }}' }">
+                            <div>
+                                <label for="jenis_tagihan" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Jenis Tagihan</label>
+                                <input type="text" name="jenis_tagihan" id="jenis_tagihan" value="{{ old('jenis_tagihan') }}" required class="mt-1 block w-full form-input rounded-md shadow-sm dark:bg-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-600 focus:border-indigo-500 focus:ring-indigo-500">
                             </div>
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="nominal_tagihan" class="form-label">Nominal Tagihan (Rp) <span class="text-danger">*</span></label>
-                                    <input type="number" class="form-control @error('nominal_tagihan') is-invalid @enderror" id="nominal_tagihan" name="nominal_tagihan" value="{{ old('nominal_tagihan') }}" placeholder="Contoh: 150000" step="any" required>
-                                    @error('nominal_tagihan') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                            <div>
+                                <label for="nominal" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nominal (Rp)</label>
+                                <input type="number" name="nominal" id="nominal" value="{{ old('nominal') }}" required class="mt-1 block w-full form-input rounded-md shadow-sm dark:bg-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-600 focus:border-indigo-500 focus:ring-indigo-500">
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label for="tanggal_tagihan" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tanggal Tagihan</label>
+                                    <input type="date" name="tanggal_tagihan" id="tanggal_tagihan" value="{{ old('tanggal_tagihan') }}" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 focus:border-indigo-500 focus:ring-indigo-500" style="color-scheme: dark;">
                                 </div>
-                                <div class="col-md-6 mb-3">
-                                    <label for="status_tagihan" class="form-label">Status Tagihan <span class="text-danger">*</span></label>
-                                    <select class="form-select @error('status_tagihan') is-invalid @enderror" id="status_tagihan" name="status_tagihan" required>
-                                        <option value="Belum Lunas" {{ old('status_tagihan', 'Belum Lunas') == 'Belum Lunas' ? 'selected' : '' }}>Belum Lunas</option>
-                                        <option value="Lunas" {{ old('status_tagihan') == 'Lunas' ? 'selected' : '' }}>Lunas</option>
-                                    </select>
-                                    @error('status_tagihan') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                                <div>
+                                    <label for="tanggal_jatuh_tempo" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tanggal Jatuh Tempo</label>
+                                    <input type="date" name="tanggal_jatuh_tempo" id="tanggal_jatuh_tempo" value="{{ old('tanggal_jatuh_tempo') }}" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 focus:border-indigo-500 focus:ring-indigo-500" style="color-scheme: dark;">
                                 </div>
                             </div>
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="tanggal_tagihan" class="form-label">Tanggal Tagihan <span class="text-danger">*</span></label>
-                                    <input type="date" class="form-control @error('tanggal_tagihan') is-invalid @enderror" id="tanggal_tagihan" name="tanggal_tagihan" value="{{ old('tanggal_tagihan', date('Y-m-d')) }}" required>
-                                    @error('tanggal_tagihan') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label for="tanggal_jatuh_tempo" class="form-label">Tanggal Jatuh Tempo</label>
-                                    <input type="date" class="form-control @error('tanggal_jatuh_tempo') is-invalid @enderror" id="tanggal_jatuh_tempo" name="tanggal_jatuh_tempo" value="{{ old('tanggal_jatuh_tempo') }}">
-                                    @error('tanggal_jatuh_tempo') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                                </div>
+                            <div>
+                                <label for="status" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Status Awal Tagihan</label>
+                                <select name="status" id="status" x-model="status" class="mt-1 block w-full form-select rounded-md shadow-sm dark:bg-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-600 focus:border-indigo-500 focus:ring-indigo-500">
+                                    <option value="Belum Lunas">Belum Lunas</option>
+                                    <option value="Lunas">Lunas</option>
+                                    <option value="Jatuh Tempo">Jatuh Tempo</option>
+                                </select>
                             </div>
-                            <div id="pelunasan_fields" style="display: {{ old('status_tagihan') == 'Lunas' ? 'block' : 'none' }};">
-                                <div class="mb-3">
-                                    <label for="tanggal_pelunasan" class="form-label">Tanggal Pelunasan</label>
-                                    <input type="date" class="form-control @error('tanggal_pelunasan') is-invalid @enderror" id="tanggal_pelunasan" name="tanggal_pelunasan" value="{{ old('tanggal_pelunasan') }}">
-                                    <div class="form-text">Diisi jika tagihan sudah lunas. Jika status "Lunas" dipilih, tanggal ini wajib diisi.</div>
-                                    @error('tanggal_pelunasan') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                                </div>
+                            <div x-show="status === 'Lunas'" x-transition>
+                                <label for="tanggal_pelunasan" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tanggal Pelunasan (Isi jika status Lunas)</label>
+                                <input type="date" name="tanggal_pelunasan" id="tanggal_pelunasan" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200" style="color-scheme: dark;">
                             </div>
-                            <div class="mb-3">
-                                <label for="keterangan" class="form-label">Keterangan Tambahan</label>
-                                <textarea class="form-control @error('keterangan') is-invalid @enderror" id="keterangan" name="keterangan" rows="2">{{ old('keterangan') }}</textarea>
-                                @error('keterangan') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                             <div>
+                                <label for="keterangan_tambahan" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Keterangan Tambahan (Opsional)</label>
+                                <textarea name="keterangan_tambahan" id="keterangan_tambahan" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 focus:border-indigo-500 focus:ring-indigo-500">{{ old('keterangan_tambahan') }}</textarea>
                             </div>
-                        </fieldset>
+                        </div>
 
-                        <div class="d-flex justify-content-end mt-4">
-                            <a href="{{ route('tagihan.index') }}" class="btn btn-outline-secondary me-2"><i class="bi bi-x-circle"></i> Batal</a>
-                            <button type="submit" class="btn btn-success"><i class="bi bi-save-fill"></i> Simpan Tagihan</button>
+                        <div class="flex items-center justify-end space-x-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                            <a href="{{ route('tagihan.index') }}" class="inline-flex items-center px-4 py-2 bg-gray-300 dark:bg-gray-600 border border-transparent rounded-md font-semibold text-xs text-gray-800 dark:text-gray-200 uppercase tracking-widest hover:bg-gray-400 dark:hover:bg-gray-500">Batal</a>
+                            <button type="submit" class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700" :disabled="!santri.id">Simpan</button>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
     </div>
-</div>
-@endsection
+</x-app-layout>
 
-@push('scripts')
+@verbatim
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    const statusTagihanSelect = document.getElementById('status_tagihan');
-    const pelunasanFieldsDiv = document.getElementById('pelunasan_fields');
-    const tanggalPelunasanInput = document.getElementById('tanggal_pelunasan');
-
-    function togglePelunasanField() {
-        if (!statusTagihanSelect || !pelunasanFieldsDiv || !tanggalPelunasanInput) return;
-        const selectedStatus = statusTagihanSelect.value;
-        if (selectedStatus === 'Lunas') {
-            pelunasanFieldsDiv.style.display = 'block';
-        } else {
-            pelunasanFieldsDiv.style.display = 'none';
-        }
-    }
-    if (statusTagihanSelect) {
-        statusTagihanSelect.addEventListener('change', togglePelunasanField);
-        togglePelunasanField();
-    }
-
-    const searchInput = document.getElementById('search_santri_nama');
-    const suggestionsDiv = document.getElementById('santri_suggestions');
-    const santriIdInput = document.getElementById('santri_id');
-    const santriFotoPreview = document.getElementById('santri_foto_preview');
-    const santriNamaDisplay = document.getElementById('santri_nama_display');
-    const santriTanggalLahir = document.getElementById('santri_tanggal_lahir');
-    const santriJenisKelamin = document.getElementById('santri_jenis_kelamin');
-    const santriPendidikan = document.getElementById('santri_pendidikan');
-    const santriKamar = document.getElementById('santri_kamar');
-    const defaultAvatar = "{{ asset('images/default_avatar.png') }}";
-    const hiddenSantriFotoPath = document.getElementById('temp_santri_foto_path');
-    const hiddenSantriNamaDisplay = document.getElementById('hidden_santri_nama_display');
-    const hiddenSantriTanggalLahir = document.getElementById('hidden_santri_tanggal_lahir');
-    const hiddenSantriJenisKelamin = document.getElementById('hidden_santri_jenis_kelamin');
-    const hiddenSantriPendidikan = document.getElementById('hidden_santri_pendidikan');
-    const hiddenSantriKamar = document.getElementById('hidden_santri_kamar');
-    let searchTimeout;
-    const debounceTime = 300; // Perkecil debounce agar lebih responsif
-
-    function selectSantri(santri) {
-        searchInput.value = santri.nama_lengkap;
-        santriIdInput.value = santri.id;
-        const fotoPath = santri.foto ? `{{ asset('storage') }}/${santri.foto}` : defaultAvatar;
-        santriFotoPreview.src = fotoPath;
-        santriNamaDisplay.value = santri.nama_lengkap;
-        let tglLahirFormatted = '-';
-        if (santri.tanggal_lahir) {
-            try {
-                tglLahirFormatted = new Date(santri.tanggal_lahir).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
-            } catch (e) {
-                tglLahirFormatted = santri.tanggal_lahir;
+    function tagihanForm(searchUrl) {
+        return {
+            searchTerm: '',
+            searchResults: [],
+            showResults: false,
+            isLoading: false,
+            santri: { id: null, nama_lengkap: '-', jenis_kelamin: '-', ttl: '-', alamat: '-', pendidikan: '-' },
+            search() {
+                if (this.searchTerm.length < 2) { this.searchResults = []; return; }
+                this.isLoading = true; this.showResults = true;
+                fetch(`${searchUrl}?term=${this.searchTerm}`)
+                    .then(response => response.json())
+                    .then(data => { this.searchResults = data; })
+                    .catch(error => { console.error('Error:', error); this.searchResults = []; })
+                    .finally(() => { this.isLoading = false; });
+            },
+            selectSantri(result) {
+                let tglLahirFormatted = result.tanggal_lahir ? new Date(result.tanggal_lahir).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }) : '';
+                this.santri.id = result.id || null;
+                this.santri.nama_lengkap = result.nama_lengkap || '-';
+                this.santri.jenis_kelamin = result.jenis_kelamin || '-';
+                this.santri.ttl = result.tempat_lahir ? `${result.tempat_lahir}, ${tglLahirFormatted}` : tglLahirFormatted;
+                this.santri.alamat = result.alamat || '-';
+                this.santri.pendidikan = result.pendidikan || '-';
+                this.searchTerm = result.nama_lengkap;
+                this.showResults = false;
             }
         }
-        santriTanggalLahir.value = tglLahirFormatted;
-        santriJenisKelamin.value = santri.jenis_kelamin || '-';
-        santriPendidikan.value = santri.pendidikan_terakhir || '-';
-        santriKamar.value = santri.kamar || '-';
-        if (hiddenSantriFotoPath) hiddenSantriFotoPath.value = fotoPath;
-        if (hiddenSantriNamaDisplay) hiddenSantriNamaDisplay.value = santri.nama_lengkap;
-        if (hiddenSantriTanggalLahir) hiddenSantriTanggalLahir.value = tglLahirFormatted;
-        if (hiddenSantriJenisKelamin) hiddenSantriJenisKelamin.value = santri.jenis_kelamin || '-';
-        if (hiddenSantriPendidikan) hiddenSantriPendidikan.value = santri.pendidikan_terakhir || '-';
-        if (hiddenSantriKamar) hiddenSantriKamar.value = santri.kamar || '-';
-        suggestionsDiv.innerHTML = '';
-        suggestionsDiv.style.display = 'none';
     }
-
-    const oldSantriId = "{{ old('santri_id') }}";
-    const oldSantriNama = "{{ old('temp_santri_nama_display') }}";
-    if (oldSantriId && oldSantriNama) {
-        searchInput.value = oldSantriNama;
-        santriIdInput.value = oldSantriId;
-        santriFotoPreview.src = "{{ old('temp_santri_foto_path', asset('images/default_avatar.png')) }}";
-        santriNamaDisplay.value = oldSantriNama;
-        santriTanggalLahir.value = "{{ old('temp_santri_tanggal_lahir', '-') }}";
-        santriJenisKelamin.value = "{{ old('temp_santri_jenis_kelamin', '-') }}";
-        santriPendidikan.value = "{{ old('temp_santri_pendidikan', '-') }}";
-        santriKamar.value = "{{ old('temp_santri_kamar', '-') }}";
-    }
-
-    if (searchInput) {
-        searchInput.addEventListener('keyup', function (e) {
-            const query = searchInput.value.trim();
-            clearTimeout(searchTimeout);
-            if (query.length < 2) {
-                suggestionsDiv.innerHTML = '';
-                suggestionsDiv.style.display = 'none';
-                return;
-            }
-            suggestionsDiv.innerHTML = '<div class="loading-indicator">Mencari...</div>';
-            suggestionsDiv.style.display = 'block';
-            searchTimeout = setTimeout(() => {
-                fetch(`{{ route('tagihan.searchSantri') }}?q=${encodeURIComponent(query)}`)
-                    .then(response => {
-                        if (!response.ok) { return response.json().then(err => { throw err; }); }
-                        return response.json();
-                    })
-                    .then(data => {
-                        suggestionsDiv.innerHTML = '';
-                        if (data.error) {
-                             suggestionsDiv.innerHTML = `<div class="no-results-indicator text-danger">Error: ${data.error}</div>`;
-                        } else if (data.length > 0) {
-                            data.forEach(santri => {
-                                const suggestionItem = document.createElement('div');
-                                suggestionItem.classList.add('autocomplete-suggestion');
-                                let imgHtml = `<img src="${defaultAvatar}" alt="foto"> `;
-                                if (santri.foto) {
-                                    imgHtml = `<img src="{{ asset('storage') }}/${santri.foto}" alt="${santri.nama_lengkap}"> `;
-                                }
-                                suggestionItem.innerHTML = `
-                                    ${imgHtml}
-                                    <span class="santri-name">${santri.nama_lengkap}</span>
-                                    <span class="santri-details">${santri.kamar ? 'Kmr: ' + santri.kamar : ''}</span>`;
-                                suggestionItem.addEventListener('click', function () { selectSantri(santri); });
-                                suggestionsDiv.appendChild(suggestionItem);
-                            });
-                        } else {
-                            suggestionsDiv.innerHTML = '<div class="no-results-indicator">Santri tidak ditemukan.</div>';
-                        }
-                        suggestionsDiv.style.display = 'block';
-                    })
-                    .catch(error => {
-                        console.error('Error fetching santri:', error);
-                        suggestionsDiv.innerHTML = `<div class="no-results-indicator text-danger">Gagal memuat data. ${error.message || ''}</div>`;
-                        suggestionsDiv.style.display = 'block';
-                    });
-            }, debounceTime);
-        });
-    }
-
-    if (suggestionsDiv) {
-        document.addEventListener('click', function (e) {
-            if (e.target !== searchInput && !suggestionsDiv.contains(e.target)) {
-                suggestionsDiv.style.display = 'none';
-            }
-        });
-    }
-});
 </script>
-@endpush
+@endverbatim

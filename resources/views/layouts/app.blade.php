@@ -1,113 +1,74 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>@yield('title', 'Sistem Manajemen Pesantren')</title>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full bg-gray-100 dark:bg-gray-900">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    {{-- Bootstrap CSS --}}
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    {{-- Bootstrap Icons --}}
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+        <title>{{ config('app.name', 'Laravel') }}</title>
 
-    {{-- Jika Anda menggunakan Vite untuk aset utama (app.css, app.js) --}}
-    {{-- @vite(['resources/css/app.css', 'resources/js/app.js']) --}}
+        <link rel="preconnect" href="https://fonts.bunny.net">
+        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+        
+        <link rel="stylesheet" href="{{ asset('css/print.css') }}" media="print">
 
-    {{-- CSS Global Kustom Anda --}}
-    <link href="{{ asset('css/style.css') }}" rel="stylesheet">
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
+    </head>
+    <body class="font-sans antialiased h-full">
+        
+        <div x-data="{ sidebarOpen: false }" class="h-full flex">
+            
+            @include('layouts.sidebar')
 
-    @stack('styles') {{-- Untuk style tambahan per halaman --}}
-</head>
-<body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-success shadow-sm">
-        <div class="container">
-            <a class="navbar-brand" href="{{ Auth::check() ? route('dashboard') : url('/') }}">
-                Manajemen Pesantren
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    @auth {{-- Pastikan pengguna sudah login untuk menampilkan menu ini --}}
-                        <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}" href="{{ route('dashboard') }}">
-                                <i class="bi bi-house-door-fill"></i> Dashboard
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {{ request()->is('santri*') ? 'active' : '' }}" href="{{ route('santri.index') }}">Manajemen Santri</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {{ request()->is('perizinan*') ? 'active' : '' }}" href="{{ route('perizinan.index') }}">Perizinan</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {{ request()->is('tagihan*') ? 'active' : '' }}" href="{{ route('tagihan.index') }}">Tagihan</a>
-                        </li>
-                        @can('manage-users') {{-- Menggunakan Gate 'manage-users' --}}
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle {{ request()->is('users*') || request()->routeIs('users.*') ? 'active' : '' }}" href="#" id="navbarDropdownManajemenPengguna" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Manajemen Pengguna
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="navbarDropdownManajemenPengguna">
-                                <li><a class="dropdown-item {{ request()->routeIs('users.index') ? 'active' : '' }}" href="{{ route('users.index') }}">Daftar Pengguna</a></li>
-                                <li><a class="dropdown-item {{ request()->routeIs('users.create') ? 'active' : '' }}" href="{{ route('users.create') }}">Tambah Pengguna Baru</a></li> {{-- INI LINK YANG SEHARUSNYA MUNCUL --}}
-                            </ul>
-                        </li>
-                        @endcan
-                    @endauth
-                </ul>
-                <ul class="navbar-nav ms-auto">
-                    @guest
-                        @if (Route::has('login'))
-                            <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('login') ? 'active' : '' }}" href="{{ route('login') }}">{{ __('Login') }}</a>
-                            </li>
-                        @endif
-                        {{-- Jika Anda ingin mengaktifkan registrasi publik lagi, uncomment ini
-                        @if (Route::has('register'))
-                            <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('register') ? 'active' : '' }}" href="{{ route('register') }}">{{ __('Register') }}</a>
-                            </li>
-                        @endif
-                        --}}
-                    @else
-                        <li class="nav-item dropdown">
-                            <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <i class="bi bi-person-circle"></i> {{ Auth::user()->name }}
-                            </a>
-                            <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                                <a class="dropdown-item" href="{{ route('profile.edit') }}">
-                                    <i class="bi bi-person-lines-fill"></i> {{ __('Profile') }}
-                                </a>
-                                <hr class="dropdown-divider">
-                                <a class="dropdown-item" href="{{ route('logout') }}"
-                                   onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                                    <i class="bi bi-box-arrow-right"></i> {{ __('Log Out') }}
-                                </a>
-                                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-                                    @csrf
-                                </form>
+            <div class="flex-1 flex flex-col lg:ml-64">
+                
+                <header class="bg-white dark:bg-gray-800 shadow sticky top-0 z-20 no-print">
+                    <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <button @click="sidebarOpen = !sidebarOpen" class="lg:hidden text-gray-500 dark:text-gray-400 focus:outline-none mr-4">
+                                    <i class="fas fa-bars fa-lg"></i>
+                                </button>
+                                @if (isset($header))
+                                    <div>
+                                        {{ $header }}
+                                    </div>
+                                @endif
                             </div>
-                        </li>
-                    @endguest
-                </ul>
+                            <div class="hidden sm:flex sm:items-center sm:ml-6">
+                                <x-dropdown align="right" width="48">
+                                    <x-slot name="trigger">
+                                        <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none transition ease-in-out duration-150">
+                                            <div>{{ Auth::user()->name }}</div>
+                                            <div class="ml-1">
+                                                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                                </svg>
+                                            </div>
+                                        </button>
+                                    </x-slot>
+                                    <x-slot name="content">
+                                        <x-dropdown-link :href="route('profile.edit')">{{ __('Profile') }}</x-dropdown-link>
+                                        <form method="POST" action="{{ route('logout') }}">
+                                            @csrf
+                                            <x-dropdown-link :href="route('logout')" onclick="event.preventDefault(); this.closest('form').submit();">{{ __('Log Out') }}</x-dropdown-link>
+                                        </form>
+                                    </x-slot>
+                                </x-dropdown>
+                            </div>
+                        </div>
+                    </div>
+                </header>
+
+                <main class="flex-1 p-4 sm:p-6 lg:p-8">
+                    {{ $slot }}
+                </main>
             </div>
         </div>
-    </nav>
+        
+        {{-- "WADAH" UNTUK SCRIPT DARI HALAMAN LAIN --}}
+        @stack('scripts')
 
-    <main class="py-4">
-        @yield('content')
-    </main>
-
-    <footer class="bg-light text-center text-lg-start mt-auto py-3">
-        <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.05);">
-            © {{ date('Y') }} Sistem Manajemen Pesantren Nurul Amin
-        </div>
-    </footer>
-
-    {{-- Bootstrap JS --}}
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-    @stack('scripts') {{-- Untuk skrip tambahan per halaman --}}
-</body>
+    </body>
 </html>

@@ -4,43 +4,37 @@ namespace App\Http\Controllers;
 
 use App\Models\Santri;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Validation\Rule;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
-use PDF; // <--- PASTIKAN BARIS INI ADA DAN BENAR (INI YANG PALING PENTING UNTUK ERROR PDF)
-use Illuminate\Contracts\View\View; // Untuk return type view()
-use Illuminate\Http\Response; // Untuk return type PDF stream/download
-use Illuminate\Http\RedirectResponse; // Untuk return type redirect()
 
 class SantriController extends Controller
 {
     /**
      * Display a listing of the resource.
+     * Ini adalah method yang hilang sebelumnya.
      */
-    public function index(Request $request): View // Mengubah return type ke View
+    public function index(Request $request)
     {
-        $searchKeyword = $request->input('search');
-        $query = Santri::query();
+        $query = Santri::latest();
 
-        if ($searchKeyword) {
-            $query->where(function($q) use ($searchKeyword) {
-                $q->where('nama_lengkap', 'like', "%{$searchKeyword}%")
-                  ->orWhere('kamar', 'like', "%{$searchKeyword}%")
-                  ->orWhere('pendidikan_terakhir', 'like', "%{$searchKeyword}%")
-                  ->orWhere('status_santri', 'like', "%{$searchKeyword}%")
-                  ->orWhere('tahun_masuk', 'like', "%{$searchKeyword}%")
-                  ->orWhere('tahun_keluar', 'like', "%{$searchKeyword}%");
-            });
+        if ($request->filled('search')) {
+            $query->where('nama_lengkap', 'like', '%' . $request->search . '%');
         }
-        $santris = $query->orderBy('nama_lengkap', 'asc')->paginate(10)->withQueryString();
+
+        if ($request->filled('status_santri')) {
+            $query->where('status_santri', $request->status_santri);
+        }
+
+        $santris = $query->paginate(10)->withQueryString();
+
         return view('santri.index', compact('santris'));
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create(): View // Mengubah return type ke View
+    public function create()
     {
         return view('santri.create');
     }
@@ -48,59 +42,35 @@ class SantriController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request): RedirectResponse // Mengubah return type ke RedirectResponse
+    public function store(Request $request)
     {
-        $validatedData = $request->validate([
+        $request->validate([
             'nama_lengkap' => 'required|string|max:255',
+            'jenis_kelamin' => 'required|in:Laki-laki,Perempuan',
+            'tempat_lahir' => 'required|string|max:255',
             'tanggal_lahir' => 'required|date',
             'alamat' => 'required|string',
-            'jenis_kelamin' => ['required', Rule::in(['Laki-laki', 'Perempuan'])],
-            'pendidikan_terakhir' => 'nullable|string|max:100',
-            'kamar' => 'nullable|string|max:50',
-            'tahun_masuk' => 'required|string|digits:4|numeric',
-            'tahun_keluar' => 'nullable|string|digits:4|numeric|gte:tahun_masuk',
             'nama_orang_tua' => 'required|string|max:255',
-            'nomor_telepon_orang_tua' => 'nullable|string|max:20',
-            'status_santri' => ['required', Rule::in(['Aktif', 'Alumni', 'Pengurus', 'Baru'])],
-            'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-        ],[
-            'tahun_keluar.gte' => 'Tahun keluar harus sama atau setelah tahun masuk.',
-            'foto.image' => 'File yang diunggah harus berupa gambar.',
-            'foto.mimes' => 'Format foto harus jpeg, png, jpg, gif, atau svg.',
-            'foto.max' => 'Ukuran foto maksimal adalah 2MB.',
+            'pendidikan' => 'required|string|max:255',
+            'nomer_orang_tua' => 'required|string|max:20',
+            'tahun_masuk' => 'required|digits:4|integer|min:1900',
+            'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'status_santri' => 'required|in:Aktif,Baru,Pengurus,Alumni',
         ]);
 
-        try {
-            $santri = new Santri();
-            $dataToSave = $request->except('foto');
-            $santri->fill($dataToSave);
-
-            if ($request->hasFile('foto') && $request->file('foto')->isValid()) {
-                try {
-                    $namaFileFoto = time() . '_' . $request->file('foto')->getClientOriginalName();
-                    $pathFoto = $request->file('foto')->storeAs('fotos_santri', $namaFileFoto, 'public');
-                    $santri->foto = $pathFoto;
-                    Log::info('Foto santri berhasil diunggah (store): ' . $pathFoto);
-                } catch (\Exception $fileException) {
-                    Log::error('Gagal mengunggah foto santri (store): ' . $fileException->getMessage(), ['exception' => $fileException]);
-                }
-            }
-
-            $santri->save();
-            return redirect()->route('santri.index')->with('success', 'Data santri baru berhasil ditambahkan!');
-        } catch (\Exception $e) {
-            Log::error('Gagal menyimpan data santri (store): ' . $e->getMessage(), ['exception' => $e]);
-            return redirect()->back()->withInput()->with('error', 'Terjadi kesalahan saat menyimpan data santri. Pesan: ' . $e->getMessage());
+        $data = $request->except('foto');
+        if ($request->hasFile('foto')) {
+            $data['foto'] = $request->file('foto')->store('santri-fotos', 'public');
         }
+
+        Santri::create($data);
+        return redirect()->route('santri.index')->with('success', 'Santri berhasil ditambahkan.');
     }
 
     /**
      * Display the specified resource.
-     *
-     * @param  \App\Models\Santri  $santri
-     * @return \Illuminate\Contracts\View\View
      */
-    public function show(Santri $santri): View // Mengubah return type ke View
+    public function show(Santri $santri)
     {
         return view('santri.show', compact('santri'));
     }
@@ -108,7 +78,7 @@ class SantriController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Santri $santri): View // Mengubah return type ke View
+    public function edit(Santri $santri)
     {
         return view('santri.edit', compact('santri'));
     }
@@ -116,105 +86,70 @@ class SantriController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Santri $santri): RedirectResponse // Mengubah return type ke RedirectResponse
+    public function update(Request $request, Santri $santri)
     {
-        $validatedData = $request->validate([
+        $request->validate([
             'nama_lengkap' => 'required|string|max:255',
+            'jenis_kelamin' => 'required|in:Laki-laki,Perempuan',
+            'tempat_lahir' => 'required|string|max:255',
             'tanggal_lahir' => 'required|date',
             'alamat' => 'required|string',
-            'jenis_kelamin' => ['required', Rule::in(['Laki-laki', 'Perempuan'])],
-            'pendidikan_terakhir' => 'nullable|string|max:100',
-            'kamar' => 'nullable|string|max:50',
-            'tahun_masuk' => 'required|string|digits:4|numeric',
-            'tahun_keluar' => 'nullable|string|digits:4|numeric|gte:tahun_masuk',
             'nama_orang_tua' => 'required|string|max:255',
-            'nomor_telepon_orang_tua' => 'nullable|string|max:20',
-            'status_santri' => ['required', Rule::in(['Aktif', 'Alumni', 'Pengurus', 'Baru'])],
-            'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-        ],[
-            'tahun_keluar.gte' => 'Tahun keluar harus sama atau setelah tahun masuk.',
-            'foto.image' => 'File yang diunggah harus berupa gambar.',
-            'foto.mimes' => 'Format foto harus jpeg, png, jpg, gif, atau svg.',
-            'foto.max' => 'Ukuran foto maksimal adalah 2MB.',
+            'pendidikan' => 'required|string|max:255',
+            'nomer_orang_tua' => 'required|string|max:20',
+            'tahun_masuk' => 'required|digits:4|integer|min:1900',
+            'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'status_santri' => 'required|in:Aktif,Baru,Pengurus,Alumni',
+            'tahun_keluar' => 'nullable|digits:4|integer|min:1900',
         ]);
 
-        try {
-            $dataToUpdate = $request->except('foto');
-            $santri->fill($dataToUpdate);
-
-            if ($request->hasFile('foto') && $request->file('foto')->isValid()) {
-                if ($santri->foto) {
-                    try {
-                        if (Storage::disk('public')->exists($santri->foto)) {
-                            Storage::disk('public')->delete($santri->foto);
-                            Log::info('Foto lama santri berhasil dihapus (update): ' . $santri->foto);
-                        }
-                    } catch (\Exception $deleteException) {
-                        Log::error('Gagal menghapus foto lama santri (update): ' . $deleteException->getMessage(), ['path' => $santri->foto, 'exception' => $deleteException]);
-                    }
-                }
-                try {
-                    $namaFileFoto = time() . '_' . $request->file('foto')->getClientOriginalName();
-                    $pathFoto = $request->file('foto')->storeAs('fotos_santri', $namaFileFoto, 'public');
-                    $santri->foto = $pathFoto;
-                    Log::info('Foto santri berhasil diperbarui dan diunggah (update): ' . $pathFoto);
-                } catch (\Exception $fileException) {
-                    Log::error('Gagal mengunggah foto baru santri (update): ' . $fileException->getMessage(), ['exception' => $fileException]);
-                }
+        $data = $request->except('foto');
+        if ($request->hasFile('foto')) {
+            if ($santri->foto) {
+                Storage::disk('public')->delete($santri->foto);
             }
-
-            $santri->save();
-            return redirect()->route('santri.index')->with('success', 'Data santri berhasil diperbarui!');
-        } catch (\Exception $e) {
-            Log::error('Gagal mengupdate data santri (update): ' . $e->getMessage(), ['exception' => $e]);
-            return redirect()->back()->withInput()->with('error', 'Terjadi kesalahan saat memperbarui data santri. Pesan: ' . $e->getMessage());
+            $data['foto'] = $request->file('foto')->store('santri-fotos', 'public');
         }
+
+        $santri->update($data);
+        return redirect()->route('santri.index')->with('success', 'Data santri berhasil diperbarui.');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Santri $santri): RedirectResponse // Mengubah return type ke RedirectResponse
+    public function destroy(Santri $santri)
     {
-        try {
-            $namaSantri = $santri->nama_lengkap;
-            $fotoPath = $santri->foto;
-
-            $santri->delete();
-            Log::info('Data santri berhasil dihapus dari database: ' . $namaSantri);
-
-            if ($fotoPath) {
-                try {
-                    if (Storage::disk('public')->exists($fotoPath)) {
-                        Storage::disk('public')->delete($fotoPath);
-                        Log::info('Foto santri berhasil dihapus dari storage (destroy): ' . $fotoPath);
-                    }
-                } catch (\Exception $deleteException) {
-                    Log::error('Gagal menghapus foto santri dari storage (destroy): ' . $deleteException->getMessage(), ['path' => $fotoPath, 'exception' => $deleteException]);
-                }
-            }
-            return redirect()->route('santri.index')->with('success', 'Data santri "' . $namaSantri . '" berhasil dihapus!');
-        } catch (\Exception $e) {
-            Log::error('Gagal menghapus data santri (destroy): ' . $e->getMessage(), ['exception' => $e]);
-            return redirect()->route('santri.index')->with('error', 'Terjadi kesalahan saat menghapus data santri.');
+        if ($santri->foto) {
+            Storage::disk('public')->delete($santri->foto);
         }
+        $santri->delete();
+        return redirect()->route('santri.index')->with('success', 'Data santri berhasil dihapus.');
     }
 
     /**
-     * Generate PDF for the specified santri.
-     *
-     * @param  \App\Models\Santri  $santri
-     * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
+     * Generate PDF for all santri.
      */
-    public function printPDF(Santri $santri): Response|RedirectResponse // Mengubah return type agar sesuai
+    public function cetak_pdf()
     {
-        try {
-            $pdf = PDF::loadView('santri.pdf', compact('santri'));
-            $fileName = 'data_santri_' . Str::slug($santri->nama_lengkap, '_') . '_' . $santri->id . '.pdf';
-            return $pdf->stream($fileName);
-        } catch (\Exception $e) {
-            Log::error('Gagal generate PDF santri: ' . $e->getMessage(), ['santri_id' => $santri->id, 'exception' => $e]);
-            return redirect()->back()->with('error', 'Gagal membuat dokumen PDF. Pesan Error: ' . $e->getMessage());
-        }
+        $santris = Santri::all();
+        $pdf = PDF::loadView('santri.pdf', ['santris' => $santris]);
+        return $pdf->stream('laporan-santri.pdf');
     }
+
+    /**
+     * Generate PDF for a single santri detail.
+     */
+    public function cetakDetailPdf(Santri $santri)
+    {
+        $pdf = Pdf::loadView('santri.detail_pdf', ['santri' => $santri]);
+        $fileName = 'detail-santri-' . Str::slug($santri->nama_lengkap) . '.pdf';
+        return $pdf->download($fileName);
+    }
+
+    public function cetakBrowser(Santri $santri)
+    {
+        return view('santri.print', compact('santri'));
+    }
+
 }

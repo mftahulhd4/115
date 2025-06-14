@@ -1,177 +1,114 @@
-@extends('layouts.app')
+<x-app-layout>
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+            {{ __('Tambah Data Santri Baru') }}
+        </h2>
+    </x-slot>
 
-@section('title', 'Tambah Santri Baru')
-
-@section('content')
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card shadow-sm">
-                <div class="card-header bg-success text-white">
-                    <h4 class="mb-0">Formulir Tambah Santri Baru</h4>
-                </div>
-                <div class="card-body">
-                    {{-- Menampilkan pesan sukses --}}
-                    @if (session('success'))
-                        <div class="alert alert-success alert-dismissible fade show" role="alert">
-                            {{ session('success') }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    @endif
-
-                    {{-- Menampilkan pesan error umum dari controller --}}
-                    @if (session('error'))
-                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                            {{ session('error') }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    @endif
-
-                    {{-- Menampilkan error validasi --}}
-                    @if ($errors->any())
-                        <div class="alert alert-danger">
-                            <h5 class="alert-heading">Oops! Ada beberapa kesalahan:</h5>
-                            <ul class="mb-0">
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endif
-
-                    <form action="{{ route('santri.store') }}" method="POST" enctype="multipart/form-data">
+    <div class="py-12">
+        <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
+            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 text-gray-900 dark:text-gray-100">
+                    <form action="{{ route('santri.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
                         @csrf
-
+                        
                         {{-- Nama Lengkap --}}
-                        <div class="mb-3">
-                            <label for="nama_lengkap" class="form-label">Nama Lengkap <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control @error('nama_lengkap') is-invalid @enderror" id="nama_lengkap" name="nama_lengkap" value="{{ old('nama_lengkap') }}" placeholder="Masukkan nama lengkap santri" required>
-                            @error('nama_lengkap')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        {{-- Tanggal Lahir --}}
-                        <div class="mb-3">
-                            <label for="tanggal_lahir" class="form-label">Tanggal Lahir <span class="text-danger">*</span></label>
-                            <input type="date" class="form-control @error('tanggal_lahir') is-invalid @enderror" id="tanggal_lahir" name="tanggal_lahir" value="{{ old('tanggal_lahir') }}" required>
-                            @error('tanggal_lahir')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        {{-- Alamat --}}
-                        <div class="mb-3">
-                            <label for="alamat" class="form-label">Alamat <span class="text-danger">*</span></label>
-                            <textarea class="form-control @error('alamat') is-invalid @enderror" id="alamat" name="alamat" rows="3" placeholder="Masukkan alamat lengkap" required>{{ old('alamat') }}</textarea>
-                            @error('alamat')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+                        <div>
+                            <label for="nama_lengkap" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nama Lengkap</label>
+                            <input type="text" name="nama_lengkap" id="nama_lengkap" value="{{ old('nama_lengkap') }}" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 focus:border-indigo-500 focus:ring-indigo-500">
+                            @error('nama_lengkap') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                         </div>
 
                         {{-- Jenis Kelamin --}}
-                        <div class="mb-3">
-                            <label for="jenis_kelamin" class="form-label">Jenis Kelamin <span class="text-danger">*</span></label>
-                            <select class="form-select @error('jenis_kelamin') is-invalid @enderror" id="jenis_kelamin" name="jenis_kelamin" required>
-                                <option value="">Pilih Jenis Kelamin</option>
-                                <option value="Laki-laki" {{ old('jenis_kelamin') == 'Laki-laki' ? 'selected' : '' }}>Laki-laki</option>
-                                <option value="Perempuan" {{ old('jenis_kelamin') == 'Perempuan' ? 'selected' : '' }}>Perempuan</option>
-                            </select>
-                            @error('jenis_kelamin')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+                        <div>
+                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Jenis Kelamin</label>
+                             <div class="mt-2 space-x-4">
+                                 <label class="inline-flex items-center">
+                                     <input type="radio" name="jenis_kelamin" value="Laki-laki" {{ old('jenis_kelamin') == 'Laki-laki' ? 'checked' : '' }} required class="form-radio text-indigo-600 dark:bg-gray-700 border-gray-300 dark:border-gray-600">
+                                     <span class="ml-2">Laki-laki</span>
+                                 </label>
+                                 <label class="inline-flex items-center">
+                                     <input type="radio" name="jenis_kelamin" value="Perempuan" {{ old('jenis_kelamin') == 'Perempuan' ? 'checked' : '' }} required class="form-radio text-indigo-600 dark:bg-gray-700 border-gray-300 dark:border-gray-600">
+                                     <span class="ml-2">Perempuan</span>
+                                 </label>
+                             </div>
+                             @error('jenis_kelamin') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                         </div>
 
-                        {{-- Row untuk Pendidikan dan Kamar --}}
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="pendidikan_terakhir" class="form-label">Pendidikan Terakhir</label>
-                                <input type="text" class="form-control @error('pendidikan_terakhir') is-invalid @enderror" id="pendidikan_terakhir" name="pendidikan_terakhir" value="{{ old('pendidikan_terakhir') }}" placeholder="Contoh: SMA, SMP">
-                                @error('pendidikan_terakhir')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
+                        {{-- Tempat & Tanggal Lahir --}}
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="tempat_lahir" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tempat Lahir</label>
+                                <input type="text" name="tempat_lahir" id="tempat_lahir" value="{{ old('tempat_lahir') }}" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 focus:border-indigo-500 focus:ring-indigo-500">
+                                @error('tempat_lahir') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="kamar" class="form-label">Kamar</label>
-                                <input type="text" class="form-control @error('kamar') is-invalid @enderror" id="kamar" name="kamar" value="{{ old('kamar') }}" placeholder="Contoh: A1, B2">
-                                @error('kamar')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
+                            <div>
+                                <label for="tanggal_lahir" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tanggal Lahir</label>
+                                <input type="date" name="tanggal_lahir" id="tanggal_lahir" value="{{ old('tanggal_lahir') }}" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 focus:border-indigo-500 focus:ring-indigo-500" style="color-scheme: dark;">
+                                @error('tanggal_lahir') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                             </div>
                         </div>
 
-                        {{-- Row untuk Tahun Masuk dan Tahun Keluar --}}
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="tahun_masuk" class="form-label">Tahun Masuk <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control @error('tahun_masuk') is-invalid @enderror" id="tahun_masuk" name="tahun_masuk" value="{{ old('tahun_masuk', date('Y')) }}" placeholder="YYYY" maxlength="4" required>
-                                @error('tahun_masuk')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="tahun_keluar" class="form-label">Tahun Keluar</label>
-                                <input type="text" class="form-control @error('tahun_keluar') is-invalid @enderror" id="tahun_keluar" name="tahun_keluar" value="{{ old('tahun_keluar') }}" placeholder="YYYY (kosongkan jika masih aktif)" maxlength="4">
-                                @error('tahun_keluar')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
+                        {{-- Alamat --}}
+                        <div>
+                            <label for="alamat" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Alamat</label>
+                            <textarea name="alamat" id="alamat" rows="3" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 focus:border-indigo-500 focus:ring-indigo-500">{{ old('alamat') }}</textarea>
+                            @error('alamat') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                         </div>
 
                         {{-- Nama Orang Tua --}}
-                        <div class="mb-3">
-                            <label for="nama_orang_tua" class="form-label">Nama Orang Tua/Wali <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control @error('nama_orang_tua') is-invalid @enderror" id="nama_orang_tua" name="nama_orang_tua" value="{{ old('nama_orang_tua') }}" placeholder="Masukkan nama orang tua atau wali" required>
-                            @error('nama_orang_tua')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+                        <div>
+                            <label for="nama_orang_tua" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nama Orang Tua</label>
+                            <input type="text" name="nama_orang_tua" id="nama_orang_tua" value="{{ old('nama_orang_tua') }}" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 focus:border-indigo-500 focus:ring-indigo-500">
+                            @error('nama_orang_tua') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                         </div>
 
-                        {{-- Nomor Telepon Orang Tua --}}
-                        <div class="mb-3">
-                            <label for="nomor_telepon_orang_tua" class="form-label">Nomor Telepon Orang Tua/Wali</label>
-                            <input type="tel" class="form-control @error('nomor_telepon_orang_tua') is-invalid @enderror" id="nomor_telepon_orang_tua" name="nomor_telepon_orang_tua" value="{{ old('nomor_telepon_orang_tua') }}" placeholder="Contoh: 081234567890">
-                            @error('nomor_telepon_orang_tua')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+                        {{-- Pendidikan & No HP --}}
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="pendidikan" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Pendidikan Terakhir</label>
+                                <input type="text" name="pendidikan" id="pendidikan" value="{{ old('pendidikan') }}" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200">
+                                @error('pendidikan') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                            </div>
+                            <div>
+                                <label for="nomer_orang_tua" class="block text-sm font-medium text-gray-700 dark:text-gray-300">No. HP Orang Tua</label>
+                                <input type="text" name="nomer_orang_tua" id="nomer_orang_tua" value="{{ old('nomer_orang_tua') }}" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200">
+                                @error('nomer_orang_tua') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                            </div>
                         </div>
 
-                        {{-- Status Santri --}}
-                        <div class="mb-3">
-                            <label for="status_santri" class="form-label">Status Santri <span class="text-danger">*</span></label>
-                            <select class="form-select @error('status_santri') is-invalid @enderror" id="status_santri" name="status_santri" required>
-                                <option value="">Pilih Status</option>
-                                <option value="Baru" {{ old('status_santri', 'Baru') == 'Baru' ? 'selected' : '' }}>Baru (Pendaftaran)</option>
-                                <option value="Aktif" {{ old('status_santri') == 'Aktif' ? 'selected' : '' }}>Aktif</option>
-                                <option value="Alumni" {{ old('status_santri') == 'Alumni' ? 'selected' : '' }}>Alumni</option>
-                                <option value="Pengurus" {{ old('status_santri') == 'Pengurus' ? 'selected' : '' }}>Pengurus</option>
-                            </select>
-                            @error('status_santri')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+                        {{-- Tahun Masuk & Status --}}
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                             <div>
+                                <label for="tahun_masuk" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tahun Masuk</label>
+                                <input type="number" name="tahun_masuk" id="tahun_masuk" value="{{ old('tahun_masuk') }}" placeholder="Contoh: 2024" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200">
+                                @error('tahun_masuk') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                            </div>
+                            <div>
+                                <label for="status_santri" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Status Santri</label>
+                                <select name="status_santri" id="status_santri" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200">
+                                    <option value="Baru" {{ old('status_santri') == 'Baru' ? 'selected' : '' }}>Baru</option>
+                                    <option value="Aktif" {{ old('status_santri') == 'Aktif' ? 'selected' : '' }}>Aktif</option>
+                                    <option value="Pengurus" {{ old('status_santri') == 'Pengurus' ? 'selected' : '' }}>Pengurus</option>
+                                    <option value="Alumni" {{ old('status_santri') == 'Alumni' ? 'selected' : '' }}>Alumni</option>
+                                </select>
+                                @error('status_santri') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                            </div>
+                        </div>
+                        
+                        {{-- Foto --}}
+                        <div>
+                            <label for="foto" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Foto</label>
+                            <input type="file" name="foto" id="foto" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-gray-700 dark:file:text-gray-300 dark:hover:file:bg-gray-600">
+                            @error('foto') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                         </div>
 
-                        {{-- Foto Santri --}}
-                        <div class="mb-3">
-                            <label for="foto" class="form-label">Foto Santri</label>
-                            <input type="file" class="form-control @error('foto') is-invalid @enderror" id="foto" name="foto" onchange="previewImage()">
-                            @error('foto')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                            <div class="form-text">Tipe file: JPG, JPEG, PNG, GIF. Maks 2MB.</div>
-                        </div>
-
-                        {{-- Preview Foto --}}
-                        <div class="mb-3">
-                            <img id="foto_preview" src="{{ asset('images/default_avatar.png') }}" alt="Preview Foto Santri" class="img-thumbnail" style="max-height: 150px; max-width: 150px; display: block;">
-                        </div>
-
-                        <div class="d-flex justify-content-end mt-4">
-                            <a href="{{ route('santri.index') }}" class="btn btn-outline-secondary me-2">
-                                <i class="bi bi-x-circle"></i> Batal
+                        <div class="flex items-center justify-end space-x-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                            <a href="{{ route('santri.index') }}" class="inline-flex items-center px-4 py-2 bg-gray-300 dark:bg-gray-600 border border-transparent rounded-md font-semibold text-xs text-gray-800 dark:text-gray-200 uppercase tracking-widest hover:bg-gray-400 dark:hover:bg-gray-500">
+                                Batal
                             </a>
-                            <button type="submit" class="btn btn-success">
-                                <i class="bi bi-person-plus-fill"></i> Tambah Santri
+                            <button type="submit" class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700">
+                                Simpan
                             </button>
                         </div>
                     </form>
@@ -179,31 +116,4 @@
             </div>
         </div>
     </div>
-</div>
-@endsection
-
-@push('scripts')
-<script>
-    function previewImage() {
-        const fotoInput = document.getElementById('foto');
-        const fotoPreview = document.getElementById('foto_preview');
-
-        if (fotoInput.files && fotoInput.files[0]) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                fotoPreview.src = e.target.result;
-                fotoPreview.style.display = 'block';
-            }
-            reader.readAsDataURL(fotoInput.files[0]);
-        } else {
-            fotoPreview.src = "{{ asset('images/default_avatar.png') }}"; // Reset ke default jika tidak ada file dipilih
-            // fotoPreview.style.display = 'none'; // Atau tetap tampilkan default avatar
-        }
-    }
-
-    // Panggil previewImage saat halaman dimuat jika ada old input untuk foto (meskipun browser biasanya tidak menyimpan file input)
-    // Ini lebih untuk konsistensi jika Anda ingin menampilkan sesuatu berdasarkan old('foto_path_sementara') jika ada
-    // Namun, untuk file input, 'old()' tidak akan mengembalikan file itu sendiri.
-    // Jadi, preview saat edit lebih relevan. Untuk create, ini hanya akan berjalan saat file dipilih.
-</script>
-@endpush
+</x-app-layout>

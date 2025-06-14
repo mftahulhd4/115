@@ -1,46 +1,40 @@
 <x-guest-layout>
-    @section('title', 'Reset Password')
-
-    <div class="text-center mb-4">
-        <h4 class="fw-bold">Atur Ulang Password Anda</h4>
-        <p class="text-muted small">Silakan masukkan password baru Anda.</p>
+    <div class="mb-4 text-center">
+        <h2 class="text-2xl font-bold text-white mb-2">Atur Ulang Password</h2>
+        <p class="text-sm text-gray-400">
+            Silakan masukkan password baru Anda di bawah ini.
+        </p>
     </div>
 
-    <form method="POST" action="{{ route('password.store') }}"> {{-- Breeze menggunakan password.store untuk update password --}}
+    <form method="POST" action="{{ route('password.store') }}">
         @csrf
 
         <input type="hidden" name="token" value="{{ $request->route('token') }}">
 
-        <div class="mb-3">
-            <label for="email" class="form-label">{{ __('Email') }}</label>
-            <input id="email" class="form-control @error('email') is-invalid @enderror" type="email" name="email" value="{{ old('email', $request->email) }}" required autofocus autocomplete="username" placeholder="Masukkan alamat email Anda">
-            @error('email')
-                <div class="invalid-feedback">
-                    {{ $message }}
-                </div>
-            @enderror
+        <div>
+            <x-input-label for="email" :value="__('Email')" />
+            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email', $request->email)" required autofocus autocomplete="username" />
+            <x-input-error :messages="$errors->get('email')" class="mt-2" />
         </div>
 
-        <div class="mb-3">
-            <label for="password" class="form-label">{{ __('Password Baru') }}</label>
-            <input id="password" class="form-control @error('password') is-invalid @enderror" type="password" name="password" required autocomplete="new-password" placeholder="Masukkan password baru (minimal 8 karakter)">
-            @error('password')
-                <div class="invalid-feedback">
-                    {{ $message }}
-                </div>
-            @enderror
+        <div class="mt-4">
+            <x-input-label for="password" :value="__('Password Baru')" />
+            <x-text-input id="password" class="block mt-1 w-full" type="password" name="password" required autocomplete="new-password" placeholder="Minimal 8 karakter" />
+            <x-input-error :messages="$errors->get('password')" class="mt-2" />
         </div>
 
-        <div class="mb-3">
-            <label for="password_confirmation" class="form-label">{{ __('Konfirmasi Password Baru') }}</label>
-            <input id="password_confirmation" class="form-control" type="password" name="password_confirmation" required autocomplete="new-password" placeholder="Ketik ulang password baru Anda">
-            {{-- Error untuk password_confirmation biasanya ditampilkan bersama error password --}}
+        <div class="mt-4">
+            <x-input-label for="password_confirmation" :value="__('Konfirmasi Password Baru')" />
+            <x-text-input id="password_confirmation" class="block mt-1 w-full"
+                                type="password"
+                                name="password_confirmation" required autocomplete="new-password" placeholder="Ketik ulang password baru"/>
+            <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
         </div>
 
-        <div class="d-grid mt-4">
-            <button type="submit" class="btn btn-success btn-lg">
+        <div class="flex items-center justify-end mt-6">
+            <x-primary-button>
                 {{ __('Reset Password') }}
-            </button>
+            </x-primary-button>
         </div>
     </form>
 </x-guest-layout>

@@ -13,14 +13,18 @@ return new class extends Migration
     {
         Schema::create('perizinans', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('santri_id')->constrained('santris')->onDelete('cascade'); // Foreign key ke tabel santris
+            $table->unsignedBigInteger('santri_id');
+            $table->foreign('santri_id')->references('id')->on('santris')->onDelete('cascade');
+            
+            // Kolom-kolom yang kita gunakan di form
             $table->string('kepentingan_izin');
             $table->date('tanggal_izin');
             $table->date('tanggal_kembali_rencana');
-            $table->date('tanggal_kembali_aktual')->nullable();
-            $table->text('keterangan')->nullable();
-            $table->enum('status_izin', ['Diajukan', 'Disetujui', 'Ditolak', 'Selesai', 'Terlambat Kembali'])->default('Diajukan');
-            // $table->foreignId('user_id_approval')->nullable()->constrained('users')->onDelete('set null'); // Opsional: untuk siapa yang menyetujui
+            $table->text('keterangan_tambahan')->nullable();
+            
+            // Kolom status yang di-set otomatis
+            $table->string('status')->default('diproses');
+            
             $table->timestamps();
         });
     }

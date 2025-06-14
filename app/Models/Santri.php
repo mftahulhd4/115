@@ -11,30 +11,17 @@ class Santri extends Model
 
     protected $fillable = [
         'nama_lengkap',
+        'jenis_kelamin', // <-- TAMBAHKAN
+        'tempat_lahir',
         'tanggal_lahir',
         'alamat',
-        'jenis_kelamin',
-        'pendidikan_terakhir',
-        'kamar',
         'tahun_masuk',
-        'tahun_keluar',
         'nama_orang_tua',
-        'nomor_telepon_orang_tua',
+        'pendidikan',
+        'nomer_orang_tua',
+        'foto',
         'status_santri',
-        'foto', // <--- TAMBAHKAN INI
+        'tahun_keluar',
     ];
-
-    protected $casts = [
-        'tanggal_lahir' => 'date',
-    ];
-
-    public function perizinans() // Nama metode jamak dari model Perizinan
-    {
-        return $this->hasMany(Perizinan::class);
-    }
-
-    public function tagihans() // Nama metode jamak dari model Tagihan
-    {
-        return $this->hasMany(Tagihan::class);
-    }
+    // ... sisa model tetap sama
 }

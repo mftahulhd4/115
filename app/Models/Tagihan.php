@@ -12,19 +12,12 @@ class Tagihan extends Model
     protected $fillable = [
         'santri_id',
         'jenis_tagihan',
-        'nominal_tagihan',
+        'nominal',
         'tanggal_tagihan',
         'tanggal_jatuh_tempo',
-        'keterangan',
-        'status_tagihan',
-        'tanggal_pelunasan', // Ini yang akan kita gunakan
-    ];
-
-    protected $casts = [
-        'tanggal_tagihan' => 'date',
-        'tanggal_jatuh_tempo' => 'date',
-        'tanggal_pelunasan' => 'date', // Ini yang akan kita gunakan
-        'nominal_tagihan' => 'decimal:2',
+        'tanggal_pelunasan',
+        'status',
+        'keterangan_tambahan', // <-- TAMBAHKAN INI
     ];
 
     public function santri()

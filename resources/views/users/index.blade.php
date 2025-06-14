@@ -1,136 +1,90 @@
-@extends('layouts.app')
+<x-app-layout>
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+            {{ __('Manajemen User') }}
+        </h2>
+    </x-slot>
 
-@section('title', 'Manajemen Pengguna')
-
-@section('content')
-<div class="container">
-    <div class="row mb-3 align-items-center">
-        <div class="col-md-6">
-            <h1>Manajemen Pengguna</h1>
-        </div>
-        <div class="col-md-6 text-md-end">
-            <a href="{{ route('users.create') }}" class="btn btn-success">
-                <i class="bi bi-person-plus-fill"></i> Tambah Pengguna Baru
-            </a>
-        </div>
-    </div>
-
-    {{-- FORM PENCARIAN --}}
-    <div class="card shadow-sm mb-3">
-        <div class="card-body">
-            <form method="GET" action="{{ route('users.index') }}">
-                <div class="row g-2 align-items-end">
-                    <div class="col-md-10">
-                        <label for="search" class="form-label">Cari Pengguna</label>
-                        <input type="text" name="search" id="search" class="form-control" placeholder="Ketik nama, email, atau peran..." value="{{ request('search') }}">
+    <div class="py-12">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 text-gray-900 dark:text-gray-100">
+                    
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-lg font-semibold">Daftar Pengguna Sistem</h3>
+                        <a href="{{ route('users.create') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700">
+                            <i class="fas fa-plus mr-2"></i>Tambah User
+                        </a>
                     </div>
-                    <div class="col-md-2">
-                        <button type="submit" class="btn btn-primary w-100"><i class="bi bi-search"></i> Cari</button>
+                    
+                    @if (session('success'))
+                        <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6" role="alert">
+                            <p>{{ session('success') }}</p>
+                        </div>
+                    @endif
+                     @if (session('error'))
+                        <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6" role="alert">
+                            <p>{{ session('error') }}</p>
+                        </div>
+                    @endif
+
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                            <thead class="bg-gray-50 dark:bg-gray-700">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Nama</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Email</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Role</th>
+                                    {{-- TAMBAHKAN HEADER KOLOM AKSI --}}
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                                @forelse ($users as $user)
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900 dark:text-gray-100">{{ $user->name }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">{{ $user->email }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                            {{ $user->role == 'admin' ? 'bg-red-100 text-red-800' : 'bg-indigo-100 text-indigo-800' }}">
+                                            {{ ucfirst($user->role) }}
+                                        </span>
+                                    </td>
+                                    {{-- TAMBAHKAN KOLOM AKSI DENGAN TOMBOL --}}
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                        <div class="flex items-center space-x-4">
+                                            {{-- <a href="{{ route('users.edit', $user->id) }}" class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-200" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </a> --}}
+                                            
+                                            {{-- Jangan tampilkan tombol hapus untuk diri sendiri --}}
+                                            @if(auth()->id() !== $user->id)
+                                                <form action="{{ route('users.destroy', $user->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus pengguna ini?');">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-200" title="Hapus">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </form>
+                                            @endif
+                                        </div>
+                                    </td>
+                                </tr>
+                                @empty
+                                <tr>
+                                    <td colspan="4" class="px-6 py-4 text-center text-gray-500 dark:text-gray-300">
+                                        Tidak ada data pengguna.
+                                    </td>
+                                </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="mt-4">
+                        {{ $users->links() }}
                     </div>
                 </div>
-            </form>
+            </div>
         </div>
     </div>
-
-    @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            {{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    @endif
-    @if(session('error'))
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            {{ session('error') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    @endif
-
-    <div class="card shadow-sm">
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-hover table-bordered">
-                    <thead class="table-light">
-                        <tr>
-                            <th scope="col">#</th>
-                            <th scope="col">Nama</th>
-                            <th scope="col">Email</th>
-                            <th scope="col">Peran</th>
-                            <th scope="col">Email Terverifikasi</th>
-                            <th scope="col">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse ($users as $key => $user)
-                        <tr>
-                            <th>{{ $users->firstItem() + $key }}</th>
-                            <td>{{ $user->name }}</td>
-                            <td>{{ $user->email }}</td>
-                            <td>
-                                <span class="badge {{ $user->role == 'admin' ? 'bg-danger' : 'bg-info text-dark' }}">
-                                    {{ ucfirst($user->role) }}
-                                </span>
-                            </td>
-                            <td>
-                                @if($user->email_verified_at)
-                                    <span class="badge bg-success">Ya</span>
-                                    {{-- Tambahkan pengecekan apakah sudah objek Carbon atau parse jika string --}}
-                                    @php
-                                        $verifiedDate = $user->email_verified_at;
-                                        if (is_string($verifiedDate)) {
-                                            try {
-                                                $verifiedDate = \Carbon\Carbon::parse($verifiedDate);
-                                            } catch (\Exception $e) {
-                                                // Jika parse gagal, tampilkan string aslinya atau pesan error
-                                                // Log error jika perlu
-                                                \Illuminate\Support\Facades\Log::error("Gagal mem-parse email_verified_at untuk user ID {$user->id}: " . $e->getMessage());
-                                                $verifiedDate = null; // Atau $user->email_verified_at (string asli)
-                                            }
-                                        }
-                                    @endphp
-                                    @if($verifiedDate instanceof \Carbon\Carbon)
-                                        <small>({{ $verifiedDate->isoFormat('D MMM YY, HH:mm') }})</small>
-                                    @elseif(!empty($user->email_verified_at))
-                                         <small>({{ $user->email_verified_at }})</small> {{-- Tampilkan string asli jika parse gagal --}}
-                                    @endif
-                                @else
-                                    <span class="badge bg-warning text-dark">Belum</span>
-                                @endif
-                            </td>
-                            <td>
-                                <a href="{{ route('users.edit', $user->id) }}" class="btn btn-sm btn-primary me-1" title="Edit">
-                                    <i class="bi bi-pencil-square"></i>
-                                </a>
-                                @if (Auth::id() !== $user->id) {{-- Jangan tampilkan tombol hapus untuk diri sendiri --}}
-                                <form action="{{ route('users.destroy', $user->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Apakah Anda yakin ingin menghapus pengguna {{ $user->name }}? Tindakan ini tidak dapat diurungkan.');">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-danger" title="Hapus">
-                                        <i class="bi bi-trash3-fill"></i>
-                                    </button>
-                                </form>
-                                @endif
-                            </td>
-                        </tr>
-                        @empty
-                        <tr>
-                            <td colspan="6" class="text-center">
-                                @if(request('search'))
-                                    Tidak ada pengguna yang cocok dengan pencarian "{{ request('search') }}".
-                                @else
-                                    Belum ada data pengguna.
-                                @endif
-                            </td>
-                        </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-            @if($users->hasPages())
-            <div class="mt-3 d-flex justify-content-center">
-                {{ $users->links() }}
-            </div>
-            @endif
-        </div>
-    </div>
-</div>
-@endsection
+</x-app-layout>

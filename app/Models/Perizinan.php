@@ -19,21 +19,8 @@ class Perizinan extends Model
         'kepentingan_izin',
         'tanggal_izin',
         'tanggal_kembali_rencana',
-        'tanggal_kembali_aktual',
-        'keterangan',
-        'status_izin',
-        // 'user_id_approval', // Jika Anda menggunakan kolom ini
-    ];
-
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
-    protected $casts = [
-        'tanggal_izin' => 'date',
-        'tanggal_kembali_rencana' => 'date',
-        'tanggal_kembali_aktual' => 'date',
+        'status',
+        'keterangan_tambahan', // <-- TAMBAHKAN NAMA KOLOM INI
     ];
 
     /**
@@ -43,10 +30,4 @@ class Perizinan extends Model
     {
         return $this->belongsTo(Santri::class);
     }
-
-    // Opsional: Jika Anda menambahkan kolom user_id_approval
-    // public function approver()
-    // {
-    //     return $this->belongsTo(User::class, 'user_id_approval');
-    // }
 }
