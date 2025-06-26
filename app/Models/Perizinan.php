@@ -4,29 +4,22 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Perizinan extends Model
 {
     use HasFactory;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
         'santri_id',
         'kepentingan_izin',
         'tanggal_izin',
         'tanggal_kembali_rencana',
         'status',
-        'keterangan_tambahan', // <-- TAMBAHKAN NAMA KOLOM INI
+        'keterangan_tambahan',
     ];
 
-    /**
-     * Get the santri that owns the perizinan.
-     */
-    public function santri()
+    public function santri(): BelongsTo
     {
         return $this->belongsTo(Santri::class);
     }

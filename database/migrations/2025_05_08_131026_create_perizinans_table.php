@@ -13,18 +13,12 @@ return new class extends Migration
     {
         Schema::create('perizinans', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('santri_id');
-            $table->foreign('santri_id')->references('id')->on('santris')->onDelete('cascade');
-            
-            // Kolom-kolom yang kita gunakan di form
+            $table->foreignId('santri_id')->constrained()->onDelete('cascade');
             $table->string('kepentingan_izin');
             $table->date('tanggal_izin');
             $table->date('tanggal_kembali_rencana');
+            $table->enum('status', ['Izin', 'Kembali', 'Terlambat'])->default('Izin');
             $table->text('keterangan_tambahan')->nullable();
-            
-            // Kolom status yang di-set otomatis
-            $table->string('status')->default('diproses');
-            
             $table->timestamps();
         });
     }

@@ -10,18 +10,21 @@ class Santri extends Model
     use HasFactory;
 
     protected $fillable = [
+        'Id_santri',
         'nama_lengkap',
-        'jenis_kelamin', // <-- TAMBAHKAN
+        'jenis_kelamin',
         'tempat_lahir',
         'tanggal_lahir',
         'alamat',
-        'tahun_masuk',
-        'nama_orang_tua',
         'pendidikan',
+        'kelas',
+        'kamar',
+        'nama_bapak',
+        'nama_ibu',
         'nomer_orang_tua',
-        'foto',
-        'status_santri',
+        'status_santri', // Ditambahkan kembali
+        'tahun_masuk',
         'tahun_keluar',
+        'foto',
     ];
-    // ... sisa model tetap sama
 }

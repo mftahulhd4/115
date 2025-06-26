@@ -16,10 +16,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // --- Route Santri ---
+    Route::get('santri/cetak-pdf/{santri}', [SantriController::class, 'cetakDetailPdf'])->name('santri.cetakDetailPdf');
+    Route::get('santri/cetak-browser/{santri}', [SantriController::class, 'cetakBrowser'])->name('santri.cetakBrowser');
     Route::resource('santri', SantriController::class);
-    Route::get('/santri/cetak_pdf', [SantriController::class, 'cetak_pdf'])->name('santri.cetak_pdf');
-    Route::get('/santri/{santri}/detail-pdf', [SantriController::class, 'cetakDetailPdf'])->name('santri.detail_pdf');
-    Route::get('/santri/{santri}/print', [SantriController::class, 'cetakBrowser'])->name('santri.cetakBrowser');
     // --- Route Perizinan ---
     Route::resource('perizinan', PerizinanController::class);
     Route::get('/search-santri', [PerizinanController::class, 'searchSantri'])->name('perizinan.searchSantri');

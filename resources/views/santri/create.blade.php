@@ -1,115 +1,145 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Tambah Data Santri Baru') }}
+            {{ __('Tambah Santri Baru') }}
         </h2>
     </x-slot>
 
     <div class="py-12">
-        <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
-                    <form action="{{ route('santri.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+                    
+                    {{-- Menampilkan error validasi jika ada --}}
+                    @if ($errors->any())
+                        <div class="mb-4">
+                            <div class="font-medium text-red-600">{{ __('Whoops! Something went wrong.') }}</div>
+                            <ul class="mt-3 list-disc list-inside text-sm text-red-600">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+
+                    <form action="{{ route('santri.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
-                        
-                        {{-- Nama Lengkap --}}
-                        <div>
-                            <label for="nama_lengkap" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nama Lengkap</label>
-                            <input type="text" name="nama_lengkap" id="nama_lengkap" value="{{ old('nama_lengkap') }}" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 focus:border-indigo-500 focus:ring-indigo-500">
-                            @error('nama_lengkap') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-                        </div>
-
-                        {{-- Jenis Kelamin --}}
-                        <div>
-                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Jenis Kelamin</label>
-                             <div class="mt-2 space-x-4">
-                                 <label class="inline-flex items-center">
-                                     <input type="radio" name="jenis_kelamin" value="Laki-laki" {{ old('jenis_kelamin') == 'Laki-laki' ? 'checked' : '' }} required class="form-radio text-indigo-600 dark:bg-gray-700 border-gray-300 dark:border-gray-600">
-                                     <span class="ml-2">Laki-laki</span>
-                                 </label>
-                                 <label class="inline-flex items-center">
-                                     <input type="radio" name="jenis_kelamin" value="Perempuan" {{ old('jenis_kelamin') == 'Perempuan' ? 'checked' : '' }} required class="form-radio text-indigo-600 dark:bg-gray-700 border-gray-300 dark:border-gray-600">
-                                     <span class="ml-2">Perempuan</span>
-                                 </label>
-                             </div>
-                             @error('jenis_kelamin') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-                        </div>
-
-                        {{-- Tempat & Tanggal Lahir --}}
+                        {{-- Perubahan: Kolom ID Santri dihapus dari tampilan --}}
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            
+                            <!-- Nama Lengkap -->
                             <div>
-                                <label for="tempat_lahir" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tempat Lahir</label>
-                                <input type="text" name="tempat_lahir" id="tempat_lahir" value="{{ old('tempat_lahir') }}" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 focus:border-indigo-500 focus:ring-indigo-500">
-                                @error('tempat_lahir') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                                <x-input-label for="nama_lengkap" :value="__('Nama Lengkap')" />
+                                <x-text-input id="nama_lengkap" class="block mt-1 w-full" type="text" name="nama_lengkap" :value="old('nama_lengkap')" required autofocus />
                             </div>
+
+                            <!-- Jenis Kelamin -->
                             <div>
-                                <label for="tanggal_lahir" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tanggal Lahir</label>
-                                <input type="date" name="tanggal_lahir" id="tanggal_lahir" value="{{ old('tanggal_lahir') }}" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 focus:border-indigo-500 focus:ring-indigo-500" style="color-scheme: dark;">
-                                @error('tanggal_lahir') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                                <x-input-label for="jenis_kelamin" :value="__('Jenis Kelamin')" />
+                                <select name="jenis_kelamin" id="jenis_kelamin" class="block mt-1 w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm">
+                                    <option value="Laki-laki" {{ old('jenis_kelamin') == 'Laki-laki' ? 'selected' : '' }}>Laki-laki</option>
+                                    <option value="Perempuan" {{ old('jenis_kelamin') == 'Perempuan' ? 'selected' : '' }}>Perempuan</option>
+                                </select>
                             </div>
-                        </div>
 
-                        {{-- Alamat --}}
-                        <div>
-                            <label for="alamat" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Alamat</label>
-                            <textarea name="alamat" id="alamat" rows="3" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 focus:border-indigo-500 focus:ring-indigo-500">{{ old('alamat') }}</textarea>
-                            @error('alamat') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-                        </div>
-
-                        {{-- Nama Orang Tua --}}
-                        <div>
-                            <label for="nama_orang_tua" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nama Orang Tua</label>
-                            <input type="text" name="nama_orang_tua" id="nama_orang_tua" value="{{ old('nama_orang_tua') }}" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 focus:border-indigo-500 focus:ring-indigo-500">
-                            @error('nama_orang_tua') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-                        </div>
-
-                        {{-- Pendidikan & No HP --}}
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- Tempat Lahir -->
                             <div>
-                                <label for="pendidikan" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Pendidikan Terakhir</label>
-                                <input type="text" name="pendidikan" id="pendidikan" value="{{ old('pendidikan') }}" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200">
-                                @error('pendidikan') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                                <x-input-label for="tempat_lahir" :value="__('Tempat Lahir')" />
+                                <x-text-input id="tempat_lahir" class="block mt-1 w-full" type="text" name="tempat_lahir" :value="old('tempat_lahir')" required />
                             </div>
-                            <div>
-                                <label for="nomer_orang_tua" class="block text-sm font-medium text-gray-700 dark:text-gray-300">No. HP Orang Tua</label>
-                                <input type="text" name="nomer_orang_tua" id="nomer_orang_tua" value="{{ old('nomer_orang_tua') }}" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200">
-                                @error('nomer_orang_tua') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-                            </div>
-                        </div>
 
-                        {{-- Tahun Masuk & Status --}}
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            
+                            <!-- Tanggal Lahir -->
+                            <div>
+                                <x-input-label for="tanggal_lahir" :value="__('Tanggal Lahir')" />
+                                <x-text-input id="tanggal_lahir" class="block mt-1 w-full" type="date" name="tanggal_lahir" :value="old('tanggal_lahir')" required />
+                            </div>
+
+                            <!-- Alamat -->
+                            <div class="md:col-span-2">
+                                <x-input-label for="alamat" :value="__('Alamat')" />
+                                <textarea name="alamat" id="alamat" rows="3" class="block mt-1 w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm">{{ old('alamat') }}</textarea>
+                            </div>
+
+                             <!-- Status Santri -->
                              <div>
-                                <label for="tahun_masuk" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tahun Masuk</label>
-                                <input type="number" name="tahun_masuk" id="tahun_masuk" value="{{ old('tahun_masuk') }}" placeholder="Contoh: 2024" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200">
-                                @error('tahun_masuk') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-                            </div>
-                            <div>
-                                <label for="status_santri" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Status Santri</label>
-                                <select name="status_santri" id="status_santri" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200">
-                                    <option value="Baru" {{ old('status_santri') == 'Baru' ? 'selected' : '' }}>Baru</option>
+                                <x-input-label for="status_santri" :value="__('Status Santri')" />
+                                <select name="status_santri" id="status_santri" class="block mt-1 w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm">
+                                    <option value="Baru" {{ old('status_santri', 'Baru') == 'Baru' ? 'selected' : '' }}>Baru</option>
                                     <option value="Aktif" {{ old('status_santri') == 'Aktif' ? 'selected' : '' }}>Aktif</option>
                                     <option value="Pengurus" {{ old('status_santri') == 'Pengurus' ? 'selected' : '' }}>Pengurus</option>
                                     <option value="Alumni" {{ old('status_santri') == 'Alumni' ? 'selected' : '' }}>Alumni</option>
                                 </select>
-                                @error('status_santri') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                            </div>
+
+                            {{-- Perubahan: Input Pendidikan menjadi dropdown --}}
+                            <div>
+                                <x-input-label for="pendidikan" :value="__('Pendidikan')" />
+                                <select name="pendidikan" id="pendidikan" class="block mt-1 w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm">
+                                    <option value="">-- Pilih Pendidikan --</option>
+                                    <option value="Madrasah Tsanawiyah Nurul Amin" {{ old('pendidikan') == 'Madrasah Tsanawiyah Nurul Amin' ? 'selected' : '' }}>Madrasah Tsanawiyah Nurul Amin</option>
+                                    <option value="Madrasah Aliyah Nurul Amin" {{ old('pendidikan') == 'Madrasah Aliyah Nurul Amin' ? 'selected' : '' }}>Madrasah Aliyah Nurul Amin</option>
+                                </select>
+                            </div>
+
+                            
+
+                            <!-- Kelas -->
+                            <div>
+                                <x-input-label for="kelas" :value="__('Kelas')" />
+                                <x-text-input id="kelas" class="block mt-1 w-full" type="text" name="kelas" :value="old('kelas')" />
+                            </div>
+
+                            <!-- Kamar -->
+                            <div>
+                                <x-input-label for="kamar" :value="__('Kamar')" />
+                                <x-text-input id="kamar" class="block mt-1 w-full" type="text" name="kamar" :value="old('kamar')" />
+                            </div>
+
+                            <!-- Nama Bapak -->
+                            <div>
+                                <x-input-label for="nama_bapak" :value="__('Nama Bapak')" />
+                                <x-text-input id="nama_bapak" class="block mt-1 w-full" type="text" name="nama_bapak" :value="old('nama_bapak')" required />
+                            </div>
+
+                            <!-- Nama Ibu -->
+                            <div>
+                                <x-input-label for="nama_ibu" :value="__('Nama Ibu')" />
+                                <x-text-input id="nama_ibu" class="block mt-1 w-full" type="text" name="nama_ibu" :value="old('nama_ibu')" required />
+                            </div>
+
+                            <!-- Nomer Orang Tua -->
+                            <div>
+                                <x-input-label for="nomer_orang_tua" :value="__('Nomor HP Orang Tua')" />
+                                <x-text-input id="nomer_orang_tua" class="block mt-1 w-full" type="text" name="nomer_orang_tua" :value="old('nomer_orang_tua')" required />
+                            </div>
+
+                             <!-- Tahun Masuk -->
+                             <div>
+                                <x-input-label for="tahun_masuk" :value="__('Tahun Masuk')" />
+                                <x-text-input id="tahun_masuk" class="block mt-1 w-full" type="number" name="tahun_masuk" :value="old('tahun_masuk', date('Y'))" required placeholder="YYYY" />
+                            </div>
+
+                            <!-- Tahun Keluar -->
+                            <div>
+                                <x-input-label for="tahun_keluar" :value="__('Tahun Keluar (Opsional)')" />
+                                <x-text-input id="tahun_keluar" class="block mt-1 w-full" type="number" name="tahun_keluar" :value="old('tahun_keluar')" placeholder="YYYY" />
+                            </div>
+
+                            <!-- Foto -->
+                            <div class="md:col-span-2">
+                                <x-input-label for="foto" :value="__('Foto (Opsional)')" />
+                                <input type="file" name="foto" id="foto" class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400">
                             </div>
                         </div>
-                        
-                        {{-- Foto --}}
-                        <div>
-                            <label for="foto" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Foto</label>
-                            <input type="file" name="foto" id="foto" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-gray-700 dark:file:text-gray-300 dark:hover:file:bg-gray-600">
-                            @error('foto') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-                        </div>
 
-                        <div class="flex items-center justify-end space-x-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                            <a href="{{ route('santri.index') }}" class="inline-flex items-center px-4 py-2 bg-gray-300 dark:bg-gray-600 border border-transparent rounded-md font-semibold text-xs text-gray-800 dark:text-gray-200 uppercase tracking-widest hover:bg-gray-400 dark:hover:bg-gray-500">
-                                Batal
+                        <div class="flex items-center justify-end mt-4">
+                            <a href="{{ route('santri.index') }}" class="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800">
+                                {{ __('Batal') }}
                             </a>
-                            <button type="submit" class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700">
-                                Simpan
-                            </button>
+                            <x-primary-button class="ml-4">
+                                {{ __('Simpan') }}
+                            </x-primary-button>
                         </div>
                     </form>
                 </div>
