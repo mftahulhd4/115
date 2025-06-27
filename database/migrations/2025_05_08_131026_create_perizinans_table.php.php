@@ -13,10 +13,11 @@ return new class extends Migration
     {
         Schema::create('perizinans', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('santri_id')->constrained()->onDelete('cascade');
+            $table->string('id_izin')->unique(); // ID unik untuk perizinan
+            $table->foreignId('santri_id')->constrained('santris')->onDelete('cascade');
             $table->string('kepentingan_izin');
             $table->date('tanggal_izin');
-            $table->date('tanggal_kembali_rencana');
+            $table->date('tanggal_kembali')->nullable(); 
             $table->enum('status', ['Izin', 'Kembali', 'Terlambat'])->default('Izin');
             $table->text('keterangan_tambahan')->nullable();
             $table->timestamps();

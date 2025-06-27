@@ -17,18 +17,26 @@ class SantriController extends Controller
      */
     public function index(Request $request)
     {
+        // Ambil data unik untuk opsi filter dropdown Pendidikan
+        $pendidikanOptions = Santri::select('pendidikan')->distinct()->whereNotNull('pendidikan')->orderBy('pendidikan')->pluck('pendidikan');
+
         $query = Santri::query();
 
+        // Terapkan filter berdasarkan input dari request
         if ($request->filled('search')) {
             $query->where('nama_lengkap', 'like', '%' . $request->search . '%');
         }
-
         if ($request->filled('status_santri')) {
             $query->where('status_santri', $request->status_santri);
         }
+        if ($request->filled('pendidikan')) {
+            $query->where('pendidikan', $request->pendidikan);
+        }
 
-        $santris = $query->orderBy('nama_lengkap', 'asc')->paginate(10);
-        return view('santri.index', compact('santris'));
+        $santris = $query->latest()->paginate(10)->withQueryString();
+
+        // Kirim data santri dan opsi filter ke view
+        return view('santri.index', compact('santris', 'pendidikanOptions'));
     }
 
     /**

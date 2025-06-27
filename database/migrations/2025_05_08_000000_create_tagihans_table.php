@@ -13,19 +13,15 @@ return new class extends Migration
     {
         Schema::create('tagihans', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('santri_id');
-            $table->foreign('santri_id')->references('id')->on('santris')->onDelete('cascade');
-
+            $table->foreignId('santri_id')->constrained('santris')->onDelete('cascade');
+            $table->string('Id_tagihan')->unique();
             $table->string('jenis_tagihan');
-            $table->decimal('nominal', 15, 2);
+            $table->decimal('nominal', 10, 2);
             $table->date('tanggal_tagihan');
             $table->date('tanggal_jatuh_tempo');
             $table->date('tanggal_pelunasan')->nullable();
-            $table->enum('status', ['Lunas', 'Belum Lunas', 'Jatuh Tempo'])->default('Belum Lunas');
-            
-            // TAMBAHKAN KOLOM INI
+            $table->string('status')->default('Belum Lunas'); // Contoh: 'Lunas', 'Belum Lunas', 'Jatuh Tempo'
             $table->text('keterangan_tambahan')->nullable();
-
             $table->timestamps();
         });
     }
