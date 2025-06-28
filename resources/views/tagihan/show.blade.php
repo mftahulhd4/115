@@ -32,7 +32,7 @@
                     </div>
 
                     @if($tagihan->status == 'Lunas')
-                        <div class="mt-6"><h4 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Informasi Pembayaran</h4><div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-6"><div><p class="text-sm text-gray-500 dark:text-gray-400">Tanggal Pelunasan</p><p class="font-semibold">{{ $tagihan->tanggal_pelunasan ? $tagihan->tanggal_pelunasan->isoFormat('dddd, D MMMM Y') : '-' }}</p></div></div></div>
+                        <div class="mt-6"><div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-6"><div><p class="text-sm text-gray-500 dark:text-gray-400">Tanggal Pelunasan</p><p class="font-semibold">{{ $tagihan->tanggal_pelunasan ? $tagihan->tanggal_pelunasan->isoFormat('dddd, D MMMM Y') : '-' }}</p></div></div></div>
                     @endif
                     
                     {{-- Tombol Aksi (Urutan dan Tampilan Baru) --}}

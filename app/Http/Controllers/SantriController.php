@@ -13,13 +13,9 @@ class SantriController extends Controller
 {
     /**
      * Display a listing of the resource.
-     * Method ini akan kita perbarui di tahap selanjutnya.
      */
     public function index(Request $request)
     {
-        // Ambil data unik untuk opsi filter dropdown Pendidikan
-        $pendidikanOptions = Santri::select('pendidikan')->distinct()->whereNotNull('pendidikan')->orderBy('pendidikan')->pluck('pendidikan');
-
         $query = Santri::query();
 
         // Terapkan filter berdasarkan input dari request
@@ -32,16 +28,24 @@ class SantriController extends Controller
         if ($request->filled('pendidikan')) {
             $query->where('pendidikan', $request->pendidikan);
         }
+        if ($request->filled('kelas')) {
+            $query->where('kelas', $request->kelas);
+        }
 
         $santris = $query->latest()->paginate(10)->withQueryString();
 
+        // Ambil data unik untuk opsi filter dropdown
+        $statusOptions = Santri::select('status_santri')->distinct()->whereNotNull('status_santri')->pluck('status_santri');
+        $pendidikanOptions = Santri::select('pendidikan')->distinct()->whereNotNull('pendidikan')->orderBy('pendidikan')->pluck('pendidikan');
+        $kelasOptions = Santri::select('kelas')->distinct()->whereNotNull('kelas')->orderBy('kelas')->pluck('kelas');
+
+
         // Kirim data santri dan opsi filter ke view
-        return view('santri.index', compact('santris', 'pendidikanOptions'));
+        return view('santri.index', compact('santris', 'pendidikanOptions', 'statusOptions', 'kelasOptions'));
     }
 
     /**
      * Show the form for creating a new resource.
-     * Method ini memanggil view yang akan kita perbarui di Langkah 2.
      */
     public function create()
     {
@@ -50,7 +54,6 @@ class SantriController extends Controller
 
     /**
      * Store a newly created resource in storage.
-     * Logika validasi dan penyimpanan data baru ada di sini.
      */
     public function store(Request $request)
     {
@@ -127,7 +130,6 @@ class SantriController extends Controller
      */
     public function update(Request $request, Santri $santri)
     {
-        // Logika untuk update akan kita sesuaikan di tahap selanjutnya
         $validated = $request->validate([
             'Id_santri' => [
                 'nullable',

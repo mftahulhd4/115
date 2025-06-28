@@ -32,7 +32,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/tagihan/{tagihan}/print', [TagihanController::class, 'cetakBrowser'])->name('tagihan.cetakBrowser');
     Route::get('/tagihan/{tagihan}/pdf-detail', [TagihanController::class, 'cetakDetailPdf'])->name('tagihan.cetakDetailPdf');
     Route::resource('tagihan', TagihanController::class);
-    // TAMBAHKAN DUA RUTE DI BAWAH INI
+    // TAMBAHKAN DUA RUTE 
     Route::get('/tagihan/{tagihan}/print', [TagihanController::class, 'cetakBrowser'])->name('tagihan.cetakBrowser');
     Route::get('/tagihan/{tagihan}/pdf-detail', [TagihanController::class, 'cetakDetailPdf'])->name('tagihan.cetakDetailPdf');
     

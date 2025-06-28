@@ -16,10 +16,12 @@
                         </a>
                     </div>
                     
+                    {{-- Form Filter dengan Layout Grid Baru --}}
                     <form action="{{ route('santri.index') }}" method="GET" class="mb-6">
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 items-end">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
+                            
                             {{-- Filter Nama Santri --}}
-                            <div>
+                            <div class="lg:col-span-2">
                                 <label for="search" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Cari Nama Santri</label>
                                 <input type="text" name="search" id="search" placeholder="Ketik nama..." value="{{ request('search') }}" class="mt-1 block w-full form-input rounded-md shadow-sm dark:bg-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-600">
                             </div>
@@ -29,10 +31,9 @@
                                 <label for="status_santri" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Status Santri</label>
                                 <select name="status_santri" id="status_santri" class="mt-1 block w-full form-select rounded-md shadow-sm dark:bg-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-600">
                                     <option value="">Semua Status</option>
-                                    <option value="Aktif" {{ request('status_santri') == 'Aktif' ? 'selected' : '' }}>Aktif</option>
-                                    <option value="Lulus" {{ request('status_santri') == 'Lulus' ? 'selected' : '' }}>Lulus</option>
-                                    <option value="Berhenti" {{ request('status_santri') == 'Berhenti' ? 'selected' : '' }}>Berhenti</option>
-                                    <option value="Pengurus" {{ request('status_santri') == 'Pengurus' ? 'selected' : '' }}>Pengurus</option>
+                                    @foreach($statusOptions as $option)
+                                        <option value="{{ $option }}" {{ request('status_santri') == $option ? 'selected' : '' }}>{{ $option }}</option>
+                                    @endforeach
                                 </select>
                             </div>
 
@@ -46,9 +47,25 @@
                                     @endforeach
                                 </select>
                             </div>
+
+                            {{-- Filter Kelas --}}
+                            <div>
+                                <label for="kelas" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Kelas</label>
+                                <select name="kelas" id="kelas" class="mt-1 block w-full form-select rounded-md shadow-sm dark:bg-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-600">
+                                    <option value="">Semua Kelas</option>
+                                    @foreach($kelasOptions as $option)
+                                        <option value="{{ $option }}" {{ request('kelas') == $option ? 'selected' : '' }}>{{ $option }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
                         </div>
-                        <div class="flex justify-end mt-4">
-                             <button type="submit" class="inline-flex items-center justify-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700">
+
+                        {{-- Tombol Aksi --}}
+                        <div class="flex justify-end mt-4 space-x-2">
+                            <a href="{{ route('santri.index') }}" class="inline-flex items-center justify-center px-4 py-2 bg-gray-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-600">
+                                <i class="fas fa-sync-alt mr-2"></i>Reset
+                            </a>
+                            <button type="submit" class="inline-flex items-center justify-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700">
                                 <i class="fas fa-filter mr-2"></i>Filter
                             </button>
                         </div>
@@ -78,7 +95,7 @@
                                         <td class="px-6 py-4 font-medium text-gray-900 dark:text-gray-100">{{ $santri->nama_lengkap }}</td>
                                         <td class="px-6 py-4 text-center">
                                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                                                @if($santri->status_santri == 'Aktif' || $santri->status_santri == 'Pengurus') bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100
+                                                @if($santri->status_santri == 'Aktif' || $santri->status_santri == 'Pengurus' || $santri->status_santri == 'Baru') bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100
                                                 @else bg-gray-100 text-gray-800 dark:bg-gray-600 dark:text-gray-200 @endif">
                                                 {{ $santri->status_santri }}
                                             </span>

@@ -21,18 +21,16 @@
                         </div>
                     @endif
 
-                    <form action="{{ route('perizinan.update', $perizinan->id) }}" method="POST" class="space-y-6">
+                    <form action="{{ route('perizinan.update', $perizinan) }}" method="POST" class="space-y-6">
                         @csrf
                         @method('PUT')
 
-                        {{-- Panel Detail Santri (Tidak bisa diubah) --}}
+                        {{-- Panel Detail Santri dikembalikan sesuai permintaan --}}
                         <div class="p-4 border border-gray-200 dark:border-gray-700 rounded-lg space-y-4">
                             <h3 class="font-semibold text-lg">Detail Santri</h3>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div><p class="text-sm text-gray-500 dark:text-gray-400">ID Santri</p><p class="mt-1 font-semibold font-mono">{{ optional($perizinan->santri)->Id_santri }}</p></div>
                                 <div><p class="text-sm text-gray-500 dark:text-gray-400">Nama Lengkap</p><p class="mt-1 font-semibold">{{ optional($perizinan->santri)->nama_lengkap }}</p></div>
-                                <div><p class="text-sm text-gray-500 dark:text-gray-400">Jenis Kelamin</p><p class="mt-1 font-semibold">{{ optional($perizinan->santri)->jenis_kelamin }}</p></div>
-                                <div><p class="text-sm text-gray-500 dark:text-gray-400">Tempat, Tanggal Lahir</p><p class="mt-1 font-semibold">{{ optional($perizinan->santri)->tempat_lahir }}, {{ optional(optional($perizinan->santri)->tanggal_lahir)->isoFormat('D MMMM Y') }}</p></div>
                                 <div><p class="text-sm text-gray-500 dark:text-gray-400">Pendidikan</p><p class="mt-1 font-semibold">{{ optional($perizinan->santri)->pendidikan }}</p></div>
                                 <div><p class="text-sm text-gray-500 dark:text-gray-400">Kamar</p><p class="mt-1 font-semibold">{{ optional($perizinan->santri)->kamar }}</p></div>
                             </div>
@@ -40,7 +38,7 @@
 
                         <hr class="dark:border-gray-700">
 
-                        {{-- Form Input Spesifik Perizinan --}}
+                        {{-- Form Input disederhanakan sesuai permintaan --}}
                         <div class="space-y-6">
                             <div>
                                 <label for="kepentingan_izin" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Kepentingan Izin</label>
@@ -62,14 +60,6 @@
                                     <input type="date" name="tanggal_kembali" id="tanggal_kembali" value="{{ old('tanggal_kembali', $perizinan->tanggal_kembali->format('Y-m-d')) }}" required class="mt-1 block w-full rounded-md dark:bg-gray-700" style="color-scheme: dark;">
                                 </div>
                             </div>
-                             <div>
-                                <label for="status" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
-                                <select name="status" id="status" required class="mt-1 block w-full form-select rounded-md shadow-sm dark:bg-gray-700 dark:text-gray-200">
-                                    <option value="Izin" {{ old('status', $perizinan->status) == 'Izin' ? 'selected' : '' }}>Izin</option>
-                                    <option value="Kembali" {{ old('status', $perizinan->status) == 'Kembali' ? 'selected' : '' }}>Kembali</option>
-                                    <option value="Terlambat" {{ old('status', $perizinan->status) == 'Terlambat' ? 'selected' : '' }}>Terlambat</option>
-                                </select>
-                            </div>
                             <div>
                                 <label for="keterangan_tambahan" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Keterangan Tambahan (Opsional)</label>
                                 <textarea name="keterangan_tambahan" id="keterangan_tambahan" rows="4" class="mt-1 block w-full rounded-md dark:bg-gray-700">{{ old('keterangan_tambahan', $perizinan->keterangan_tambahan) }}</textarea>
@@ -77,7 +67,7 @@
                         </div>
 
                         <div class="flex items-center justify-end space-x-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                            <a href="{{ route('perizinan.show', $perizinan->id) }}" class="px-4 py-2 bg-gray-300 dark:bg-gray-600 rounded-md font-semibold text-xs uppercase tracking-widest">Batal</a>
+                            <a href="{{ route('perizinan.show', $perizinan->id_izin) }}" class="px-4 py-2 bg-gray-300 dark:bg-gray-600 rounded-md font-semibold text-xs uppercase tracking-widest">Batal</a>
                             <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md font-semibold text-xs uppercase tracking-widest">Perbarui</button>
                         </div>
                     </form>

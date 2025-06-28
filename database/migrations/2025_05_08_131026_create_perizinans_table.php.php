@@ -12,14 +12,19 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('perizinans', function (Blueprint $table) {
-            $table->id();
-            $table->string('id_izin')->unique(); // ID unik untuk perizinan
+            // MENGUBAH PRIMARY KEY DARI 'id' MENJADI 'id_izin'
+            $table->string('id_izin')->primary(); 
+            
             $table->foreignId('santri_id')->constrained('santris')->onDelete('cascade');
             $table->string('kepentingan_izin');
+            $table->text('keterangan_izin')->nullable();
+            $table->string('penjemput');
+            $table->string('nomer_penjemput');
             $table->date('tanggal_izin');
-            $table->date('tanggal_kembali')->nullable(); 
-            $table->enum('status', ['Izin', 'Kembali', 'Terlambat'])->default('Izin');
-            $table->text('keterangan_tambahan')->nullable();
+            $table->time('jam_izin');
+            $table->date('tanggal_kembali')->nullable();
+            $table->time('jam_kembali')->nullable();
+            $table->string('status');
             $table->timestamps();
         });
     }

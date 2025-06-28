@@ -9,33 +9,49 @@ class Perizinan extends Model
 {
     use HasFactory;
 
+    // Beritahu Eloquent bahwa primary key bukan 'id'
+    protected $primaryKey = 'id_izin'; 
+
+    // Beritahu Eloquent bahwa primary key bukan auto-incrementing integer
+    public $incrementing = false; 
+
+    // Beritahu Eloquent bahwa tipe primary key adalah string
+    protected $keyType = 'string';
+
     /**
      * The attributes that are mass assignable.
      *
      * @var array<int, string>
      */
     protected $fillable = [
-        'id_izin',
+        'id_izin', 
         'santri_id',
         'kepentingan_izin',
+        'keterangan_izin',
+        'penjemput',
+        'nomer_penjemput',
         'tanggal_izin',
+        'jam_izin',
         'tanggal_kembali',
+        'jam_kembali',
         'status',
-        'keterangan_tambahan',
     ];
 
     /**
-     * The attributes that should be cast to native types.
+     * The attributes that should be cast.
      *
-     * @var array
+     * @var array<string, string>
      */
+    // --- TAMBAHAN BARU UNTUK MEMPERBAIKI ERROR ---
     protected $casts = [
         'tanggal_izin' => 'date',
         'tanggal_kembali' => 'date',
     ];
+    // --- AKHIR TAMBAHAN ---
+
 
     /**
-     * Get the santri for the permission.
+     * Get the santri that owns the perizinan.
      */
     public function santri()
     {
