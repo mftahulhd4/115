@@ -21,14 +21,15 @@
                         </div>
                     @endif
 
-                    <form action="{{ route('santri.update', $santri->id) }}" method="POST" enctype="multipart/form-data">
+                    {{-- PERUBAHAN PADA ACTION FORM --}}
+                    <form action="{{ route('santri.update', $santri) }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             
                             <div>
-                                <x-input-label for="Id_santri" :value="__('ID Santri')" />
-                                <x-text-input id="Id_santri" class="block mt-1 w-full bg-gray-100 dark:bg-gray-700" type="text" name="Id_santri" :value="old('Id_santri', $santri->Id_santri)" readonly />
+                                <x-input-label for="id_santri" :value="__('ID Santri')" />
+                                <x-text-input id="id_santri" class="block mt-1 w-full bg-gray-100 dark:bg-gray-700" type="text" name="id_santri" :value="old('id_santri', $santri->id_santri)" readonly />
                                 <small class="text-xs text-gray-500">ID Santri tidak dapat diubah.</small>
                             </div>
 
@@ -79,8 +80,6 @@
                                 </select>
                             </div>
 
-                            
-
                             <div>
                                 <x-input-label for="kelas" :value="__('Kelas')" />
                                 <x-text-input id="kelas" class="block mt-1 w-full" type="text" name="kelas" :value="old('kelas', $santri->kelas)" />
@@ -129,7 +128,7 @@
                         </div>
 
                         <div class="flex items-center justify-end mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
-                            <a href="{{ route('santri.show', $santri->id) }}" class="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800">
+                            <a href="{{ route('santri.show', $santri) }}" class="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800">
                                 {{ __('Batal') }}
                             </a>
                             <x-primary-button class="ml-4">

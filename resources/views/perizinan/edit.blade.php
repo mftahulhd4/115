@@ -25,20 +25,38 @@
                         @csrf
                         @method('PUT')
 
-                        {{-- Panel Detail Santri dikembalikan sesuai permintaan --}}
+                        {{-- Panel Detail Santri --}}
                         <div class="p-4 border border-gray-200 dark:border-gray-700 rounded-lg space-y-4">
                             <h3 class="font-semibold text-lg">Detail Santri</h3>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div><p class="text-sm text-gray-500 dark:text-gray-400">ID Santri</p><p class="mt-1 font-semibold font-mono">{{ optional($perizinan->santri)->Id_santri }}</p></div>
+                                <div><p class="text-sm text-gray-500 dark:text-gray-400">ID Santri</p><p class="mt-1 font-semibold font-mono">{{ optional($perizinan->santri)->id_santri }}</p></div>
                                 <div><p class="text-sm text-gray-500 dark:text-gray-400">Nama Lengkap</p><p class="mt-1 font-semibold">{{ optional($perizinan->santri)->nama_lengkap }}</p></div>
-                                <div><p class="text-sm text-gray-500 dark:text-gray-400">Pendidikan</p><p class="mt-1 font-semibold">{{ optional($perizinan->santri)->pendidikan }}</p></div>
-                                <div><p class="text-sm text-gray-500 dark:text-gray-400">Kamar</p><p class="mt-1 font-semibold">{{ optional($perizinan->santri)->kamar }}</p></div>
+                                
+                                {{-- BAGIAN YANG DITAMBAHKAN KEMBALI --}}
+                                <div>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">Jenis Kelamin</p>
+                                    <p class="mt-1 font-semibold">{{ optional($perizinan->santri)->jenis_kelamin }}</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">Tempat, Tanggal Lahir</p>
+                                    <p class="mt-1 font-semibold">{{ optional($perizinan->santri)->tempat_lahir }}, {{ optional($perizinan->santri)->tanggal_lahir ? \Carbon\Carbon::parse(optional($perizinan->santri)->tanggal_lahir)->isoFormat('D MMMM Y') : '' }}</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">Pendidikan</p>
+                                    <p class="mt-1 font-semibold">{{ optional($perizinan->santri)->pendidikan ?? '-' }}</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">Kamar</p>
+                                    <p class="mt-1 font-semibold">{{ optional($perizinan->santri)->kamar ?? '-' }}</p>
+                                </div>
+                                {{-- AKHIR BAGIAN YANG DITAMBAHKAN KEMBALI --}}
+
                             </div>
                         </div>
 
                         <hr class="dark:border-gray-700">
 
-                        {{-- Form Input disederhanakan sesuai permintaan --}}
+                        {{-- Form Input --}}
                         <div class="space-y-6">
                             <div>
                                 <label for="kepentingan_izin" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Kepentingan Izin</label>
@@ -53,11 +71,11 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                     <label for="tanggal_izin" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tanggal Izin</label>
-                                    <input type="date" name="tanggal_izin" id="tanggal_izin" value="{{ old('tanggal_izin', $perizinan->tanggal_izin->format('Y-m-d')) }}" required class="mt-1 block w-full rounded-md dark:bg-gray-700" style="color-scheme: dark;">
+                                    <input type="date" name="tanggal_izin" id="tanggal_izin" value="{{ old('tanggal_izin', \Carbon\Carbon::parse($perizinan->tanggal_izin)->format('Y-m-d')) }}" required class="mt-1 block w-full rounded-md dark:bg-gray-700" style="color-scheme: dark;">
                                 </div>
                                 <div>
                                     <label for="tanggal_kembali" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tanggal Kembali</label>
-                                    <input type="date" name="tanggal_kembali" id="tanggal_kembali" value="{{ old('tanggal_kembali', $perizinan->tanggal_kembali->format('Y-m-d')) }}" required class="mt-1 block w-full rounded-md dark:bg-gray-700" style="color-scheme: dark;">
+                                    <input type="date" name="tanggal_kembali" id="tanggal_kembali" value="{{ old('tanggal_kembali', $perizinan->tanggal_kembali ? \Carbon\Carbon::parse($perizinan->tanggal_kembali)->format('Y-m-d') : '') }}" required class="mt-1 block w-full rounded-md dark:bg-gray-700" style="color-scheme: dark;">
                                 </div>
                             </div>
                             <div>
@@ -67,7 +85,7 @@
                         </div>
 
                         <div class="flex items-center justify-end space-x-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                            <a href="{{ route('perizinan.show', $perizinan->id_izin) }}" class="px-4 py-2 bg-gray-300 dark:bg-gray-600 rounded-md font-semibold text-xs uppercase tracking-widest">Batal</a>
+                            <a href="{{ route('perizinan.show', $perizinan) }}" class="px-4 py-2 bg-gray-300 dark:bg-gray-600 rounded-md font-semibold text-xs uppercase tracking-widest">Batal</a>
                             <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md font-semibold text-xs uppercase tracking-widest">Perbarui</button>
                         </div>
                     </form>

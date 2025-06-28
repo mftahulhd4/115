@@ -11,7 +11,8 @@
                 <div class="p-6 text-gray-900 dark:text-gray-100" x-data="tagihanForm('{{ route('tagihan.searchSantri') }}')">
                     <form action="{{ route('tagihan.store') }}" method="POST" class="space-y-6">
                         @csrf
-                        <input type="hidden" name="santri_id" x-model="santri.id">
+                        {{-- DIPERBAIKI: Mengirim id_santri (kustom) bukan santri_id (numerik) --}}
+                        <input type="hidden" name="id_santri" x-model="santri.id_santri">
 
                         {{-- Bagian Pencarian Santri --}}
                         <div>
@@ -20,7 +21,7 @@
                                 <input type="text" id="search_santri" x-model="searchTerm" @input.debounce.300ms="search()" @focus="showResults = true" autocomplete="off" class="mt-1 block w-full form-input rounded-md shadow-sm dark:bg-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-600 focus:border-indigo-500 focus:ring-indigo-500" placeholder="Ketik nama santri (min 2 huruf)...">
                                 <div x-show="showResults" @click.away="showResults = false" class="absolute z-10 w-full bg-white dark:bg-gray-700 rounded-md shadow-lg mt-1 border dark:border-gray-600" x-cloak>
                                     <div x-show="isLoading" class="p-3 text-gray-500">Mencari...</div>
-                                    <ul x-show="!isLoading">
+                                    <ul x-show="!isLoading" class="max-h-60 overflow-y-auto">
                                         <template x-if="searchResults.length > 0">
                                             <template x-for="result in searchResults" :key="result.id">
                                                 <li @click="selectSantri(result)" class="flex items-center p-3 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600">
@@ -35,18 +36,17 @@
                                     </ul>
                                 </div>
                             </div>
-                            @error('santri_id') <span class="text-red-500 text-sm mt-1">Anda harus memilih santri dari hasil pencarian.</span> @enderror
+                            @error('id_santri') <span class="text-red-500 text-sm mt-1">Anda harus memilih santri dari hasil pencarian.</span> @enderror
                         </div>
 
-                        {{-- =============================================== --}}
-                        {{-- Panel Detail Santri (Struktur HTML Diperbarui) --}}
-                        {{-- =============================================== --}}
+                        {{-- Panel Detail Santri --}}
                         <div class="p-4 border border-gray-200 dark:border-gray-700 rounded-lg space-y-4">
                             <h3 class="font-semibold text-lg">Detail Santri Terpilih</h3>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <p class="text-sm text-gray-500 dark:text-gray-400">ID Santri</p>
-                                    <p class="mt-1 font-semibold font-mono" x-text="santri.Id_santri"></p>
+                                    {{-- DIPERBAIKI: Menggunakan id_santri (huruf kecil) --}}
+                                    <p class="mt-1 font-semibold font-mono" x-text="santri.id_santri"></p>
                                 </div>
                                 <div>
                                     <p class="text-sm text-gray-500 dark:text-gray-400">Nama Lengkap</p>
@@ -116,7 +116,7 @@
                         </div>
                         <div class="flex items-center justify-end space-x-4 pt-4 border-t border-gray-200 dark:border-gray-700">
                             <a href="{{ route('tagihan.index') }}" class="inline-flex items-center px-4 py-2 bg-gray-300 dark:bg-gray-600 border border-transparent rounded-md font-semibold text-xs text-gray-800 dark:text-gray-200 uppercase tracking-widest hover:bg-gray-400 dark:hover:bg-gray-500">Batal</a>
-                            <button type="submit" class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700" :disabled="!santri.id">Simpan</button>
+                            <button type="submit" class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700" :disabled="!santri.id_santri || santri.id_santri === '-'">Simpan</button>
                         </div>
                     </form>
                 </div>
@@ -133,8 +133,8 @@
             searchResults: [],
             showResults: false,
             isLoading: false,
-            // Perbarui objek santri untuk menampung data baru
-            santri: { id: null, Id_santri: '-', nama_lengkap: '-', ttl: '-', jenis_kelamin: '-', pendidikan: '-', kamar: '-' },
+            // DIPERBAIKI: Menggunakan id_santri (huruf kecil)
+            santri: { id: null, id_santri: '-', nama_lengkap: '-', ttl: '-', jenis_kelamin: '-', pendidikan: '-', kamar: '-' },
             search() {
                 if (this.searchTerm.length < 2) { this.searchResults = []; return; }
                 this.isLoading = true;
@@ -145,12 +145,12 @@
                     .catch(error => { console.error('Error:', error); this.searchResults = []; })
                     .finally(() => { this.isLoading = false; });
             },
-            // Perbarui fungsi ini untuk mengisi data baru saat santri dipilih
             selectSantri(result) {
                 let tglLahirFormatted = result.tanggal_lahir ? new Date(result.tanggal_lahir).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }) : '';
                 
                 this.santri.id = result.id || null;
-                this.santri.Id_santri = result.Id_santri || '-';
+                // DIPERBAIKI: Menggunakan id_santri (huruf kecil)
+                this.santri.id_santri = result.id_santri || '-';
                 this.santri.nama_lengkap = result.nama_lengkap || '-';
                 this.santri.ttl = result.tempat_lahir ? `${result.tempat_lahir}, ${tglLahirFormatted}` : (tglLahirFormatted || '-');
                 this.santri.jenis_kelamin = result.jenis_kelamin || '-';

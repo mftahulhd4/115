@@ -12,20 +12,17 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('perizinans', function (Blueprint $table) {
-            // MENGUBAH PRIMARY KEY DARI 'id' MENJADI 'id_izin'
-            $table->string('id_izin')->primary(); 
-            
-            $table->foreignId('santri_id')->constrained('santris')->onDelete('cascade');
+            $table->string('id_izin')->primary();
+            $table->string('id_santri');
             $table->string('kepentingan_izin');
-            $table->text('keterangan_izin')->nullable();
-            $table->string('penjemput');
-            $table->string('nomer_penjemput');
             $table->date('tanggal_izin');
-            $table->time('jam_izin');
             $table->date('tanggal_kembali')->nullable();
-            $table->time('jam_kembali')->nullable();
             $table->string('status');
+            $table->text('keterangan_tambahan')->nullable();
             $table->timestamps();
+
+            // DIUBAH MENJADI HURUF KECIL
+            $table->foreign('id_santri')->references('id_santri')->on('santris')->onDelete('cascade');
         });
     }
 

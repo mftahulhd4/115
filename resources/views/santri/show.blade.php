@@ -7,13 +7,13 @@
 
     <div class="py-12">
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
-            {{-- 1. Inisialisasi Alpine.js untuk kontrol modal --}}
+            {{-- Inisialisasi Alpine.js untuk kontrol modal --}}
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg" x-data="{ showModal: false }">
                 <div class="p-6 text-gray-900 dark:text-gray-100 printable-content">
                     
                     {{-- Header Detail Santri --}}
                     <div class="flex items-center space-x-4 pb-4 border-b border-gray-200 dark:border-gray-700">
-                        {{-- 2. Foto dibuat bisa diklik --}}
+                        {{-- Foto dibuat bisa diklik --}}
                         <div @if($santri->foto) @click="showModal = true" @endif class="relative cursor-pointer">
                              <img class="h-20 w-20 rounded-full object-cover" src="{{ $santri->foto ? asset('storage/fotos/' . $santri->foto) : '/images/default-avatar.png' }}" alt="Foto Santri">
                              @if($santri->foto)
@@ -24,7 +24,7 @@
                         </div>
                         <div>
                             <h3 class="text-2xl font-bold">{{ $santri->nama_lengkap }}</h3>
-                            <p class="text-md text-gray-500 dark:text-gray-400">{{ $santri->Id_santri }}</p>
+                            <p class="text-md text-gray-500 dark:text-gray-400">{{ $santri->id_santri }}</p>
                         </div>
                     </div>
 
@@ -68,10 +68,16 @@
                         <a href="{{ route('santri.cetakBrowser', $santri) }}" target="_blank" class="inline-flex items-center justify-center px-4 py-2 bg-gray-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700"><i class="fas fa-print mr-2"></i>Cetak</a>
                         <a href="{{ route('santri.cetakDetailPdf', $santri) }}" class="inline-flex items-center justify-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700"><i class="fas fa-file-pdf mr-2"></i>Cetak PDF</a>
                         <a href="{{ route('santri.edit', $santri) }}" class="inline-flex items-center justify-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700"><i class="fas fa-edit mr-2"></i>Edit</a>
-                        <form action="{{ route('santri.destroy', $santri->id) }}" method="POST" onsubmit="return confirm('Yakin hapus data santri ini? Ini tidak dapat diurungkan.');">@csrf @method('DELETE')<button type="submit" class="inline-flex items-center justify-center px-4 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-700"><i class="fas fa-trash mr-2"></i>Hapus</button></form>
+                        
+                        {{-- PERUBAHAN PADA ACTION FORM HAPUS --}}
+                        <form action="{{ route('santri.destroy', $santri) }}" method="POST" onsubmit="return confirm('Yakin hapus data santri ini? Ini tidak dapat diurungkan.');">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="inline-flex items-center justify-center px-4 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-700"><i class="fas fa-trash mr-2"></i>Hapus</button>
+                        </form>
                     </div>
 
-                    {{-- 3. Bagian HTML untuk Modal Foto --}}
+                    {{-- Modal Foto --}}
                     @if ($santri->foto)
                         <div
                             x-show="showModal"

@@ -91,7 +91,8 @@
                                 @forelse ($santris as $santri)
                                     <tr class="hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer" onclick="window.location.href='{{ route('santri.show', $santri) }}'">
                                         <td class="px-6 py-4"><img class="h-10 w-10 rounded-full object-cover" src="{{ $santri->foto ? asset('storage/fotos/' . $santri->foto) : '/images/default-avatar.png' }}" alt="Foto Santri"></td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-500 dark:text-gray-400">{{ $santri->Id_santri }}</td>
+                                        {{-- MEMASTIKAN PEMANGGILAN PROPERTI BENAR --}}
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-500 dark:text-gray-400">{{ $santri->id_santri }}</td>
                                         <td class="px-6 py-4 font-medium text-gray-900 dark:text-gray-100">{{ $santri->nama_lengkap }}</td>
                                         <td class="px-6 py-4 text-center">
                                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 

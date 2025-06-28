@@ -4,45 +4,36 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Tagihan extends Model
 {
     use HasFactory;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
-        'santri_id',
+        'id_santri', // <-- BARIS INI DITAMBAHKAN
         'Id_tagihan',
         'jenis_tagihan',
         'nominal',
         'tanggal_tagihan',
         'tanggal_jatuh_tempo',
-        'tanggal_pelunasan',
         'status',
         'keterangan_tambahan',
+        'tanggal_pelunasan',
     ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
-    protected $casts = [
-        'nominal' => 'float',
-        'tanggal_tagihan' => 'date',
-        'tanggal_jatuh_tempo' => 'date',
-        'tanggal_pelunasan' => 'date',
-    ];
-
-    /**
-     * Get the santri that owns the tagihan.
-     */
-    public function santri()
+    protected function casts(): array
     {
-        return $this->belongsTo(Santri::class);
+        return [
+            'tanggal_tagihan' => 'datetime',
+            'tanggal_jatuh_tempo' => 'datetime',
+            'tanggal_pelunasan' => 'datetime',
+            'nominal' => 'decimal:2',
+        ];
+    }
+    
+    public function santri(): BelongsTo
+    {
+        return $this->belongsTo(Santri::class, 'id_santri', 'id_santri');
     }
 }

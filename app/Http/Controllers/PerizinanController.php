@@ -15,16 +15,12 @@ class PerizinanController extends Controller
     {
         $query = Perizinan::with('santri')->latest();
 
-        // Terapkan filter berdasarkan input dari request
         if ($request->filled('nama_santri')) {
             $query->whereHas('santri', function ($q) use ($request) {
                 $q->where('nama_lengkap', 'like', '%' . $request->nama_santri . '%');
             });
         }
         
-        // Logika untuk filter 'status' dihapus
-
-        // Filter berdasarkan bulan dan tahun
         if ($request->filled('bulan')) {
             $query->whereMonth('tanggal_izin', $request->bulan);
         }
@@ -33,8 +29,7 @@ class PerizinanController extends Controller
         }
 
         $perizinans = $query->paginate(10)->withQueryString();
-
-        // Variabel untuk opsi filter yang tidak perlu sudah dihapus
+        
         return view('perizinan.index', compact('perizinans'));
     }
 
@@ -46,7 +41,7 @@ class PerizinanController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'santri_id' => 'required|exists:santris,id',
+            'id_santri' => 'required|exists:santris,id_santri',
             'kepentingan_izin' => 'required|string|max:255',
             'tanggal_izin' => 'required|date',
             'tanggal_kembali' => 'required|date|after_or_equal:tanggal_izin',
@@ -66,7 +61,7 @@ class PerizinanController extends Controller
         
         $validated['id_izin'] = "IZN-{$today}-" . str_pad($sequence, 4, '0', STR_PAD_LEFT);
         $validated['status'] = 'Izin';
-
+        
         Perizinan::create($validated);
 
         return redirect()->route('perizinan.index')->with('success', 'Data perizinan berhasil dibuat.');
@@ -74,11 +69,13 @@ class PerizinanController extends Controller
 
     public function show(Perizinan $perizinan)
     {
+        $perizinan->load('santri');
         return view('perizinan.show', compact('perizinan'));
     }
 
     public function edit(Perizinan $perizinan)
     {
+        $perizinan->load('santri'); 
         return view('perizinan.edit', compact('perizinan'));
     }
 
@@ -112,10 +109,10 @@ class PerizinanController extends Controller
     {
         $term = $request->get('term');
         $santris = Santri::where('nama_lengkap', 'like', '%' . $term . '%')
-                        ->orWhere('Id_santri', 'like', '%' . $term . '%')
+                        ->orWhere('id_santri', 'like', '%' . $term . '%')
                         ->where('status_santri', 'Aktif')
                         ->limit(10)
-                        ->get(['id', 'Id_santri', 'nama_lengkap', 'kamar', 'pendidikan', 'kelas', 'foto']);
+                        ->get(['id', 'id_santri', 'nama_lengkap', 'kamar', 'pendidikan', 'kelas', 'foto', 'jenis_kelamin', 'tempat_lahir', 'tanggal_lahir']);
 
         $santris->transform(function ($santri) {
             $santri->foto_url = $santri->foto
@@ -130,7 +127,7 @@ class PerizinanController extends Controller
     public function cetakDetailPdf(Perizinan $perizinan)
     {
         $pdf = Pdf::loadView('perizinan.detail_pdf', compact('perizinan'));
-        return $pdf->download('surat-izin-' . $perizinan->santri->nama_lengkap . '.pdf');
+        return $pdf->download('surat-izin-' . optional($perizinan->santri)->nama_lengkap . '.pdf');
     }
 
     public function cetakBrowser(Perizinan $perizinan)

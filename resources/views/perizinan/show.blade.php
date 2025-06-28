@@ -15,7 +15,8 @@
                         <img class="h-20 w-20 rounded-full object-cover" src="{{ optional($perizinan->santri)->foto ? asset('storage/fotos/' . optional($perizinan->santri)->foto) : '/images/default-avatar.png' }}" alt="Foto Santri">
                         <div>
                             <h3 class="text-2xl font-bold">{{ optional($perizinan->santri)->nama_lengkap ?? 'Santri Telah Dihapus' }}</h3>
-                            <p class="text-md text-gray-500 dark:text-gray-400">{{ optional($perizinan->santri)->Id_santri }}</p>
+                            {{-- DIUBAH: dari Id_santri menjadi id_santri agar konsisten --}}
+                            <p class="text-md text-gray-500 dark:text-gray-400">{{ optional($perizinan->santri)->id_santri }}</p>
                         </div>
                     </div>
 
@@ -28,15 +29,16 @@
                             </div>
                             <div>
                                 <p class="text-sm text-gray-500 dark:text-gray-400">Tempat, Tanggal Lahir</p>
-                                <p class="font-semibold">{{ optional($perizinan->santri)->tempat_lahir }}, {{ optional(optional($perizinan->santri)->tanggal_lahir)->isoFormat('D MMMM Y') }}</p>
+                                {{-- DIPERBAIKI: Menambahkan Carbon::parse untuk mencegah error --}}
+                                <p class="font-semibold">{{ optional($perizinan->santri)->tempat_lahir }}, {{ optional($perizinan->santri)->tanggal_lahir ? \Carbon\Carbon::parse(optional($perizinan->santri)->tanggal_lahir)->isoFormat('D MMMM Y') : '' }}</p>
                             </div>
                             <div>
                                 <p class="text-sm text-gray-500 dark:text-gray-400">Pendidikan</p>
-                                <p class="font-semibold">{{ optional($perizinan->santri)->pendidikan }}</p>
+                                <p class="font-semibold">{{ optional($perizinan->santri)->pendidikan ?? '-' }}</p>
                             </div>
                             <div>
                                 <p class="text-sm text-gray-500 dark:text-gray-400">Kamar</p>
-                                <p class="font-semibold">{{ optional($perizinan->santri)->kamar }}</p>
+                                <p class="font-semibold">{{ optional($perizinan->santri)->kamar ?? '-' }}</p>
                             </div>
                         </div>
                     </div>
@@ -48,20 +50,22 @@
                                 <p class="text-sm text-gray-500 dark:text-gray-400">ID Izin</p>
                                 <p class="font-semibold font-mono">{{ $perizinan->id_izin }}</p>
                             </div>
-                             {{-- KOLOM STATUS TELAH DIHAPUS DARI SINI --}}
+                             
                             <div class="md:col-span-2">
                                 <p class="text-sm text-gray-500 dark:text-gray-400">Kepentingan</p>
                                 <p class="font-semibold">{{ $perizinan->kepentingan_izin }}</p>
                             </div>
                             <div>
                                 <p class="text-sm text-gray-500 dark:text-gray-400">Tanggal Izin</p>
-                                <p class="font-semibold">{{ $perizinan->tanggal_izin->isoFormat('dddd, D MMMM Y') }}</p>
+                                {{-- DIPERBAIKI: Menambahkan Carbon::parse untuk mencegah error --}}
+                                <p class="font-semibold">{{ \Carbon\Carbon::parse($perizinan->tanggal_izin)->isoFormat('dddd, D MMMM Y') }}</p>
                             </div>
                             <div>
                                 <p class="text-sm text-gray-500 dark:text-gray-400">Tanggal Kembali</p>
                                 <p class="font-semibold">
+                                    {{-- DIPERBAIKI: Menambahkan Carbon::parse untuk mencegah error --}}
                                     @if($perizinan->tanggal_kembali)
-                                        {{ $perizinan->tanggal_kembali->isoFormat('dddd, D MMMM Y') }}
+                                        {{ \Carbon\Carbon::parse($perizinan->tanggal_kembali)->isoFormat('dddd, D MMMM Y') }}
                                     @else
                                         -
                                     @endif
@@ -69,12 +73,13 @@
                             </div>
                             <div class="md:col-span-2">
                                 <p class="text-sm text-gray-500 dark:text-gray-400">Keterangan Tambahan</p>
-                                <p class="font-semibold">{{ $perizinan->keterangan_izin ?? '-' }}</p>
+                                {{-- DIUBAH: dari keterangan_izin menjadi keterangan_tambahan --}}
+                                <p class="font-semibold">{{ $perizinan->keterangan_tambahan ?? '-' }}</p>
                             </div>
                         </div>
                     </div>
                     
-                    {{-- Tombol Aksi (Tampilan Disesuaikan seperti santri/show.blade.php) --}}
+                    {{-- Tombol Aksi --}}
                     <div class="mt-8 pt-4 border-t border-gray-200 dark:border-gray-700 flex flex-wrap items-center justify-end gap-3 no-print">
                         <a href="{{ route('perizinan.index') }}" class="inline-flex items-center justify-center px-4 py-2 bg-gray-200 dark:bg-gray-600 border border-transparent rounded-md font-semibold text-xs text-gray-800 dark:text-gray-200 uppercase tracking-widest hover:bg-gray-300 dark:hover:bg-gray-500">
                             Kembali

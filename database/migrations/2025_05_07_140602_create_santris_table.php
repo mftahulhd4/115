@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('santris', function (Blueprint $table) {
             $table->id();
-            $table->string('Id_santri')->unique()->nullable();
+            $table->string('id_santri')->unique()->nullable(); // DIUBAH MENJADI HURUF KECIL
             $table->string('nama_lengkap');
             $table->enum('jenis_kelamin', ['Laki-laki', 'Perempuan']);
             $table->string('tempat_lahir');
@@ -25,7 +25,7 @@ return new class extends Migration
             $table->string('nama_bapak');
             $table->string('nama_ibu');
             $table->string('nomer_orang_tua');
-            $table->enum('status_santri', ['Aktif', 'Baru', 'Pengurus', 'Alumni'])->default('Baru'); // Ditambahkan kembali
+            $table->enum('status_santri', ['Aktif', 'Baru', 'Pengurus', 'Alumni'])->default('Baru');
             $table->year('tahun_masuk');
             $table->year('tahun_keluar')->nullable();
             $table->string('foto')->nullable();

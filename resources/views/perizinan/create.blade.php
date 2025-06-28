@@ -11,7 +11,8 @@
                 <div class="p-6 text-gray-900 dark:text-gray-100" x-data="perizinanForm('{{ route('perizinan.searchSantri') }}')">
                     <form action="{{ route('perizinan.store') }}" method="POST" class="space-y-6">
                         @csrf
-                        <input type="hidden" name="santri_id" x-model="selectedSantri.id">
+                        {{-- Menggunakan 'id_santri' (huruf kecil) --}}
+                        <input type="hidden" name="id_santri" x-model="selectedSantri.id_santri">
 
                         {{-- Bagian Pencarian Santri --}}
                         <div>
@@ -35,7 +36,7 @@
                                     </ul>
                                 </div>
                             </div>
-                            @error('santri_id') <span class="text-red-500 text-sm mt-1">Anda harus memilih santri.</span> @enderror
+                            @error('id_santri') <span class="text-red-500 text-sm mt-1">Anda harus memilih santri.</span> @enderror
                         </div>
 
                         {{-- Panel Detail Santri --}}
@@ -44,7 +45,8 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <p class="text-sm text-gray-500 dark:text-gray-400">ID Santri</p>
-                                    <p class="mt-1 font-semibold font-mono" x-text="selectedSantri.Id_santri"></p>
+                                    {{-- Menggunakan 'id_santri' (huruf kecil) --}}
+                                    <p class="mt-1 font-semibold font-mono" x-text="selectedSantri.id_santri"></p>
                                 </div>
                                 <div>
                                     <p class="text-sm text-gray-500 dark:text-gray-400">Nama Lengkap</p>
@@ -103,7 +105,7 @@
 
                         <div class="flex items-center justify-end space-x-4 pt-4 border-t border-gray-200 dark:border-gray-700">
                             <a href="{{ route('perizinan.index') }}" class="px-4 py-2 bg-gray-300 dark:bg-gray-600 rounded-md font-semibold text-xs uppercase tracking-widest">Batal</a>
-                            <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md font-semibold text-xs uppercase tracking-widest" :disabled="!selectedSantri.id">Simpan</button>
+                            <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md font-semibold text-xs uppercase tracking-widest" :disabled="!selectedSantri.id_santri || selectedSantri.id_santri === '-'">Simpan</button>
                         </div>
                     </form>
                 </div>
@@ -121,8 +123,9 @@
             showResults: false,
             isLoading: false,
             selectedSantri: { 
+                // Menggunakan 'id_santri' (huruf kecil)
                 id: null, 
-                Id_santri: '-', 
+                id_santri: '-', 
                 nama_lengkap: '-', 
                 jenis_kelamin: '-', 
                 ttl: '-', 
@@ -143,8 +146,9 @@
             selectSantri(santri) {
                 let tglLahirFormatted = santri.tanggal_lahir ? new Date(santri.tanggal_lahir).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }) : '';
                 
+                // Menggunakan 'id_santri' (huruf kecil)
                 this.selectedSantri.id = santri.id || null;
-                this.selectedSantri.Id_santri = santri.Id_santri || '-';
+                this.selectedSantri.id_santri = santri.id_santri || '-';
                 this.selectedSantri.nama_lengkap = santri.nama_lengkap || '-';
                 this.selectedSantri.jenis_kelamin = santri.jenis_kelamin || '-';
                 this.selectedSantri.ttl = santri.tempat_lahir ? `${santri.tempat_lahir}, ${tglLahirFormatted}` : (tglLahirFormatted || '-');
