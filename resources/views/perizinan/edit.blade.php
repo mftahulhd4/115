@@ -1,92 +1,91 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Edit Izin: ') . $perizinan->id_izin }}
+            {{ __('Edit Perizinan: ') }} {{ $perizinan->id_izin }}
         </h2>
     </x-slot>
 
     <div class="py-12">
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900 dark:text-gray-100">
+                <div class="p-6 md:p-8 text-gray-900 dark:text-gray-100">
                     
-                    @if ($errors->any())
-                        <div class="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-                            <strong class="font-bold">Oops! Ada yang salah.</strong>
-                            <ul class="mt-2 list-disc list-inside">
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endif
-
-                    <form action="{{ route('perizinan.update', $perizinan) }}" method="POST" class="space-y-6">
+                    <form action="{{ route('perizinan.update', $perizinan) }}" method="POST" class="space-y-8">
                         @csrf
                         @method('PUT')
+                        
+                        <div>
+                             <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Detail Santri</h3>
+                             <div class="mt-2 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                                <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 text-sm">
+                                    <dt class="font-medium text-gray-500 dark:text-gray-400">Nama Lengkap</dt>
+                                    <dd class="font-semibold dark:text-gray-200">{{ $perizinan->santri->nama_lengkap ?? 'N/A' }}</dd>
+                                    
+                                    <dt class="font-medium text-gray-500 dark:text-gray-400">ID Santri</dt>
+                                    <dd class="font-mono dark:text-gray-300">{{ $perizinan->santri->id_santri ?? 'N/A' }}</dd>
+                                    
+                                    <dt class="font-medium text-gray-500 dark:text-gray-400">Tempat, Tgl Lahir</dt>
+                                    <dd class="dark:text-gray-300">{{ $perizinan->santri->tempat_lahir ?? '' }}, {{ $perizinan->santri->tanggal_lahir ? \Carbon\Carbon::parse($perizinan->santri->tanggal_lahir)->isoFormat('D MMMM Y') : '' }}</dd>
 
-                        {{-- Panel Detail Santri --}}
-                        <div class="p-4 border border-gray-200 dark:border-gray-700 rounded-lg space-y-4">
-                            <h3 class="font-semibold text-lg">Detail Santri</h3>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div><p class="text-sm text-gray-500 dark:text-gray-400">ID Santri</p><p class="mt-1 font-semibold font-mono">{{ optional($perizinan->santri)->id_santri }}</p></div>
-                                <div><p class="text-sm text-gray-500 dark:text-gray-400">Nama Lengkap</p><p class="mt-1 font-semibold">{{ optional($perizinan->santri)->nama_lengkap }}</p></div>
-                                
-                                {{-- BAGIAN YANG DITAMBAHKAN KEMBALI --}}
-                                <div>
-                                    <p class="text-sm text-gray-500 dark:text-gray-400">Jenis Kelamin</p>
-                                    <p class="mt-1 font-semibold">{{ optional($perizinan->santri)->jenis_kelamin }}</p>
-                                </div>
-                                <div>
-                                    <p class="text-sm text-gray-500 dark:text-gray-400">Tempat, Tanggal Lahir</p>
-                                    <p class="mt-1 font-semibold">{{ optional($perizinan->santri)->tempat_lahir }}, {{ optional($perizinan->santri)->tanggal_lahir ? \Carbon\Carbon::parse(optional($perizinan->santri)->tanggal_lahir)->isoFormat('D MMMM Y') : '' }}</p>
-                                </div>
-                                <div>
-                                    <p class="text-sm text-gray-500 dark:text-gray-400">Pendidikan</p>
-                                    <p class="mt-1 font-semibold">{{ optional($perizinan->santri)->pendidikan ?? '-' }}</p>
-                                </div>
-                                <div>
-                                    <p class="text-sm text-gray-500 dark:text-gray-400">Kamar</p>
-                                    <p class="mt-1 font-semibold">{{ optional($perizinan->santri)->kamar ?? '-' }}</p>
-                                </div>
-                                {{-- AKHIR BAGIAN YANG DITAMBAHKAN KEMBALI --}}
-
+                                    <dt class="font-medium text-gray-500 dark:text-gray-400">Pendidikan</dt>
+                                    <dd class="dark:text-gray-300">{{ $perizinan->santri->pendidikan ?? '-' }}</dd>
+                                    
+                                    <dt class="font-medium text-gray-500 dark:text-gray-400">Kelas</dt>
+                                    <dd class="dark:text-gray-300">{{ $perizinan->santri->kelas ?? '-' }}</dd>
+                                </dl>
                             </div>
                         </div>
 
-                        <hr class="dark:border-gray-700">
-
-                        {{-- Form Input --}}
-                        <div class="space-y-6">
-                            <div>
-                                <label for="kepentingan_izin" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Kepentingan Izin</label>
-                                <select name="kepentingan_izin" id="kepentingan_izin" required class="mt-1 block w-full form-select rounded-md shadow-sm dark:bg-gray-700 dark:text-gray-200">
-                                    <option value="Pulang Kampung" {{ old('kepentingan_izin', $perizinan->kepentingan_izin) == 'Pulang Kampung' ? 'selected' : '' }}>Pulang Kampung</option>
-                                    <option value="Acara Keluarga" {{ old('kepentingan_izin', $perizinan->kepentingan_izin) == 'Acara Keluarga' ? 'selected' : '' }}>Acara Keluarga</option>
-                                    <option value="Sakit / Berobat" {{ old('kepentingan_izin', $perizinan->kepentingan_izin) == 'Sakit / Berobat' ? 'selected' : '' }}>Sakit / Berobat</option>
-                                    <option value="Keperluan Sekolah/Kampus" {{ old('kepentingan_izin', $perizinan->kepentingan_izin) == 'Keperluan Sekolah/Kampus' ? 'selected' : '' }}>Keperluan Sekolah/Kampus</option>
-                                    <option value="Lainnya" {{ old('kepentingan_izin', $perizinan->kepentingan_izin) == 'Lainnya' ? 'selected' : '' }}>Lainnya</option>
-                                </select>
-                            </div>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-3">
+                            <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Edit Detail Perizinan</h3>
+                            <div class="space-y-4">
                                 <div>
-                                    <label for="tanggal_izin" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tanggal Izin</label>
-                                    <input type="date" name="tanggal_izin" id="tanggal_izin" value="{{ old('tanggal_izin', \Carbon\Carbon::parse($perizinan->tanggal_izin)->format('Y-m-d')) }}" required class="mt-1 block w-full rounded-md dark:bg-gray-700" style="color-scheme: dark;">
+                                    <x-input-label for="keperluan" :value="__('Keperluan Izin (Wajib)')" />
+                                    <textarea id="keperluan" name="keperluan" class="block mt-1 w-full border-gray-300 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-300 rounded-md shadow-sm" rows="3" required>{{ old('keperluan', $perizinan->keperluan) }}</textarea>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <x-input-label for="waktu_izin" :value="__('Waktu Mulai Izin')" />
+                                        <x-text-input id="waktu_izin" class="block mt-1 w-full" type="datetime-local" name="waktu_izin" :value="old('waktu_izin', $perizinan->waktu_izin->format('Y-m-d\TH:i'))" required />
+                                    </div>
+                                    <div>
+                                        <x-input-label for="estimasi_kembali" :value="__('Estimasi Kembali')" />
+                                        <x-text-input id="estimasi_kembali" class="block mt-1 w-full" type="datetime-local" name="estimasi_kembali" :value="old('estimasi_kembali', $perizinan->estimasi_kembali->format('Y-m-d\TH:i'))" required />
+                                    </div>
                                 </div>
                                 <div>
-                                    <label for="tanggal_kembali" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tanggal Kembali</label>
-                                    <input type="date" name="tanggal_kembali" id="tanggal_kembali" value="{{ old('tanggal_kembali', $perizinan->tanggal_kembali ? \Carbon\Carbon::parse($perizinan->tanggal_kembali)->format('Y-m-d') : '') }}" required class="mt-1 block w-full rounded-md dark:bg-gray-700" style="color-scheme: dark;">
+                                    <x-input-label for="keterangan" :value="__('Keterangan Tambahan (Opsional)')" />
+                                    <textarea id="keterangan" name="keterangan" class="block mt-1 w-full border-gray-300 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-300 rounded-md shadow-sm" rows="2">{{ old('keterangan', $perizinan->keterangan) }}</textarea>
                                 </div>
-                            </div>
-                            <div>
-                                <label for="keterangan_tambahan" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Keterangan Tambahan (Opsional)</label>
-                                <textarea name="keterangan_tambahan" id="keterangan_tambahan" rows="4" class="mt-1 block w-full rounded-md dark:bg-gray-700">{{ old('keterangan_tambahan', $perizinan->keterangan_tambahan) }}</textarea>
                             </div>
                         </div>
 
-                        <div class="flex items-center justify-end space-x-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                            <a href="{{ route('perizinan.show', $perizinan) }}" class="px-4 py-2 bg-gray-300 dark:bg-gray-600 rounded-md font-semibold text-xs uppercase tracking-widest">Batal</a>
-                            <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md font-semibold text-xs uppercase tracking-widest">Perbarui</button>
+                        <div class="space-y-3">
+                            <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Manajemen Status</h3>
+                            <div class="p-4 border border-yellow-300 dark:border-yellow-700 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg space-y-4">
+                                <div>
+                                    <x-input-label for="status" :value="__('Ubah Status Izin')" />
+                                    <select id="status" name="status" class="mt-1 block w-full border-gray-300 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-300 rounded-md shadow-sm">
+                                        <option value="Pengajuan" {{ old('status', $perizinan->status) == 'Pengajuan' ? 'selected' : '' }}>Pengajuan</option>
+                                        <option value="Diizinkan" {{ old('status', $perizinan->status) == 'Diizinkan' ? 'selected' : '' }}>Diizinkan</option>
+                                        <option value="Kembali" {{ (old('status', $perizinan->status) == 'Kembali' || old('status', $perizinan->status) == 'Terlambat') ? 'selected' : '' }}>Tandai Sudah Kembali</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <x-input-label for="waktu_kembali_aktual" :value="__('Waktu Kembali Aktual (Isi jika sudah kembali)')" />
+                                    <x-text-input id="waktu_kembali_aktual" class="block mt-1 w-full" type="datetime-local" name="waktu_kembali_aktual" :value="optional($perizinan->waktu_kembali_aktual)->format('Y-m-d\TH:i')" />
+                                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Jika status diubah ke 'Kembali' dan ini dikosongkan, waktu saat ini akan digunakan otomatis.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center justify-end mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+                            <a href="{{ route('perizinan.show', $perizinan) }}" class="text-sm text-gray-700 dark:text-gray-300 underline hover:no-underline">
+                                Batal
+                            </a>
+                            <x-primary-button class="ml-4">
+                                {{ __('Simpan Perubahan') }}
+                            </x-primary-button>
                         </div>
                     </form>
                 </div>

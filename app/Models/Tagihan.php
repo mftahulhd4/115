@@ -4,36 +4,49 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Tagihan extends Model
 {
     use HasFactory;
 
+    /**
+     * Nama tabel yang terhubung dengan model ini.
+     */
+    protected $table = 'tagihans';
+
+    /**
+     * Kolom yang dapat diisi secara massal.
+     */
     protected $fillable = [
-        'id_santri', // <-- BARIS INI DITAMBAHKAN
-        'Id_tagihan',
-        'jenis_tagihan',
-        'nominal',
-        'tanggal_tagihan',
-        'tanggal_jatuh_tempo',
-        'status',
-        'keterangan_tambahan',
-        'tanggal_pelunasan',
+        'jenis_tagihan_id',
+        'id_santri',
+        'status_pembayaran',
+        'tanggal_pembayaran',
     ];
 
-    protected function casts(): array
+    /**
+     * Mengubah tipe data kolom secara otomatis.
+     */
+    protected $casts = [
+        'tanggal_pembayaran' => 'datetime',
+    ];
+
+    /**
+     * Mendefinisikan relasi "belongs-to".
+     * Satu Tagihan ini 'milik' satu JenisTagihan.
+     */
+    public function jenisTagihan()
     {
-        return [
-            'tanggal_tagihan' => 'datetime',
-            'tanggal_jatuh_tempo' => 'datetime',
-            'tanggal_pelunasan' => 'datetime',
-            'nominal' => 'decimal:2',
-        ];
+        return $this->belongsTo(JenisTagihan::class);
     }
-    
-    public function santri(): BelongsTo
+
+    /**
+     * Mendefinisikan relasi "belongs-to".
+     * Satu Tagihan ini 'milik' satu Santri.
+     */
+    public function santri()
     {
+        // Foreign key 'id_santri' merujuk ke primary key 'id_santri' di tabel santris
         return $this->belongsTo(Santri::class, 'id_santri', 'id_santri');
     }
 }

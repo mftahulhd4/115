@@ -1,164 +1,165 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Buat Izin Baru') }}
+            {{ __('Buat Pengajuan Izin Baru') }}
         </h2>
     </x-slot>
 
     <div class="py-12">
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900 dark:text-gray-100" x-data="perizinanForm('{{ route('perizinan.searchSantri') }}')">
-                    <form action="{{ route('perizinan.store') }}" method="POST" class="space-y-6">
+                <div class="p-6 md:p-8 text-gray-900 dark:text-gray-100">
+                    
+                    <form action="{{ route('perizinan.store') }}" method="POST" class="space-y-8">
                         @csrf
-                        {{-- Menggunakan 'id_santri' (huruf kecil) --}}
-                        <input type="hidden" name="id_santri" x-model="selectedSantri.id_santri">
-
-                        {{-- Bagian Pencarian Santri --}}
-                        <div>
-                            <label for="search_santri" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Cari Nama Santri</label>
-                            <div class="relative">
-                                <input type="text" id="search_santri" x-model="searchTerm" @input.debounce.300ms="search()" @focus="showResults = true" autocomplete="off" class="mt-1 block w-full form-input rounded-md shadow-sm dark:bg-gray-700 dark:text-gray-200" placeholder="Ketik nama santri...">
-                                <div x-show="showResults" @click.away="showResults = false" class="absolute z-10 w-full bg-white dark:bg-gray-700 rounded-md shadow-lg mt-1" x-cloak>
-                                    <div x-show="isLoading" class="p-3 text-gray-500">Mencari...</div>
-                                    <ul x-show="!isLoading" class="max-h-60 overflow-y-auto">
-                                        <template x-if="santriResults.length > 0">
-                                            <template x-for="santri in santriResults" :key="santri.id">
-                                                <li @click="selectSantri(santri)" class="flex items-center p-3 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600">
-                                                    <img :src="santri.foto_url" alt="Foto" class="h-10 w-10 rounded-full object-cover mr-4">
-                                                    <span class="font-medium" x-text="santri.nama_lengkap"></span>
-                                                </li>
-                                            </template>
-                                        </template>
-                                        <template x-if="santriResults.length === 0 && searchTerm.length > 1">
-                                            <li class="p-3 text-gray-500">Santri tidak ditemukan.</li>
-                                        </template>
-                                    </ul>
-                                </div>
-                            </div>
-                            @error('id_santri') <span class="text-red-500 text-sm mt-1">Anda harus memilih santri.</span> @enderror
+                        
+                        <div class="space-y-3">
+                            <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">1. Pilih Santri</h3>
+                            <x-input-label for="id_santri_select" :value="__('Cari Nama atau ID Santri')" />
+                            <select id="id_santri_select" class="block w-full" name="id_santri_dummy"></select>
+                            <input type="hidden" name="id_santri" id="id_santri">
+                            <x-input-error :messages="$errors->get('id_santri')" class="mt-2" />
                         </div>
 
-                        {{-- Panel Detail Santri --}}
-                        <div class="p-4 border border-gray-200 dark:border-gray-700 rounded-lg space-y-4">
-                            <h3 class="font-semibold text-lg">Detail Santri Terpilih</h3>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <p class="text-sm text-gray-500 dark:text-gray-400">ID Santri</p>
-                                    {{-- Menggunakan 'id_santri' (huruf kecil) --}}
-                                    <p class="mt-1 font-semibold font-mono" x-text="selectedSantri.id_santri"></p>
-                                </div>
-                                <div>
-                                    <p class="text-sm text-gray-500 dark:text-gray-400">Nama Lengkap</p>
-                                    <p class="mt-1 font-semibold" x-text="selectedSantri.nama_lengkap"></p>
-                                </div>
-                                <div>
-                                    <p class="text-sm text-gray-500 dark:text-gray-400">Jenis Kelamin</p>
-                                    <p class="mt-1 font-semibold" x-text="selectedSantri.jenis_kelamin"></p>
-                                </div>
-                                <div>
-                                    <p class="text-sm text-gray-500 dark:text-gray-400">Tempat, Tanggal Lahir</p>
-                                    <p class="mt-1 font-semibold" x-text="selectedSantri.ttl"></p>
-                                </div>
-                                <div>
-                                    <p class="text-sm text-gray-500 dark:text-gray-400">Pendidikan</p>
-                                    <p class="mt-1 font-semibold" x-text="selectedSantri.pendidikan"></p>
-                                </div>
-                                 <div>
-                                    <p class="text-sm text-gray-500 dark:text-gray-400">Kamar</p>
-                                    <p class="mt-1 font-semibold" x-text="selectedSantri.kamar"></p>
-                                </div>
+                        <div class="space-y-3">
+                             <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Detail Santri Terpilih</h3>
+                             <div id="santri-info" class="mt-4 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                                <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 text-sm">
+                                    <dt class="font-medium text-gray-500 dark:text-gray-400">Nama Lengkap</dt>
+                                    <dd id="info-nama" class="font-semibold dark:text-gray-200">-</dd>
+                                    
+                                    <dt class="font-medium text-gray-500 dark:text-gray-400">ID Santri</dt>
+                                    <dd id="info-id" class="font-mono dark:text-gray-300">-</dd>
+                                    
+                                    <dt class="font-medium text-gray-500 dark:text-gray-400">Tempat, Tgl Lahir</dt>
+                                    <dd id="info-ttl" class="dark:text-gray-300">-</dd>
+
+                                    <dt class="font-medium text-gray-500 dark:text-gray-400">Pendidikan</dt>
+                                    <dd id="info-pendidikan" class="dark:text-gray-300">-</dd>
+                                    
+                                    <dt class="font-medium text-gray-500 dark:text-gray-400">Kelas</dt>
+                                    <dd id="info-kelas" class="dark:text-gray-300">-</dd>
+                                </dl>
                             </div>
                         </div>
 
-                        <hr class="dark:border-gray-700">
-
-                        {{-- Form Input Spesifik Perizinan --}}
-                        <div class="space-y-6">
-                            <div>
-                                <label for="kepentingan_izin" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Kepentingan Izin</label>
-                                <select name="kepentingan_izin" id="kepentingan_izin" required class="mt-1 block w-full form-select rounded-md shadow-sm dark:bg-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-600 focus:border-indigo-500 focus:ring-indigo-500">
-                                    <option value="" disabled selected>-- Pilih Kepentingan --</option>
-                                    <option value="Pulang Kampung" {{ old('kepentingan_izin') == 'Pulang Kampung' ? 'selected' : '' }}>Pulang Kampung</option>
-                                    <option value="Acara Keluarga" {{ old('kepentingan_izin') == 'Acara Keluarga' ? 'selected' : '' }}>Acara Keluarga</option>
-                                    <option value="Sakit / Berobat" {{ old('kepentingan_izin') == 'Sakit / Berobat' ? 'selected' : '' }}>Sakit / Berobat</option>
-                                    <option value="Keperluan Sekolah/Kampus" {{ old('kepentingan_izin') == 'Keperluan Sekolah/Kampus' ? 'selected' : '' }}>Keperluan Sekolah/Kampus</option>
-                                    <option value="Lainnya" {{ old('kepentingan_izin') == 'Lainnya' ? 'selected' : '' }}>Lainnya</option>
-                                </select>
-                                @error('kepentingan_izin') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-                            </div>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-3">
+                            <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">2. Detail Perizinan</h3>
+                            <div class="space-y-4">
                                 <div>
-                                    <label for="tanggal_izin" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tanggal Izin</label>
-                                    <input type="date" name="tanggal_izin" id="tanggal_izin" value="{{ old('tanggal_izin', date('Y-m-d')) }}" required class="mt-1 block w-full rounded-md dark:bg-gray-700" style="color-scheme: dark;">
+                                    <x-input-label for="keperluan" :value="__('Keperluan Izin (Wajib)')" />
+                                    <textarea id="keperluan" name="keperluan" class="block mt-1 w-full border-gray-300 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-300 rounded-md shadow-sm" rows="3" required>{{ old('keperluan') }}</textarea>
+                                    <x-input-error :messages="$errors->get('keperluan')" class="mt-2" />
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <x-input-label for="waktu_izin" :value="__('Waktu Mulai Izin')" />
+                                        <x-text-input id="waktu_izin" class="block mt-1 w-full" type="datetime-local" name="waktu_izin" :value="old('waktu_izin')" required />
+                                        <x-input-error :messages="$errors->get('waktu_izin')" class="mt-2" />
+                                    </div>
+                                    <div>
+                                        <x-input-label for="estimasi_kembali" :value="__('Estimasi Kembali')" />
+                                        <x-text-input id="estimasi_kembali" class="block mt-1 w-full" type="datetime-local" name="estimasi_kembali" :value="old('estimasi_kembali')" required />
+                                        <x-input-error :messages="$errors->get('estimasi_kembali')" class="mt-2" />
+                                    </div>
                                 </div>
                                 <div>
-                                    <label for="tanggal_kembali" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tanggal Kembali</label>
-                                    <input type="date" name="tanggal_kembali" id="tanggal_kembali" value="{{ old('tanggal_kembali') }}" required class="mt-1 block w-full rounded-md dark:bg-gray-700" style="color-scheme: dark;">
+                                    <x-input-label for="keterangan" :value="__('Keterangan Tambahan (Opsional)')" />
+                                    <textarea id="keterangan" name="keterangan" class="block mt-1 w-full border-gray-300 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-300 rounded-md shadow-sm" rows="2">{{ old('keterangan') }}</textarea>
+                                    <x-input-error :messages="$errors->get('keterangan')" class="mt-2" />
                                 </div>
-                            </div>
-                            <div>
-                                <label for="keterangan_tambahan" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Keterangan Tambahan (Opsional)</label>
-                                <textarea name="keterangan_tambahan" id="keterangan_tambahan" rows="4" class="mt-1 block w-full rounded-md dark:bg-gray-700" placeholder="Isi jika memilih 'Lainnya' atau perlu detail tambahan...">{{ old('keterangan_tambahan') }}</textarea>
                             </div>
                         </div>
-
-                        <div class="flex items-center justify-end space-x-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                            <a href="{{ route('perizinan.index') }}" class="px-4 py-2 bg-gray-300 dark:bg-gray-600 rounded-md font-semibold text-xs uppercase tracking-widest">Batal</a>
-                            <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md font-semibold text-xs uppercase tracking-widest" :disabled="!selectedSantri.id_santri || selectedSantri.id_santri === '-'">Simpan</button>
+                        
+                        <div class="flex items-center justify-end mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+                            <a href="{{ route('perizinan.index') }}" class="text-sm text-gray-700 dark:text-gray-300 underline hover:no-underline">
+                                Batal
+                            </a>
+                            <x-primary-button class="ml-4">
+                                {{ __('Ajukan Izin') }}
+                            </x-primary-button>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
     </div>
+
+    @push('scripts')
+        <script>
+            $(document).ready(function() {
+                function formatSantri (santri) {
+                    if (santri.loading) { return santri.text; }
+                    var $container = $(
+                        "<div class='select2-result-santri clearfix'>" +
+                            "<div class='select2-result-santri__avatar'><img src='" + (santri.foto_url || '') + "' /></div>" +
+                            "<div class='select2-result-santri__meta'>" +
+                                "<div class='select2-result-santri__title'></div>" +
+                                "<div class='select2-result-santri__id'></div>" +
+                            "</div>" +
+                        "</div>"
+                    );
+                    $container.find(".select2-result-santri__title").text(santri.nama_lengkap);
+                    $container.find(".select2-result-santri__id").text("ID: " + santri.id_santri);
+                    return $container;
+                }
+
+                function formatSantriSelection (santri) {
+                    return santri.nama_lengkap || santri.text;
+                }
+
+                $('#id_santri_select').select2({
+                    placeholder: 'Ketik nama atau ID santri...',
+                    theme: 'bootstrap-5',
+                    minimumInputLength: 1, 
+                    ajax: {
+                        url: '{{ route("perizinan.search") }}',
+                        dataType: 'json',
+                        delay: 250,
+                        processResults: function (data) {
+                            return {
+                                results: $.map(data, function(item) {
+                                    return { id: item.id_santri, text: item.nama_lengkap, ...item };
+                                })
+                            };
+                        },
+                        cache: true
+                    },
+                    templateResult: formatSantri,
+                    templateSelection: formatSantriSelection,
+                    escapeMarkup: function (markup) { return markup; }
+                });
+
+                // PERUBAHAN LOGIKA JAVASCRIPT
+                $('#id_santri_select').on('select2:select', function (e) {
+                    var data = e.params.data;
+                    $('#id_santri').val(data.id_santri);
+                    $('#info-nama').text(data.nama_lengkap || '-');
+                    $('#info-id').text(data.id_santri || '-');
+                    $('#info-kelas').text(data.kelas || '-');
+                    $('#info-pendidikan').text(data.pendidikan || '-');
+                    
+                    // Menggabungkan dan memformat Tempat, Tanggal Lahir
+                    let ttl = '-';
+                    if (data.tempat_lahir) {
+                        ttl = data.tempat_lahir;
+                        if (data.tanggal_lahir) {
+                            const tgl = new Date(data.tanggal_lahir);
+                            const options = { day: '2-digit', month: 'long', year: 'numeric' };
+                            ttl += ', ' + tgl.toLocaleDateString('id-ID', options);
+                        }
+                    }
+                    $('#info-ttl').text(ttl);
+                });
+            });
+        </script>
+        
+        <style>
+            .select2-result-santri__avatar img { width: 40px; height: 40px; border-radius: 50%; margin-right: 10px; object-fit: cover; }
+            .select2-result-santri { display: flex; align-items: center; }
+            .select2-result-santri__meta { display: flex; flex-direction: column; }
+            .select2-result-santri__title { font-weight: 600; color: #333; }
+            .select2-result-santri__id { font-size: 0.8rem; color: #777; }
+        </style>
+    @endpush
 </x-app-layout>
-
-@verbatim
-<script>
-    function perizinanForm(searchSantriUrl) {
-        return {
-            searchTerm: '',
-            santriResults: [],
-            showResults: false,
-            isLoading: false,
-            selectedSantri: { 
-                // Menggunakan 'id_santri' (huruf kecil)
-                id: null, 
-                id_santri: '-', 
-                nama_lengkap: '-', 
-                jenis_kelamin: '-', 
-                ttl: '-', 
-                pendidikan: '-', 
-                kamar: '-' 
-            },
-
-            search() {
-                if (this.searchTerm.length < 2) { this.santriResults = []; return; }
-                this.isLoading = true;
-                this.showResults = true;
-                fetch(`${searchSantriUrl}?term=${this.searchTerm}`)
-                    .then(res => res.json())
-                    .then(data => { this.santriResults = data; })
-                    .finally(() => this.isLoading = false);
-            },
-
-            selectSantri(santri) {
-                let tglLahirFormatted = santri.tanggal_lahir ? new Date(santri.tanggal_lahir).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }) : '';
-                
-                // Menggunakan 'id_santri' (huruf kecil)
-                this.selectedSantri.id = santri.id || null;
-                this.selectedSantri.id_santri = santri.id_santri || '-';
-                this.selectedSantri.nama_lengkap = santri.nama_lengkap || '-';
-                this.selectedSantri.jenis_kelamin = santri.jenis_kelamin || '-';
-                this.selectedSantri.ttl = santri.tempat_lahir ? `${santri.tempat_lahir}, ${tglLahirFormatted}` : (tglLahirFormatted || '-');
-                this.selectedSantri.pendidikan = santri.pendidikan || '-';
-                this.selectedSantri.kamar = santri.kamar || '-';
-
-                this.searchTerm = santri.nama_lengkap;
-                this.showResults = false;
-            }
-        }
-    }
-</script>
-@endverbatim

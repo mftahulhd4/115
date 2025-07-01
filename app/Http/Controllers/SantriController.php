@@ -3,11 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Santri;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class SantriController extends Controller
 {
@@ -16,25 +15,25 @@ class SantriController extends Controller
         $query = Santri::query();
 
         if ($request->filled('search')) {
-            $query->where('nama_lengkap', 'like', '%' . $request->search . '%');
+            $search = $request->input('search');
+            $query->where('nama_lengkap', 'like', "%{$search}%")
+                  ->orWhere('id_santri', 'like', "%{$search}%");
         }
+        
         if ($request->filled('status_santri')) {
             $query->where('status_santri', $request->status_santri);
         }
+
         if ($request->filled('pendidikan')) {
             $query->where('pendidikan', $request->pendidikan);
         }
+
         if ($request->filled('kelas')) {
             $query->where('kelas', $request->kelas);
         }
 
-        $santris = $query->latest()->paginate(10)->withQueryString();
-
-        $statusOptions = Santri::select('status_santri')->distinct()->whereNotNull('status_santri')->pluck('status_santri');
-        $pendidikanOptions = Santri::select('pendidikan')->distinct()->whereNotNull('pendidikan')->orderBy('pendidikan')->pluck('pendidikan');
-        $kelasOptions = Santri::select('kelas')->distinct()->whereNotNull('kelas')->orderBy('kelas')->pluck('kelas');
-
-        return view('santri.index', compact('santris', 'pendidikanOptions', 'statusOptions', 'kelasOptions'));
+        $santris = $query->latest()->paginate(10);
+        return view('santri.index', compact('santris'));
     }
 
     public function create()
@@ -44,43 +43,31 @@ class SantriController extends Controller
 
     public function store(Request $request)
     {
-        // SEMUA 'Id_santri' DIUBAH MENJADI 'id_santri'
         $validated = $request->validate([
-            'id_santri' => 'nullable|string|max:20|unique:santris,id_santri',
             'nama_lengkap' => 'required|string|max:255',
-            'jenis_kelamin' => 'required|in:Laki-laki,Perempuan',
             'tempat_lahir' => 'required|string|max:100',
             'tanggal_lahir' => 'required|date',
+            'jenis_kelamin' => ['required', Rule::in(['Laki-laki', 'Perempuan'])],
             'alamat' => 'required|string',
-            'pendidikan' => 'nullable|string|max:100',
-            'kelas' => 'nullable|string|max:50',
-            'kamar' => 'nullable|string|max:50',
+            'pendidikan' => ['required', Rule::in(['Mts Nurul Amin', 'MA Nurul Amin'])],
+            'kelas' => ['required', Rule::in(['VII', 'VIII', 'IX', 'X', 'XI', 'XII'])],
+            'kamar' => 'required|string|max:50',
+            'tahun_masuk' => 'required|digits:4|integer|min:1900|max:' . (date('Y') + 1),
             'nama_bapak' => 'required|string|max:255',
             'nama_ibu' => 'required|string|max:255',
-            'nomer_orang_tua' => 'required|string|max:15',
-            'status_santri' => 'required|in:Aktif,Baru,Pengurus,Alumni',
-            'tahun_masuk' => 'required|digits:4|integer|min:1900',
-            'tahun_keluar' => 'nullable|digits:4|integer|min:1900|after_or_equal:tahun_masuk',
+            'nomer_orang_tua' => 'required|string|max:20',
+            'status_santri' => ['required', Rule::in(['Santri Baru', 'Santri Aktif', 'Pengurus', 'Alumni'])],
             'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
-        
-        if (empty($validated['id_santri'])) {
-            $tahunMasuk = $validated['tahun_masuk'];
-            $lastSantri = Santri::where(DB::raw('SUBSTRING(id_santri, 1, 4)'), $tahunMasuk)
-                                ->orderBy('id_santri', 'desc')
-                                ->first();
-            
-            $nomorUrut = 1;
-            if ($lastSantri) {
-                $lastNomorUrut = (int) substr($lastSantri->id_santri, 4, 3);
-                $nomorUrut = $lastNomorUrut + 1;
-            }
-            
-            $validated['id_santri'] = $tahunMasuk . str_pad($nomorUrut, 3, '0', STR_PAD_LEFT);
-        }
+
+        $santri_terakhir = Santri::where('tahun_masuk', $request->tahun_masuk)->orderBy('id_santri', 'desc')->first();
+        $nomor_urut = $santri_terakhir ? (int)substr($santri_terakhir->id_santri, 4) + 1 : 1;
+        $id_santri = $request->tahun_masuk . str_pad($nomor_urut, 3, '0', STR_PAD_LEFT);
+
+        $validated['id_santri'] = $id_santri;
 
         if ($request->hasFile('foto')) {
-            $path = $request->file('foto')->store('public/fotos');
+            $path = $request->file('foto')->storeAs('public/fotos', $id_santri . '.' . $request->file('foto')->extension());
             $validated['foto'] = basename($path);
         }
 
@@ -101,40 +88,33 @@ class SantriController extends Controller
 
     public function update(Request $request, Santri $santri)
     {
-        // SEMUA 'Id_santri' DIUBAH MENJADI 'id_santri'
         $validated = $request->validate([
-            'id_santri' => [
-                'nullable',
-                'string',
-                'max:20',
-                Rule::unique('santris', 'id_santri')->ignore($santri->id),
-            ],
             'nama_lengkap' => 'required|string|max:255',
-            'jenis_kelamin' => 'required|in:Laki-laki,Perempuan',
             'tempat_lahir' => 'required|string|max:100',
             'tanggal_lahir' => 'required|date',
+            'jenis_kelamin' => ['required', Rule::in(['Laki-laki', 'Perempuan'])],
             'alamat' => 'required|string',
-            'pendidikan' => 'nullable|string|max:100',
-            'kelas' => 'nullable|string|max:50',
-            'kamar' => 'nullable|string|max:50',
+            'pendidikan' => ['required', Rule::in(['Mts Nurul Amin', 'MA Nurul Amin'])],
+            'kelas' => ['required', Rule::in(['VII', 'VIII', 'IX', 'X', 'XI', 'XII'])],
+            'kamar' => 'required|string|max:50',
+            'tahun_masuk' => 'required|digits:4|integer|min:1900|max:' . (date('Y') + 1),
             'nama_bapak' => 'required|string|max:255',
             'nama_ibu' => 'required|string|max:255',
-            'nomer_orang_tua' => 'required|string|max:15',
-            'status_santri' => 'required|in:Aktif,Baru,Pengurus,Alumni',
-            'tahun_masuk' => 'required|digits:4|integer|min:1900',
-            'tahun_keluar' => 'nullable|digits:4|integer|min:1900|after_or_equal:tahun_masuk',
+            'nomer_orang_tua' => 'required|string|max:20',
+            'status_santri' => ['required', Rule::in(['Santri Baru', 'Santri Aktif', 'Pengurus', 'Alumni'])],
             'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
-        
+
         if ($request->hasFile('foto')) {
             if ($santri->foto) {
                 Storage::delete('public/fotos/' . $santri->foto);
             }
-            $path = $request->file('foto')->store('public/fotos');
+            $path = $request->file('foto')->storeAs('public/fotos', $santri->id_santri . '.' . $request->file('foto')->extension());
             $validated['foto'] = basename($path);
         }
 
         $santri->update($validated);
+
         return redirect()->route('santri.index')->with('success', 'Data santri berhasil diperbarui.');
     }
 
@@ -147,14 +127,16 @@ class SantriController extends Controller
         return redirect()->route('santri.index')->with('success', 'Data santri berhasil dihapus.');
     }
     
-    public function cetakDetailPdf(Santri $santri)
+    public function detailPdf(Santri $santri)
     {
         $pdf = Pdf::loadView('santri.detail_pdf', compact('santri'));
-        return $pdf->download('biodata-santri-' . $santri->nama_lengkap . '.pdf');
+        return $pdf->stream('detail-santri-' . $santri->id_santri . '.pdf');
     }
 
-    public function cetakBrowser(Santri $santri)
+    public function print(Santri $santri)
     {
         return view('santri.print', compact('santri'));
     }
+
+    
 }
