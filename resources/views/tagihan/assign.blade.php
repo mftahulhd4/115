@@ -9,18 +9,18 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg mb-6">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
-                     <a href="{{ route('tagihan.show', $jenisTagihan) }}" class="text-sm font-medium text-blue-600 dark:text-blue-500 hover:underline mb-4 block">
+                     <a href="{{ route('tagihan.show', $jenisTagihan->id_jenis_tagihan) }}" class="text-sm font-medium text-blue-600 dark:text-blue-500 hover:underline mb-4 block">
                         &larr; Kembali ke Detail Tagihan
                     </a>
                     <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-200">{{ $jenisTagihan->nama_tagihan }}</h3>
                     <p class="text-sm text-gray-600 dark:text-gray-400">Periode: {{ \Carbon\Carbon::create()->month($jenisTagihan->bulan)->isoFormat('MMMM') }} {{ $jenisTagihan->tahun }}</p>
-                    <p class="mt-1 text-2xl font-bold text-green-600 dark:text-green-400">Rp {{ number_format($jenisTagihan->jumlah, 0, ',', '.') }}</p>
+                    <p class="mt-1 text-2xl font-bold text-green-600 dark:text-green-400">Rp {{ number_format($jenisTagihan->nominal, 0, ',', '.') }}</p>
                 </div>
             </div>
 
             <div x-data="{ selectAll: false, selected: [] }" class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
-                    <form action="{{ route('tagihan.assign', $jenisTagihan) }}" method="GET" class="mb-6 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                    <form action="{{ route('tagihan.assign', $jenisTagihan->id_jenis_tagihan) }}" method="GET" class="mb-6 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
                         <h4 class="font-semibold mb-2 dark:text-gray-200">Filter Santri</h4>
                         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                             <div>
@@ -49,7 +49,8 @@
                         </div>
                     </form>
 
-                    <form action="{{ route('tagihan.storeAssignment', $jenisTagihan) }}" method="POST">
+                    {{-- PERBAIKAN FINAL: Menggunakan nama route snake_case yang benar --}}
+                    <form action="{{ route('tagihan.store_assignment', $jenisTagihan->id_jenis_tagihan) }}" method="POST">
                         @csrf
                         <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
                             <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">

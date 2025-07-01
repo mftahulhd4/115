@@ -9,44 +9,49 @@ class Tagihan extends Model
 {
     use HasFactory;
 
-    /**
-     * Nama tabel yang terhubung dengan model ini.
-     */
     protected $table = 'tagihans';
 
     /**
-     * Kolom yang dapat diisi secara massal.
+     * The primary key associated with the table.
+     *
+     * @var string
+     */
+    protected $primaryKey = 'id_tagihan';
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
      */
     protected $fillable = [
-        'jenis_tagihan_id',
         'id_santri',
+        'id_jenis_tagihan',
         'status_pembayaran',
         'tanggal_pembayaran',
     ];
 
     /**
-     * Mengubah tipe data kolom secara otomatis.
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
      */
     protected $casts = [
         'tanggal_pembayaran' => 'datetime',
     ];
 
     /**
-     * Mendefinisikan relasi "belongs-to".
-     * Satu Tagihan ini 'milik' satu JenisTagihan.
-     */
-    public function jenisTagihan()
-    {
-        return $this->belongsTo(JenisTagihan::class);
-    }
-
-    /**
-     * Mendefinisikan relasi "belongs-to".
-     * Satu Tagihan ini 'milik' satu Santri.
+     * Mendefinisikan relasi ke model Santri.
      */
     public function santri()
     {
-        // Foreign key 'id_santri' merujuk ke primary key 'id_santri' di tabel santris
         return $this->belongsTo(Santri::class, 'id_santri', 'id_santri');
+    }
+
+    /**
+     * Mendefinisikan relasi ke model JenisTagihan.
+     */
+    public function jenisTagihan()
+    {
+        return $this->belongsTo(JenisTagihan::class, 'id_jenis_tagihan', 'id_jenis_tagihan');
     }
 }

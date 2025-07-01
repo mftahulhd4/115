@@ -1,10 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Detail Jenis Tagihan') }}
-        </h2>
+        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">{{ __('Detail Jenis Tagihan') }}</h2>
     </x-slot>
-
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             @if (session('success'))
@@ -12,22 +9,21 @@
                     {{ session('success') }}
                 </div>
             @endif
-
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg mb-6">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
                     <div class="flex flex-wrap items-start justify-between gap-4">
                         <div>
                             <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-200">{{ $jenisTagihan->nama_tagihan }}</h3>
                             <p class="text-sm text-gray-600 dark:text-gray-400">Periode: {{ \Carbon\Carbon::create()->month($jenisTagihan->bulan)->isoFormat('MMMM') }} {{ $jenisTagihan->tahun }}</p>
-                            <p class="mt-1 text-2xl font-bold text-green-600 dark:text-green-400">Rp {{ number_format($jenisTagihan->jumlah, 0, ',', '.') }}</p>
+                            <p class="mt-1 text-2xl font-bold text-green-600 dark:text-green-400">Rp {{ number_format($jenisTagihan->nominal, 0, ',', '.') }}</p>
                             @if($jenisTagihan->deskripsi)
                                 <p class="mt-2 text-sm text-gray-500 dark:text-gray-300">{{ $jenisTagihan->deskripsi }}</p>
                             @endif
                         </div>
                         <div class="flex flex-wrap items-center justify-end gap-2">
-                            <a href="{{ route('tagihan.assign', $jenisTagihan) }}" class="inline-flex items-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700">Terapkan ke Santri</a>
-                            <a href="{{ route('tagihan.edit', $jenisTagihan) }}" class="inline-flex items-center px-4 py-2 bg-yellow-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-yellow-600">Edit</a>
-                            <form action="{{ route('tagihan.destroy', $jenisTagihan) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus jenis tagihan ini? SEMUA tagihan santri yang terkait akan ikut terhapus permanen.');">
+                            <a href="{{ route('tagihan.assign', $jenisTagihan->id_jenis_tagihan) }}" class="inline-flex items-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700">Terapkan ke Santri</a>
+                            <a href="{{ route('tagihan.edit', $jenisTagihan->id_jenis_tagihan) }}" class="inline-flex items-center px-4 py-2 bg-yellow-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-yellow-600">Edit</a>
+                            <form action="{{ route('tagihan.destroy', $jenisTagihan->id_jenis_tagihan) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus jenis tagihan ini? SEMUA tagihan santri yang terkait akan ikut terhapus permanen.');">
                                 @csrf
                                 @method('DELETE')
                                 <x-danger-button type="submit">Hapus</x-danger-button>
@@ -52,7 +48,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                  <div class="p-6 text-gray-900 dark:text-gray-100">
                     <h3 class="text-lg font-semibold mb-4">Daftar Santri dengan Tagihan Ini</h3>
@@ -68,7 +63,7 @@
                             </thead>
                             <tbody>
                                 @forelse ($tagihans as $tagihan)
-                                    <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 cursor-pointer" onclick="window.location='{{ route('tagihan.showSantriBill', $tagihan) }}';">
+                                    <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 cursor-pointer" onclick="window.location='{{ route('tagihan.show_santri_bill', $tagihan->id_tagihan) }}';">
                                         <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                                            <div class="flex items-center gap-3">
                                                <img src="{{ optional($tagihan->santri)->foto ? asset('storage/fotos/' . $tagihan->santri->foto) : 'https://ui-avatars.com/api/?name=' . urlencode(optional($tagihan->santri)->nama_lengkap) . '&background=random' }}" alt="{{ optional($tagihan->santri)->nama_lengkap }}" class="w-8 h-8 rounded-full object-cover">

@@ -5,7 +5,7 @@
     <div class="py-12">
         <div class="max-w-2xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                <form action="{{ route('tagihan.updateSantriBill', $tagihan) }}" method="POST">
+                <form action="{{ route('tagihan.update_santri_bill', $tagihan->id_tagihan) }}" method="POST">
                     @csrf
                     @method('PUT')
                     <div class="p-6 space-y-4">
@@ -26,7 +26,7 @@
                         </div>
                     </div>
                     <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700/50 flex justify-end gap-4">
-                        <a href="{{ route('tagihan.showSantriBill', $tagihan) }}" class="text-sm underline py-2">Batal</a>
+                        <a href="{{ route('tagihan.show_santri_bill', $tagihan->id_tagihan) }}" class="text-sm underline py-2">Batal</a>
                         <x-primary-button>Simpan Perubahan</x-primary-button>
                     </div>
                 </form>

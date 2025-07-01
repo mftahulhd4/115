@@ -24,14 +24,14 @@
     <div class="container">
         <div class="header">
             <h1>PONDOK PESANTREN NURUL AMIN</h1>
-            <h2>Jl. Mabuk Pahit No.69, Karang Besuki, Kec. Sukun, Kota Malang, Jawa Timur</h2>
+            <h2>Jl. Moch Shaleh Simpang III Krajan, Sumberejo, Besuki</h2>
         </div>
         <div class="content">
             <h3>Kuitansi Pembayaran</h3>
             <table class="details-table">
                 <tr>
                     <td width="20%"><strong>No. Kuitansi</strong></td>
-                    <td width="80%">: {{ $tagihan->id }}</td>
+                    <td width="80%">: TAG-{{ $tagihan->id_tagihan }}</td>
                 </tr>
                  <tr>
                     <td><strong>Diterima dari</strong></td>
@@ -53,17 +53,17 @@
                 <tbody>
                     <tr>
                         <td>{{ $tagihan->jenisTagihan->nama_tagihan }}</td>
-                        <td>Rp {{ number_format($tagihan->jenisTagihan->jumlah, 0, ',', '.') }}</td>
+                        <td>Rp {{ number_format($tagihan->jenisTagihan->nominal, 0, ',', '.') }}</td>
                     </tr>
                     <tr class="total">
                         <td style="text-align:right;">Total</td>
-                        <td>Rp {{ number_format($tagihan->jenisTagihan->jumlah, 0, ',', '.') }}</td>
+                        <td>Rp {{ number_format($tagihan->jenisTagihan->nominal, 0, ',', '.') }}</td>
                     </tr>
                 </tbody>
             </table>
 
             <div class="signature-section">
-                <p>Malang, {{ now()->isoFormat('D MMMM Y') }}</p>
+                <p>Probolinggo, {{ now()->isoFormat('D MMMM Y') }}</p>
                 <p>Bendahara,</p>
                 <br><br><br>
                 <p style="text-decoration: underline;">(.........................)</p>

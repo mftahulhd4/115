@@ -4,7 +4,6 @@
             {{ __('Manajemen Tagihan') }}
         </h2>
     </x-slot>
-
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             @if (session('success'))
@@ -12,15 +11,12 @@
                     {{ session('success') }}
                 </div>
             @endif
-                    
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
-                    
                     <div class="mb-6">
                         <h3 class="text-2xl font-semibold text-gray-800 dark:text-gray-200">Daftar Jenis Tagihan</h3>
                         <p class="text-sm text-gray-600 dark:text-gray-400">Buat dan kelola master tagihan yang akan diterapkan ke santri.</p>
                     </div>
-
                     <form action="{{ route('tagihan.index') }}" method="GET" class="mb-6 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
                         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                             <div class="md:col-span-2">
@@ -46,13 +42,11 @@
                             <button type="submit" class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700">Filter</button>
                         </div>
                     </form>
-                    
                     <div class="flex justify-end mb-4">
                         <a href="{{ route('tagihan.create') }}" class="text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5">
                             + Buat Jenis Tagihan Baru
                         </a>
                     </div>
-
                     <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
                         <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
                             <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
@@ -68,9 +62,9 @@
                                 @forelse ($jenisTagihans as $jenis)
                                     <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
                                         <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                           <a href="{{ route('tagihan.show', $jenis) }}" class="hover:underline">{{ $jenis->nama_tagihan }}</a>
+                                           <a href="{{ route('tagihan.show', $jenis->id_jenis_tagihan) }}" class="hover:underline">{{ $jenis->nama_tagihan }}</a>
                                         </th>
-                                        <td class="px-6 py-4">Rp {{ number_format($jenis->jumlah, 0, ',', '.') }}</td>
+                                        <td class="px-6 py-4">Rp {{ number_format($jenis->nominal, 0, ',', '.') }}</td>
                                         <td class="px-6 py-4">{{ \Carbon\Carbon::create()->month($jenis->bulan)->isoFormat('MMMM') }} {{ $jenis->tahun }}</td>
                                         <td class="px-6 py-4">
                                             @if($jenis->total_santri > 0)
@@ -85,9 +79,9 @@
                                         </td>
                                         <td class="px-6 py-4 text-right">
                                             <div class="flex justify-end gap-2">
-                                                <a href="{{ route('tagihan.show', $jenis) }}" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">Detail</a>
-                                                <a href="{{ route('tagihan.assign', $jenis) }}" class="font-medium text-green-600 dark:text-green-500 hover:underline">Terapkan</a>
-                                                <a href="{{ route('tagihan.edit', $jenis) }}" class="font-medium text-yellow-500 hover:underline">Edit</a>
+                                                <a href="{{ route('tagihan.show', $jenis->id_jenis_tagihan) }}" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">Detail</a>
+                                                <a href="{{ route('tagihan.assign', $jenis->id_jenis_tagihan) }}" class="font-medium text-green-600 dark:text-green-500 hover:underline">Terapkan</a>
+                                                <a href="{{ route('tagihan.edit', $jenis->id_jenis_tagihan) }}" class="font-medium text-yellow-500 hover:underline">Edit</a>
                                             </div>
                                         </td>
                                     </tr>
@@ -99,7 +93,6 @@
                             </tbody>
                         </table>
                     </div>
-                    
                     <div class="mt-4">
                         {{ $jenisTagihans->appends(request()->query())->links() }}
                     </div>

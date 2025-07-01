@@ -10,7 +10,7 @@
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 md:p-8 text-gray-900 dark:text-gray-100">
                     
-                    <form action="{{ route('tagihan.update', $jenisTagihan) }}" method="POST" class="space-y-6">
+                    <form action="{{ route('tagihan.update', $jenisTagihan->id_jenis_tagihan) }}" method="POST" class="space-y-6">
                         @csrf
                         @method('PUT')
                         
@@ -22,9 +22,9 @@
 
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                             <div>
-                                <x-input-label for="jumlah" :value="__('Jumlah (Rp)')" />
-                                <x-text-input id="jumlah" class="block mt-1 w-full" type="number" name="jumlah" :value="old('jumlah', $jenisTagihan->jumlah)" required />
-                                <x-input-error :messages="$errors->get('jumlah')" class="mt-2" />
+                                <x-input-label for="nominal" :value="__('Jumlah (Rp)')" />
+                                <x-text-input id="nominal" class="block mt-1 w-full" type="number" name="nominal" :value="old('nominal', $jenisTagihan->nominal)" required />
+                                <x-input-error :messages="$errors->get('nominal')" class="mt-2" />
                             </div>
                              <div>
                                 <x-input-label for="bulan" :value="__('Untuk Bulan')" />
@@ -51,7 +51,7 @@
                         </div>
                         
                         <div class="flex items-center justify-end mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
-                            <a href="{{ route('tagihan.show', $jenisTagihan) }}" class="text-sm text-gray-700 dark:text-gray-300 underline hover:no-underline">
+                            <a href="{{ route('tagihan.show', $jenisTagihan->id_jenis_tagihan) }}" class="text-sm text-gray-700 dark:text-gray-300 underline hover:no-underline">
                                 Batal
                             </a>
                             <x-primary-button class="ml-4">
