@@ -11,12 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('jenis_tagihans', function (Blueprint $table) {
-            $table->id('id_jenis_tagihan'); // Primary Key kustom
-            $table->string('nama_tagihan');
-            $table->decimal('nominal', 10, 2);
-            $table->string('bulan');
-            $table->year('tahun');
+        Schema::create('statuses', function (Blueprint $table) {
+            $table->id('id_status'); // Primary Key kustom
+            $table->string('nama_status')->unique();
             $table->timestamps();
         });
     }
@@ -26,6 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('jenis_tagihans');
+        Schema::dropIfExists('statuses');
     }
 };

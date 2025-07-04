@@ -2,9 +2,8 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Cetak Biodata - {{ $santri->nama_lengkap }}</title>
+    <title>Cetak Biodata - {{ $santri->nama_santri }}</title>
     <style>
-        /* Gaya ini meniru tampilan PDF Biodata */
         body { 
             font-family: 'Times New Roman', Times, serif; 
             font-size: 12pt; 
@@ -13,7 +12,7 @@
         }
         .page {
             padding: 2cm;
-            max-width: 18cm; /* Lebar kertas A4 dikurangi margin */
+            max-width: 18cm;
             margin: auto;
         }
         .kop-surat {
@@ -45,8 +44,8 @@
             margin-bottom: 30px;
         }
         .profile-pic {
-            width: 113px; /* Lebar untuk pas foto 3x4 */
-            height: 151px; /* Tinggi untuk pas foto 3x4 */
+            width: 113px;
+            height: 151px;
             border: 1px solid #ddd;
             padding: 3px;
             margin: auto;
@@ -60,36 +59,18 @@
             padding: 6px 0;
             vertical-align: top;
         }
-        .content-table .label {
-            width: 35%;
-        }
-        .content-table .separator {
-            width: 5%;
-            text-align: center;
-        }
-        .content-table .value {
-            width: 60%;
-            font-weight: bold;
-        }
-        .footer {
-            margin-top: 50px;
-            width: 100%;
-        }
-        .signature {
-            width: 35%;
-            float: right;
-            text-align: center;
-        }
-        .signature .date, .signature .jabatan {
-            margin-bottom: 70px;
-        }
-        .signature .nama {
-            font-weight: bold;
-            text-decoration: underline;
+        .content-table .label { width: 35%; }
+        .content-table .separator { width: 5%; text-align: center; }
+        .content-table .value { width: 60%; font-weight: bold; }
+        .footer { margin-top: 50px; width: 100%; }
+        .signature { width: 35%; float: right; text-align: center; }
+        .signature .date, .signature .jabatan { margin-bottom: 70px; }
+        .signature .nama { font-weight: bold; text-decoration: underline; }
+        @media print {
+            .no-print { display: none; }
         }
     </style>
     <script>
-        // Memicu dialog print secara otomatis saat halaman dimuat
         window.onload = function() {
             window.print();
         }
@@ -105,59 +86,27 @@
             <h3>BIODATA SANTRI</h3>
         </div>
         <div class="profile-section">
-            {{-- Menggunakan asset() karena ini dirender di browser --}}
-            <img class="profile-pic" src="{{ $santri->foto ? asset('storage/' . $santri->foto) : asset('images/default-avatar.png') }}" alt="Foto">
+            <img class="profile-pic" src="{{ $santri->foto ? asset('storage/fotos/' . $santri->foto) : asset('images/default-avatar.png') }}" alt="Foto">
         </div>
         <table class="content-table">
-            <tr>
-                <td class="label">Nama Lengkap</td>
-                <td class="separator">:</td>
-                <td class="value">{{ $santri->nama_lengkap }}</td>
-            </tr>
-            <tr>
-                <td class="label">Jenis Kelamin</td>
-                <td class="separator">:</td>
-                <td class="value">{{ $santri->jenis_kelamin }}</td>
-            </tr>
-            <tr>
-                <td class="label">Tempat, Tanggal Lahir</td>
-                <td class="separator">:</td>
-                <td class="value">{{ $santri->tempat_lahir }}, {{ \Carbon\Carbon::parse($santri->tanggal_lahir)->isoFormat('D MMMM Y') }}</td>
-            </tr>
-            <tr>
-                <td class="label">Alamat</td>
-                <td class="separator">:</td>
-                <td class="value">{{ $santri->alamat }}</td>
-            </tr>
-            <tr>
-                <td class="label">Pendidikan Terakhir</td>
-                <td class="separator">:</td>
-                <td class="value">{{ $santri->pendidikan }}</td>
-            </tr>
-            <tr>
-                <td class="label">Tahun Masuk</td>
-                <td class="separator">:</td>
-                <td class="value">{{ $santri->tahun_masuk }}</td>
-            </tr>
-            <tr>
-                <td class="label">Status Santri</td>
-                <td class="separator">:</td>
-                <td class="value">{{ $santri->status_santri }}</td>
-            </tr>
-             <tr>
-                <td class="label">Nama Orang Tua/Wali</td>
-                <td class="separator">:</td>
-                <td class="value">{{ $santri->nama_orang_tua }}</td>
-            </tr>
-             <tr>
-                <td class="label">No. HP Orang Tua/Wali</td>
-                <td class="separator">:</td>
-                <td class="value">{{ $santri->nomer_orang_tua }}</td>
-            </tr>
+            <tr><td class="label">ID Santri</td><td class="separator">:</td><td class="value">{{ $santri->id_santri }}</td></tr>
+            <tr><td class="label">Nama Lengkap</td><td class="separator">:</td><td class="value">{{ $santri->nama_santri }}</td></tr>
+            <tr><td class="label">Jenis Kelamin</td><td class="separator">:</td><td class="value">{{ $santri->jenis_kelamin }}</td></tr>
+            <tr><td class="label">Tempat, Tanggal Lahir</td><td class="separator">:</td><td class="value">{{ $santri->tempat_lahir }}, {{ \Carbon\Carbon::parse($santri->tanggal_lahir)->isoFormat('D MMMM Y') }}</td></tr>
+            <tr><td class="label">Alamat</td><td class="separator">:</td><td class="value">{{ $santri->alamat }}</td></tr>
+            <tr><td class="label">Pendidikan</td><td class="separator">:</td><td class="value">{{ $santri->pendidikan->nama_pendidikan ?? 'N/A' }}</td></tr>
+            <tr><td class="label">Kelas</td><td class="separator">:</td><td class="value">{{ $santri->kelas->nama_kelas ?? 'N/A' }}</td></tr>
+            <tr><td class="label">Tahun Masuk</td><td class="separator">:</td><td class="value">{{ $santri->tahun_masuk }}</td></tr>
+            <tr><td class="label">Status Santri</td><td class="separator">:</td><td class="value">{{ $santri->status->nama_status ?? 'N/A' }}</td></tr>
+            <tr><td class="label">Nama Ayah</td><td class="separator">:</td><td class="value">{{ $santri->nama_ayah }}</td></tr>
+            <tr><td class="label">Nama Ibu</td><td class="separator">:</td><td class="value">{{ $santri->nama_ibu }}</td></tr>
+            <tr><td class="label">No. HP Wali</td><td class="separator">:</td><td class="value">{{ $santri->nomor_hp_wali }}</td></tr>
         </table>
         <div class="footer">
              <div class="signature">
+                <p class="date">Situbondo, {{ now()->isoFormat('D MMMM Y') }}</p>
                 <p class="jabatan">Administrasi,</p>
+                <br><br><br>
                 <p class="nama">(_________________________)</p>
             </div>
         </div>

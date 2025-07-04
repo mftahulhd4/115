@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Buat Pengajuan Izin Baru') }}
+            {{ __('Buat Perizinan Baru') }}
         </h2>
     </x-slot>
 
@@ -9,21 +9,23 @@
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 md:p-8 text-gray-900 dark:text-gray-100">
-                    
+
                     <form action="{{ route('perizinan.store') }}" method="POST" class="space-y-8">
                         @csrf
-                        
+
+                        {{-- BAGIAN 1: PILIH SANTRI --}}
                         <div class="space-y-3">
                             <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">1. Pilih Santri</h3>
                             <x-input-label for="id_santri_select" :value="__('Cari Nama atau ID Santri')" />
                             <select id="id_santri_select" class="block w-full" name="id_santri_dummy"></select>
-                            <input type="hidden" name="id_santri" id="id_santri">
+                            <input type="hidden" name="id_santri" id="id_santri" required>
                             <x-input-error :messages="$errors->get('id_santri')" class="mt-2" />
                         </div>
 
+                        {{-- BAGIAN DETAIL SANTRI (SESUAI GAMBAR) --}}
                         <div class="space-y-3">
                              <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Detail Santri Terpilih</h3>
-                             <div id="santri-info" class="mt-4 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                             <div class="mt-2 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
                                 <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 text-sm">
                                     <dt class="font-medium text-gray-500 dark:text-gray-400">Nama Lengkap</dt>
                                     <dd id="info-nama" class="font-semibold dark:text-gray-200">-</dd>
@@ -43,6 +45,7 @@
                             </div>
                         </div>
 
+                        {{-- BAGIAN 2: DETAIL PERIZINAN --}}
                         <div class="space-y-3">
                             <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">2. Detail Perizinan</h3>
                             <div class="space-y-4">
@@ -53,20 +56,15 @@
                                 </div>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div>
-                                        <x-input-label for="waktu_izin" :value="__('Waktu Mulai Izin')" />
-                                        <x-text-input id="waktu_izin" class="block mt-1 w-full" type="datetime-local" name="waktu_izin" :value="old('waktu_izin')" required />
-                                        <x-input-error :messages="$errors->get('waktu_izin')" class="mt-2" />
+                                        <x-input-label for="waktu_pergi" :value="__('Waktu Mulai Izin')" />
+                                        <x-text-input id="waktu_pergi" class="block mt-1 w-full" type="datetime-local" name="waktu_pergi" :value="old('waktu_pergi')" required />
+                                        <x-input-error :messages="$errors->get('waktu_pergi')" class="mt-2" />
                                     </div>
                                     <div>
                                         <x-input-label for="estimasi_kembali" :value="__('Estimasi Kembali')" />
                                         <x-text-input id="estimasi_kembali" class="block mt-1 w-full" type="datetime-local" name="estimasi_kembali" :value="old('estimasi_kembali')" required />
                                         <x-input-error :messages="$errors->get('estimasi_kembali')" class="mt-2" />
                                     </div>
-                                </div>
-                                <div>
-                                    <x-input-label for="keterangan" :value="__('Keterangan Tambahan (Opsional)')" />
-                                    <textarea id="keterangan" name="keterangan" class="block mt-1 w-full border-gray-300 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-300 rounded-md shadow-sm" rows="2">{{ old('keterangan') }}</textarea>
-                                    <x-input-error :messages="$errors->get('keterangan')" class="mt-2" />
                                 </div>
                             </div>
                         </div>
@@ -88,24 +86,26 @@
     @push('scripts')
         <script>
             $(document).ready(function() {
+                // Template untuk menampilkan hasil pencarian di dropdown
                 function formatSantri (santri) {
                     if (santri.loading) { return santri.text; }
                     var $container = $(
-                        "<div class='select2-result-santri clearfix'>" +
-                            "<div class='select2-result-santri__avatar'><img src='" + (santri.foto_url || '') + "' /></div>" +
-                            "<div class='select2-result-santri__meta'>" +
-                                "<div class='select2-result-santri__title'></div>" +
-                                "<div class='select2-result-santri__id'></div>" +
-                            "</div>" +
-                        "</div>"
+                        `<div class='select2-result-santri clearfix'>
+                            <div class='select2-result-santri__avatar'><img src='${santri.foto_url}' /></div>
+                            <div class='select2-result-santri__meta'>
+                                <div class='select2-result-santri__title'></div>
+                                <div class='select2-result-santri__id'></div>
+                            </div>
+                        </div>`
                     );
-                    $container.find(".select2-result-santri__title").text(santri.nama_lengkap);
+                    $container.find(".select2-result-santri__title").text(santri.nama_santri);
                     $container.find(".select2-result-santri__id").text("ID: " + santri.id_santri);
                     return $container;
                 }
 
+                // Template untuk menampilkan santri yang sudah terpilih
                 function formatSantriSelection (santri) {
-                    return santri.nama_lengkap || santri.text;
+                    return santri.nama_santri || santri.text;
                 }
 
                 $('#id_santri_select').select2({
@@ -119,7 +119,8 @@
                         processResults: function (data) {
                             return {
                                 results: $.map(data, function(item) {
-                                    return { id: item.id_santri, text: item.nama_lengkap, ...item };
+                                    // Memastikan semua data yang dibutuhkan ada di sini
+                                    return { id: item.id_santri, text: item.nama_santri, ...item };
                                 })
                             };
                         },
@@ -130,16 +131,16 @@
                     escapeMarkup: function (markup) { return markup; }
                 });
 
-                // PERUBAHAN LOGIKA JAVASCRIPT
+                // Event listener saat seorang santri dipilih
                 $('#id_santri_select').on('select2:select', function (e) {
                     var data = e.params.data;
                     $('#id_santri').val(data.id_santri);
-                    $('#info-nama').text(data.nama_lengkap || '-');
+                    // PERBAIKAN: Menggunakan nama kolom yang benar: nama_santri
+                    $('#info-nama').text(data.nama_santri || '-');
                     $('#info-id').text(data.id_santri || '-');
-                    $('#info-kelas').text(data.kelas || '-');
-                    $('#info-pendidikan').text(data.pendidikan || '-');
+                    $('#info-kelas').text(data.nama_kelas || '-');
+                    $('#info-pendidikan').text(data.nama_pendidikan || '-');
                     
-                    // Menggabungkan dan memformat Tempat, Tanggal Lahir
                     let ttl = '-';
                     if (data.tempat_lahir) {
                         ttl = data.tempat_lahir;

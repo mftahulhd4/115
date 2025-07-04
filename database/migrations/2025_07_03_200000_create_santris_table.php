@@ -12,33 +12,23 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('santris', function (Blueprint $table) {
-            // Kolom Primary Key
-            $table->string('id_santri')->primary();
-
-            // Kolom Data Diri Santri
-            $table->string('nama_lengkap');
+            $table->string('id_santri')->primary(); // Mengganti nama primary key
+            $table->string('nama_santri');
             $table->string('tempat_lahir');
             $table->date('tanggal_lahir');
             $table->enum('jenis_kelamin', ['Laki-laki', 'Perempuan']);
             $table->text('alamat');
-
-            // Kolom Informasi Akademik
-            $table->string('pendidikan');
-            $table->string('kelas');
-            $table->string('kamar');
-            $table->string('tahun_masuk', 4);
-
-            // Kolom Data Orang Tua
-            $table->string('nama_bapak');
+            $table->string('nama_ayah');
             $table->string('nama_ibu');
-            $table->string('nomer_orang_tua');
+            $table->string('nomor_hp_wali');
+            $table->year('tahun_masuk');
+            
+            // Foreign Key ke tabel master
+            $table->foreignId('id_pendidikan')->constrained('pendidikans', 'id_pendidikan');
+            $table->foreignId('id_kelas')->constrained('kelas', 'id_kelas');
+            $table->foreignId('id_status')->constrained('statuses', 'id_status');
 
-            // Kolom Status dan Foto
-            // PERUBAHAN: Menyesuaikan nilai enum sesuai permintaan
-            $table->enum('status_santri', ['Santri Baru', 'Santri Aktif', 'Pengurus', 'Alumni'])->default('Santri Baru');
             $table->string('foto')->nullable();
-
-            // Timestamps
             $table->timestamps();
         });
     }

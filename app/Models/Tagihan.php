@@ -9,38 +9,19 @@ class Tagihan extends Model
 {
     use HasFactory;
 
-    protected $table = 'tagihans';
-
-    /**
-     * The primary key associated with the table.
-     *
-     * @var string
-     */
+    // Menentukan primary key kustom
     protected $primaryKey = 'id_tagihan';
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
+    // Kolom yang bisa diisi
     protected $fillable = [
         'id_santri',
         'id_jenis_tagihan',
+        'tanggal_bayar',
         'status_pembayaran',
-        'tanggal_pembayaran',
     ];
 
     /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
-    protected $casts = [
-        'tanggal_pembayaran' => 'datetime',
-    ];
-
-    /**
-     * Mendefinisikan relasi ke model Santri.
+     * Relasi many-to-one ke Santri
      */
     public function santri()
     {
@@ -48,7 +29,7 @@ class Tagihan extends Model
     }
 
     /**
-     * Mendefinisikan relasi ke model JenisTagihan.
+     * Relasi many-to-one ke JenisTagihan
      */
     public function jenisTagihan()
     {

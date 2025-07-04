@@ -9,52 +9,78 @@ class Santri extends Model
 {
     use HasFactory;
 
-    // Menentukan nama tabel secara eksplisit (opsional, karena Laravel sudah pintar)
-    protected $table = 'santris';
-
-    // 1. Menentukan primary key
+    // Menentukan primary key kustom
     protected $primaryKey = 'id_santri';
 
-    // 2. Memberi tahu Eloquent bahwa primary key bukan auto-incrementing
+    // Memberitahu Laravel bahwa primary key bukan auto-incrementing integer
     public $incrementing = false;
 
-    // 3. Memberi tahu Eloquent bahwa tipe data primary key adalah string
+    // Memberitahu Laravel bahwa tipe data primary key adalah string
     protected $keyType = 'string';
 
-    // 4. Atribut yang dapat diisi secara massal (mass assignable)
+    // PERBAIKAN: Menyesuaikan semua nama kolom agar cocok dengan migrasi
     protected $fillable = [
         'id_santri',
-        'nama_lengkap',
+        'nama_santri',
         'tempat_lahir',
         'tanggal_lahir',
         'jenis_kelamin',
         'alamat',
-        'pendidikan',
-        'kelas',
-        'kamar',
-        'tahun_masuk',
-        'nama_bapak',
+        'nama_ayah',
         'nama_ibu',
-        'nomer_orang_tua',
-        'status_santri', // Perubahan dari 'status' menjadi 'status_santri'
+        'nomor_hp_wali',
+        'tahun_masuk',
+        'id_pendidikan', // Menggunakan foreign key
+        'id_kelas',      // Menggunakan foreign key
+        'id_status',     // Menggunakan foreign key
         'foto',
     ];
 
+    // Untuk memastikan kolom tanggal terbaca sebagai objek Carbon
+    protected $casts = [
+        'tanggal_lahir' => 'date',
+    ];
+
     /**
-     * Relasi ke model Tagihan.
-     * Nama foreign key dan local key sudah benar, jadi tidak perlu diubah.
+     * FUNGSI RELASI YANG SEBELUMNYA HILANG
+     * Relasi many-to-one ke Pendidikan
      */
-    public function tagihan()
+    public function pendidikan()
     {
-        return $this->hasMany(Tagihan::class, 'id_santri', 'id_santri');
+        return $this->belongsTo(Pendidikan::class, 'id_pendidikan', 'id_pendidikan');
     }
 
     /**
-     * Relasi ke model Perizinan.
-     * Nama foreign key dan local key sudah benar, jadi tidak perlu diubah.
+     * FUNGSI RELASI YANG SEBELUMNYA HILANG
+     * Relasi many-to-one ke Kelas
      */
-    public function perizinan()
+    public function kelas()
+    {
+        return $this->belongsTo(Kelas::class, 'id_kelas', 'id_kelas');
+    }
+
+    /**
+     * FUNGSI RELASI YANG SEBELUMNYA HILANG
+     * Relasi many-to-one ke Status
+     */
+    public function status()
+    {
+        return $this->belongsTo(Status::class, 'id_status', 'id_status');
+    }
+    
+    /**
+     * Relasi one-to-many ke Perizinan
+     */
+    public function perizinans()
     {
         return $this->hasMany(Perizinan::class, 'id_santri', 'id_santri');
+    }
+
+    /**
+     * Relasi one-to-many ke Tagihan
+     */
+    public function tagihans()
+    {
+        return $this->hasMany(Tagihan::class, 'id_santri', 'id_santri');
     }
 }

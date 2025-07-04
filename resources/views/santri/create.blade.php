@@ -10,15 +10,16 @@
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
                     
+                    {{-- FORM CREATE YANG DIPERBARUI --}}
                     <form action="{{ route('santri.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
                         @csrf
                         
                         <h3 class="text-lg font-semibold border-b border-gray-200 dark:border-gray-700 pb-2">Data Diri Santri</h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <x-input-label for="nama_lengkap" :value="__('Nama Lengkap')" />
-                                <x-text-input id="nama_lengkap" class="block mt-1 w-full" type="text" name="nama_lengkap" :value="old('nama_lengkap')" required />
-                                <x-input-error :messages="$errors->get('nama_lengkap')" class="mt-2" />
+                                <x-input-label for="nama_santri" :value="__('Nama Lengkap')" />
+                                <x-text-input id="nama_santri" class="block mt-1 w-full" type="text" name="nama_santri" :value="old('nama_santri')" required />
+                                <x-input-error :messages="$errors->get('nama_santri')" class="mt-2" />
                             </div>
                             <div>
                                 <x-input-label for="jenis_kelamin" :value="__('Jenis Kelamin')" />
@@ -47,33 +48,26 @@
                         </div>
 
                         <h3 class="text-lg font-semibold border-b border-gray-200 dark:border-gray-700 pb-2 pt-4">Data Akademik & Domisili</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             <div>
-                                <x-input-label for="pendidikan" :value="__('Pendidikan')" />
-                                <select id="pendidikan" name="pendidikan" class="block mt-1 w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm" required>
+                                <x-input-label for="id_pendidikan" :value="__('Pendidikan')" />
+                                <select id="id_pendidikan" name="id_pendidikan" class="block mt-1 w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm" required>
                                     <option value="" disabled selected>Pilih Pendidikan</option>
-                                    <option value="Mts Nurul Amin" @if(old('pendidikan') == 'Mts Nurul Amin') selected @endif>Mts Nurul Amin</option>
-                                    <option value="MA Nurul Amin" @if(old('pendidikan') == 'MA Nurul Amin') selected @endif>MA Nurul Amin</option>
+                                    @foreach ($pendidikans as $pendidikan)
+                                        <option value="{{ $pendidikan->id_pendidikan }}" @if(old('id_pendidikan') == $pendidikan->id_pendidikan) selected @endif>{{ $pendidikan->nama_pendidikan }}</option>
+                                    @endforeach
                                 </select>
-                                <x-input-error :messages="$errors->get('pendidikan')" class="mt-2" />
+                                <x-input-error :messages="$errors->get('id_pendidikan')" class="mt-2" />
                             </div>
                             <div>
-                                <x-input-label for="kelas" :value="__('Kelas')" />
-                                <select id="kelas" name="kelas" class="block mt-1 w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm" required>
+                                <x-input-label for="id_kelas" :value="__('Kelas')" />
+                                <select id="id_kelas" name="id_kelas" class="block mt-1 w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm" required>
                                     <option value="" disabled selected>Pilih Kelas</option>
-                                    <option value="VII" @if(old('kelas') == 'VII') selected @endif>VII</option>
-                                    <option value="VIII" @if(old('kelas') == 'VIII') selected @endif>VIII</option>
-                                    <option value="IX" @if(old('kelas') == 'IX') selected @endif>IX</option>
-                                    <option value="X" @if(old('kelas') == 'X') selected @endif>X</option>
-                                    <option value="XI" @if(old('kelas') == 'XI') selected @endif>XI</option>
-                                    <option value="XII" @if(old('kelas') == 'XII') selected @endif>XII</option>
+                                    @foreach ($kelas as $item)
+                                        <option value="{{ $item->id_kelas }}" @if(old('id_kelas') == $item->id_kelas) selected @endif>{{ $item->nama_kelas }}</option>
+                                    @endforeach
                                 </select>
-                                <x-input-error :messages="$errors->get('kelas')" class="mt-2" />
-                            </div>
-                            <div>
-                                <x-input-label for="kamar" :value="__('Kamar')" />
-                                <x-text-input id="kamar" class="block mt-1 w-full" type="text" name="kamar" :value="old('kamar')" required />
-                                <x-input-error :messages="$errors->get('kamar')" class="mt-2" />
+                                <x-input-error :messages="$errors->get('id_kelas')" class="mt-2" />
                             </div>
                              <div>
                                 <x-input-label for="tahun_masuk" :value="__('Tahun Masuk')" />
@@ -85,9 +79,9 @@
                         <h3 class="text-lg font-semibold border-b border-gray-200 dark:border-gray-700 pb-2 pt-4">Data Orang Tua</h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             <div>
-                                <x-input-label for="nama_bapak" :value="__('Nama Bapak')" />
-                                <x-text-input id="nama_bapak" class="block mt-1 w-full" type="text" name="nama_bapak" :value="old('nama_bapak')" required />
-                                <x-input-error :messages="$errors->get('nama_bapak')" class="mt-2" />
+                                <x-input-label for="nama_ayah" :value="__('Nama Ayah')" />
+                                <x-text-input id="nama_ayah" class="block mt-1 w-full" type="text" name="nama_ayah" :value="old('nama_ayah')" required />
+                                <x-input-error :messages="$errors->get('nama_ayah')" class="mt-2" />
                             </div>
                              <div>
                                 <x-input-label for="nama_ibu" :value="__('Nama Ibu')" />
@@ -95,23 +89,23 @@
                                 <x-input-error :messages="$errors->get('nama_ibu')" class="mt-2" />
                             </div>
                             <div>
-                                <x-input-label for="nomer_orang_tua" :value="__('Nomor HP Orang Tua')" />
-                                <x-text-input id="nomer_orang_tua" class="block mt-1 w-full" type="text" name="nomer_orang_tua" :value="old('nomer_orang_tua')" required />
-                                <x-input-error :messages="$errors->get('nomer_orang_tua')" class="mt-2" />
+                                <x-input-label for="nomor_hp_wali" :value="__('Nomor HP Wali')" />
+                                <x-text-input id="nomor_hp_wali" class="block mt-1 w-full" type="text" name="nomor_hp_wali" :value="old('nomor_hp_wali')" required />
+                                <x-input-error :messages="$errors->get('nomor_hp_wali')" class="mt-2" />
                             </div>
                         </div>
 
                         <h3 class="text-lg font-semibold border-b border-gray-200 dark:border-gray-700 pb-2 pt-4">Status & Foto</h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <x-input-label for="status_santri" :value="__('Status Santri')" />
-                                <select id="status_santri" name="status_santri" class="block mt-1 w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm" required>
-                                    <option value="Santri Baru" @if(old('status_santri') == 'Santri Baru') selected @endif>Santri Baru</option>
-                                    <option value="Santri Aktif" @if(old('status_santri') == 'Santri Aktif') selected @endif>Santri Aktif</option>
-                                    <option value="Pengurus" @if(old('status_santri') == 'Pengurus') selected @endif>Pengurus</option>
-                                    <option value="Alumni" @if(old('status_santri') == 'Alumni') selected @endif>Alumni</option>
+                                <x-input-label for="id_status" :value="__('Status Santri')" />
+                                <select id="id_status" name="id_status" class="block mt-1 w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm" required>
+                                    <option value="" disabled selected>Pilih Status</option>
+                                    @foreach ($statuses as $status)
+                                        <option value="{{ $status->id_status }}" @if(old('id_status') == $status->id_status) selected @endif>{{ $status->nama_status }}</option>
+                                    @endforeach
                                 </select>
-                                <x-input-error :messages="$errors->get('status_santri')" class="mt-2" />
+                                <x-input-error :messages="$errors->get('id_status')" class="mt-2" />
                             </div>
                             <div>
                                 <x-input-label for="foto" :value="__('Foto Santri (Opsional)')" />

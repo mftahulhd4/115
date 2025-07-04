@@ -13,16 +13,14 @@ return new class extends Migration
             
             $table->string('id_santri');
             $table->foreign('id_santri')->references('id_santri')->on('santris')->onDelete('cascade');
-            
-            $table->string('penanggung_jawab');
-            $table->text('keperluan');
-            $table->dateTime('waktu_izin');
+
+            $table->string('keperluan');
+            $table->dateTime('waktu_pergi');
             $table->dateTime('estimasi_kembali');
-            $table->dateTime('waktu_kembali_aktual')->nullable(); // Bisa kosong
+            $table->dateTime('waktu_kembali_aktual')->nullable();
             
-            $table->enum('status', ['Pengajuan', 'Diizinkan', 'Kembali', 'Terlambat'])->default('Pengajuan');
-            
-            $table->text('keterangan')->nullable(); // Bisa kosong
+            // PERUBAHAN: Menambahkan 'Ditolak'
+            $table->enum('status', ['Pengajuan', 'Diizinkan', 'Ditolak', 'Kembali', 'Terlambat'])->default('Pengajuan');
             
             $table->timestamps();
         });

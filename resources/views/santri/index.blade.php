@@ -28,33 +28,31 @@
                                 <input type="search" name="search" id="search" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-900 dark:border-gray-600" placeholder="Ketik di sini..." value="{{ request('search') }}">
                             </div>
                             <div>
-                                <label for="status_santri" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
-                                <select id="status_santri" name="status_santri" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-900 dark:border-gray-600 dark:text-gray-300">
+                                <label for="id_status" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
+                                <select id="id_status" name="id_status" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-900 dark:border-gray-600 dark:text-gray-300">
                                     <option value="">Semua Status</option>
-                                    <option value="Santri Baru" {{ request('status_santri') == 'Santri Baru' ? 'selected' : '' }}>Santri Baru</option>
-                                    <option value="Santri Aktif" {{ request('status_santri') == 'Santri Aktif' ? 'selected' : '' }}>Santri Aktif</option>
-                                    <option value="Pengurus" {{ request('status_santri') == 'Pengurus' ? 'selected' : '' }}>Pengurus</option>
-                                    <option value="Alumni" {{ request('status_santri') == 'Alumni' ? 'selected' : '' }}>Alumni</option>
+                                    @foreach($statuses as $status)
+                                        <option value="{{ $status->id_status }}" {{ request('id_status') == $status->id_status ? 'selected' : '' }}>{{ $status->nama_status }}</option>
+                                    @endforeach
                                 </select>
                             </div>
                             <div>
-                                <label for="pendidikan" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Pendidikan</label>
-                                <select id="pendidikan" name="pendidikan" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-900 dark:border-gray-600 dark:text-gray-300">
+                                <label for="id_pendidikan" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Pendidikan</label>
+                                {{-- KODE YANG DIPERBAIKI: name="id_pendidikan" --}}
+                                <select id="id_pendidikan" name="id_pendidikan" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-900 dark:border-gray-600 dark:text-gray-300">
                                     <option value="">Semua</option>
-                                    <option value="Mts Nurul Amin" {{ request('pendidikan') == 'Mts Nurul Amin' ? 'selected' : '' }}>Mts Nurul Amin</option>
-                                    <option value="MA Nurul Amin" {{ request('pendidikan') == 'MA Nurul Amin' ? 'selected' : '' }}>MA Nurul Amin</option>
+                                     @foreach($pendidikans as $pendidikan)
+                                        <option value="{{ $pendidikan->id_pendidikan }}" {{ request('id_pendidikan') == $pendidikan->id_pendidikan ? 'selected' : '' }}>{{ $pendidikan->nama_pendidikan }}</option>
+                                    @endforeach
                                 </select>
                             </div>
                             <div>
-                                <label for="kelas" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Kelas</label>
-                                <select id="kelas" name="kelas" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-900 dark:border-gray-600 dark:text-gray-300">
+                                <label for="id_kelas" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Kelas</label>
+                                <select id="id_kelas" name="id_kelas" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-900 dark:border-gray-600 dark:text-gray-300">
                                     <option value="">Semua</option>
-                                    <option value="VII" {{ request('kelas') == 'VII' ? 'selected' : '' }}>VII</option>
-                                    <option value="VIII" {{ request('kelas') == 'VIII' ? 'selected' : '' }}>VIII</option>
-                                    <option value="IX" {{ request('kelas') == 'IX' ? 'selected' : '' }}>IX</option>
-                                    <option value="X" {{ request('kelas') == 'X' ? 'selected' : '' }}>X</option>
-                                    <option value="XI" {{ request('kelas') == 'XI' ? 'selected' : '' }}>XI</option>
-                                    <option value="XII" {{ request('kelas') == 'XII' ? 'selected' : '' }}>XII</option>
+                                    @foreach($kelas as $item)
+                                        <option value="{{ $item->id_kelas }}" {{ request('id_kelas') == $item->id_kelas ? 'selected' : '' }}>{{ $item->nama_kelas }}</option>
+                                    @endforeach
                                 </select>
                             </div>
                         </div>
@@ -77,16 +75,17 @@
                                     <th scope="col" class="px-6 py-3">ID Santri</th>
                                     <th scope="col" class="px-6 py-3">Foto</th>
                                     <th scope="col" class="px-6 py-3">Nama Lengkap</th>
-                                    <th scope="col" class="px-6 py-3">Status Santri</th>
+                                    <th scope="col" class="px-6 py-3">Status</th>
+                                    <th scope="col" class="px-6 py-3">Pendidikan & Kelas</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @forelse ($santris as $index => $santri)
+                                @forelse ($santris as $santri)
                                     <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
                                         <td class="px-6 py-4">{{ $santri->id_santri }}</td>
                                         <td class="px-6 py-4">
                                             @if ($santri->foto)
-                                                <img src="{{ asset('storage/fotos/' . $santri->foto) }}" alt="{{ $santri->nama_lengkap }}" class="w-10 h-10 rounded-full object-cover">
+                                                <img src="{{ asset('storage/fotos/' . $santri->foto) }}" alt="{{ $santri->nama_santri }}" class="w-10 h-10 rounded-full object-cover">
                                             @else
                                                 <div class="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-600 flex items-center justify-center">
                                                     <svg class="w-6 h-6 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -97,15 +96,16 @@
                                         </td>
                                         <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                                             <a href="{{ route('santri.show', $santri) }}" class="hover:underline">
-                                                {{ $santri->nama_lengkap }}
+                                                {{ $santri->nama_santri }}
                                             </a>
                                         </th>
-                                        <td class="px-6 py-4">{{ $santri->status_santri }}</td>
+                                        <td class="px-6 py-4">{{ $santri->status->nama_status ?? 'N/A' }}</td>
+                                        <td class="px-6 py-4">{{ $santri->pendidikan->nama_pendidikan ?? 'N/A' }} - {{ $santri->kelas->nama_kelas ?? 'N/A' }}</td>
                                     </tr>
                                 @empty
                                      <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                                        <td colspan="4" class="px-6 py-4 text-center">
-                                            Data santri tidak ditemukan. Coba reset filter Anda.
+                                        <td colspan="5" class="px-6 py-4 text-center">
+                                            Data santri tidak ditemukan.
                                         </td>
                                     </tr>
                                 @endforelse
@@ -114,7 +114,7 @@
                     </div>
                     
                     <div class="mt-4">
-                        {{ $santris->appends(request()->query())->links() }}
+                        {{ $santris->links() }}
                     </div>
 
                 </div>

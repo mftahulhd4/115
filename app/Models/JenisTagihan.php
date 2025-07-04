@@ -4,26 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class JenisTagihan extends Model
 {
     use HasFactory;
-
-    protected $table = 'jenis_tagihans';
     
-    /**
-     * The primary key associated with the table.
-     *
-     * @var string
-     */
+    // Menentukan primary key kustom
     protected $primaryKey = 'id_jenis_tagihan';
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
+    // Kolom yang bisa diisi
     protected $fillable = [
         'nama_tagihan',
         'nominal',
@@ -32,11 +21,10 @@ class JenisTagihan extends Model
     ];
 
     /**
-     * Mendefinisikan relasi one-to-many ke model Tagihan.
-     * Satu JenisTagihan bisa memiliki banyak Tagihan.
+     * Relasi one-to-many ke Tagihan
      */
-    public function tagihans(): HasMany
+    public function tagihans()
     {
-        return $this->hasMany(Tagihan::class, 'id_jenis_tagihan', 'id_jenis_tagihan');
+        return $this->hasMany(Tagihan::class, 'id_jenis_tagihan');
     }
 }
