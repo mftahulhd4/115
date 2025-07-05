@@ -19,8 +19,12 @@ class JenisTagihan extends Model
         'id_jenis_tagihan',
         'nama_jenis_tagihan',
         'deskripsi',
-        'bulan', // Tambahkan ini
-        'tahun', // Tambahkan ini
+        'bulan',
+        'tahun',
+        // --- TAMBAHAN BARU ---
+        'jumlah_tagihan',
+        'tanggal_tagihan',
+        'tanggal_jatuh_tempo',
     ];
 
     public function daftarTagihan(): HasMany

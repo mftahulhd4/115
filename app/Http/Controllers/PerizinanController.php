@@ -54,9 +54,6 @@ class PerizinanController extends Controller
         return view('perizinan.create');
     }
     
-    /**
-     * PERBAIKAN UTAMA: LOGIKA PEMBUATAN ID BARU
-     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -76,22 +73,16 @@ class PerizinanController extends Controller
                 ->withInput();
         }
 
-        // --- Logika Baru untuk Nomor Urut Selalu Naik ---
-        // 1. Cari izin terakhir yang dibuat hari ini berdasarkan urutan ID
         $lastPermitToday = Perizinan::whereDate('created_at', Carbon::today())->orderBy('id_izin', 'desc')->first();
         
-        $nextNumber = 1; // Nomor urut default adalah 1
+        $nextNumber = 1;
 
-        // 2. Jika ada izin sebelumnya hari ini
         if ($lastPermitToday) {
-            // Ambil 4 digit terakhir dari ID, ubah ke angka, lalu tambah 1
             $lastNumber = (int) substr($lastPermitToday->id_izin, -4);
             $nextNumber = $lastNumber + 1;
         }
 
-        // 3. Buat ID baru yang dijamin unik untuk hari itu
         $id_izin = 'IZN-' . date('Ymd') . '-' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
-        // --- Akhir dari Logika Baru ---
         
         $validated['id_izin'] = $id_izin;
         $validated['status'] = 'Pengajuan';
@@ -114,11 +105,14 @@ class PerizinanController extends Controller
 
     public function update(Request $request, Perizinan $perizinan)
     {
+        // --- AWAL PERUBAHAN ---
         $validated = $request->validate([
+            'keperluan' => 'required|string', // Ditambahkan
             'estimasi_kembali' => 'required|date|after_or_equal:waktu_pergi',
             'status' => ['required', Rule::in(['Pengajuan', 'Diizinkan', 'Ditolak', 'Kembali'])],
             'waktu_kembali_aktual' => 'nullable|date',
         ]);
+        // --- AKHIR PERUBAHAN ---
 
         $newStatus = $request->status;
         
@@ -128,12 +122,14 @@ class PerizinanController extends Controller
             $finalStatus = $waktuKembali->isAfter($estimasiKembali) ? 'Terlambat' : 'Kembali';
 
             $perizinan->update([
+                'keperluan' => $validated['keperluan'], // Ditambahkan
                 'status' => $finalStatus,
                 'waktu_kembali_aktual' => $waktuKembali,
                 'estimasi_kembali' => $estimasiKembali,
             ]);
         } else {
             $perizinan->update([
+                'keperluan' => $validated['keperluan'], // Ditambahkan
                 'status' => $newStatus,
                 'estimasi_kembali' => $request->estimasi_kembali,
             ]);

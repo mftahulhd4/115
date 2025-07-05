@@ -3,8 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Santri;
-use App\Models\Status; // 1. Tambahkan use statement untuk model Status
+use App\Models\Status;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB; // Tambahkan ini
 
 class DashboardController extends Controller
 {
@@ -13,21 +14,21 @@ class DashboardController extends Controller
      */
     public function index()
     {
-        // 2. Cara baru yang lebih baik untuk menghitung santri berdasarkan relasi
+        // CARA LAMA (BERPOTENSI GAGAL JIKA CASE BERBEDA)
+        // $statusAktifId = Status::where('nama_status', 'Aktif')->value('id_status');
         
-        // Cari ID untuk setiap status
-        $statusAktifId = Status::where('nama_status', 'Aktif')->value('id_status');
-        $statusBaruId = Status::where('nama_status', 'Baru')->value('id_status');
-        $statusPengurusId = Status::where('nama_status', 'Pengurus')->value('id_status');
-        $statusAlumniId = Status::where('nama_status', 'Alumni')->value('id_status');
+        // --- SOLUSI: Gunakan whereRaw untuk perbandingan case-insensitive ---
+        $statusAktifId = Status::whereRaw('LOWER(nama_status) = ?', ['aktif'])->value('id_status');
+        $statusBaruId = Status::whereRaw('LOWER(nama_status) = ?', ['baru'])->value('id_status');
+        $statusPengurusId = Status::whereRaw('LOWER(nama_status) = ?', ['pengurus'])->value('id_status');
+        $statusAlumniId = Status::whereRaw('LOWER(nama_status) = ?', ['alumni'])->value('id_status');
 
         // Hitung santri berdasarkan id_status
-        $jumlahSantriAktif = Santri::where('id_status', $statusAktifId)->count();
-        $jumlahSantriBaru = Santri::where('id_status', $statusBaruId)->count();
-        $jumlahPengurus = Santri::where('id_status', $statusPengurusId)->count();
-        $jumlahAlumni = Santri::where('id_status', $statusAlumniId)->count();
+        $jumlahSantriAktif = $statusAktifId ? Santri::where('id_status', $statusAktifId)->count() : 0;
+        $jumlahSantriBaru = $statusBaruId ? Santri::where('id_status', $statusBaruId)->count() : 0;
+        $jumlahPengurus = $statusPengurusId ? Santri::where('id_status', $statusPengurusId)->count() : 0;
+        $jumlahAlumni = $statusAlumniId ? Santri::where('id_status', $statusAlumniId)->count() : 0;
         
-
         // Kirim semua data yang sudah dihitung ke view 'dashboard'
         return view('dashboard', [
             'jumlahSantriAktif' => $jumlahSantriAktif,

@@ -16,12 +16,14 @@
                     @if ($jenisTagihan->bulan && $jenisTagihan->tahun)
                         <p class="text-sm text-gray-600 dark:text-gray-400">Periode: {{ \Carbon\Carbon::create()->month($jenisTagihan->bulan)->isoFormat('MMMM') }} {{ $jenisTagihan->tahun }}</p>
                     @endif
+                    {{-- Detail jumlah dan tanggal dihapus dari halaman ini --}}
                 </div>
             </div>
 
-            <div x-data="{ selectAll: false, selected: [] }" class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+            <div x-data="{ selectAll: false, selected: @json(collect(old('santri_ids')) ?? []) }" class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
                     
+                    {{-- Form Filter --}}
                     <form action="{{ route('tagihan.assign', $jenisTagihan->id_jenis_tagihan) }}" method="GET" class="mb-6 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
                         <h4 class="font-semibold mb-2 dark:text-gray-200">Filter Santri</h4>
                         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
@@ -61,27 +63,10 @@
                         </div>
                     </form>
 
-                    {{-- PERBAIKAN FINAL DI SINI --}}
+                    {{-- Form untuk Menerapkan Tagihan --}}
                     <form action="{{ route('tagihan.store_assignment', $jenisTagihan->id_jenis_tagihan) }}" method="POST">
                         @csrf
-                        <div class="mb-4">
-                            <x-input-label for="jumlah_tagihan" :value="__('Jumlah Tagihan (Rp)')" />
-                            <x-text-input id="jumlah_tagihan" name="jumlah_tagihan" type="number" class="mt-1 block w-full md:w-1/2" placeholder="Contoh: 50000" required />
-                            <x-input-error :messages="$errors->get('jumlah_tagihan')" class="mt-2" />
-                        </div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                             <div>
-                                <x-input-label for="tanggal_tagihan" :value="__('Tanggal Tagihan')" />
-                                <x-text-input id="tanggal_tagihan" name="tanggal_tagihan" type="date" class="mt-1 block w-full" value="{{ date('Y-m-d') }}" required />
-                                <x-input-error :messages="$errors->get('tanggal_tagihan')" class="mt-2" />
-                            </div>
-                            <div>
-                                <x-input-label for="tanggal_jatuh_tempo" :value="__('Tanggal Jatuh Tempo (Opsional)')" />
-                                <x-text-input id="tanggal_jatuh_tempo" name="tanggal_jatuh_tempo" type="date" class="mt-1 block w-full" />
-                                <x-input-error :messages="$errors->get('tanggal_jatuh_tempo')" class="mt-2" />
-                            </div>
-                        </div>
-
+                        
                         <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
                             <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
                                 <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">

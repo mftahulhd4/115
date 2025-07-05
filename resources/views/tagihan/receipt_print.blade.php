@@ -2,80 +2,95 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    {{-- PERBAIKAN: Menggunakan nama relasi & atribut yang benar --}}
-    <title>Cetak Kuitansi - {{ optional($tagihan->santri)->nama_santri }}</title>
+    <title>Kuitansi - {{ $tagihan->id_daftar_tagihan }}</title>
     <style>
-        body{ font-family: 'Helvetica', 'Arial', sans-serif; font-size: 14px; color: #333; }
-        .container{ max-width: 800px; margin: 20px auto; padding: 20px; border: 1px solid #ccc; }
-        .header{ text-align: center; border-bottom: 3px solid #000; padding-bottom: 10px; }
-        .header h1{ margin: 0; font-size: 28px; text-transform: uppercase; }
-        .header h2{ margin: 5px 0; font-size: 16px; }
-        .content { margin-top: 30px; }
-        .content h3{ text-align: center; text-transform: uppercase; text-decoration: underline; margin-bottom: 30px; }
-        .details-table { width: 100%; margin-bottom: 20px; }
-        .details-table td { padding: 5px 0; }
-        .payment-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        .payment-table th, .payment-table td { border: 1px solid #555; padding: 8px; text-align: left; }
-        .payment-table th { background-color: #f2f2f2; }
-        .payment-table .total { font-weight: bold; }
-        .signature-section { margin-top: 50px; width: 30%; float: right; text-align: center; }
+        body { font-family: 'Times New Roman', Times, serif; font-size: 12pt; color: #000; }
+        .container { width: 18cm; margin: 0 auto; border: 2px solid #000; padding: 20px; }
+        .header { text-align: center; border-bottom: 2px double #000; padding-bottom: 10px; margin-bottom: 20px; }
+        .header h1 { margin: 0; font-size: 18pt; }
+        .header p { margin: 5px 0 0; font-size: 12pt; }
+        .title { text-align: center; font-size: 16pt; font-weight: bold; text-decoration: underline; margin-bottom: 25px; }
+        .content-table { width: 100%; margin-bottom: 25px; }
+        .content-table td { padding: 5px 0; vertical-align: top; }
+        .content-table .label { width: 180px; }
+        .content-table .colon { width: 15px; }
+        .amount-box { border: 1px solid #000; padding: 10px; text-align: center; font-size: 16pt; font-weight: bold; background-color: #eee; }
+        .terbilang { font-style: italic; text-transform: capitalize; }
+        .footer-table { width: 100%; margin-top: 30px; }
+        .footer-table td { width: 50%; text-align: center; }
+        .signature { margin-top: 60px; }
+        @media print { body { -webkit-print-color-adjust: exact; } .no-print { display: none; } }
     </style>
 </head>
 <body onload="window.print()">
+    <div class="no-print" style="text-align: center; margin-bottom: 20px;">
+        <p>Dokumen siap dicetak. Jika jendela print tidak muncul otomatis, tekan CTRL+P.</p>
+    </div>
+
     <div class="container">
         <div class="header">
             <h1>PONDOK PESANTREN NURUL AMIN</h1>
-            <h2>Jl. Moch Shaleh Simpang III Krajan, Sumberejo, Besuki</h2>
+            <p>Jl. Nama Jalan No. XX, Kota, Provinsi, Kode Pos</p>
         </div>
-        <div class="content">
-            <h3>Kuitansi Pembayaran</h3>
-            <table class="details-table">
-                <tr>
-                    <td width="20%"><strong>No. Kuitansi</strong></td>
-                    {{-- PERBAIKAN: Menggunakan ID dari daftar tagihan --}}
-                    <td width="80%">: {{ $tagihan->id_daftar_tagihan }}</td>
-                </tr>
-                 <tr>
-                    <td><strong>Diterima dari</strong></td>
-                    {{-- PERBAIKAN: Menggunakan atribut nama_santri --}}
-                    <td>: {{ optional($tagihan->santri)->nama_santri }} ({{ optional($tagihan->santri)->id_santri }})</td>
-                </tr>
-                <tr>
-                    <td><strong>Tanggal Bayar</strong></td>
-                    <td_>
-                        {{-- PERBAIKAN: Menggunakan tanggal tagihan, atau bisa disesuaikan jika ada kolom tanggal lunas --}}
-                        : {{ $tagihan->status_pembayaran == 'Lunas' ? \Carbon\Carbon::parse($tagihan->updated_at)->isoFormat('dddd, D MMMM Y') : 'Belum Lunas' }}
-                    </td>
-                </tr>
-            </table>
 
-            <table class="payment-table">
-                <thead>
-                    <tr>
-                        <th width="70%">Deskripsi Pembayaran</th>
-                        <th>Jumlah</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        {{-- PERBAIKAN: Menggunakan nama relasi & atribut yang benar --}}
-                        <td>{{ $tagihan->jenisTagihan->nama_jenis_tagihan }}</td>
-                        <td>Rp {{ number_format($tagihan->jumlah_tagihan, 0, ',', '.') }}</td>
-                    </tr>
-                    <tr class="total">
-                        <td style="text-align:right;">Total</td>
-                        <td>Rp {{ number_format($tagihan->jumlah_tagihan, 0, ',', '.') }}</td>
-                    </tr>
-                </tbody>
-            </table>
+        <div class="title">KUITANSI PEMBAYARAN</div>
 
-            <div class="signature-section">
-                <p>Besuki, {{ now()->isoFormat('D MMMM Y') }}</p>
-                <p>Bendahara,</p>
-                <br><br><br>
-                <p style="text-decoration: underline;">(.........................)</p>
-            </div>
+        <table style="width:100%; margin-bottom: 10px;">
+            <tr>
+                <td style="text-align: right;">No. {{ $tagihan->id_daftar_tagihan }}</td>
+            </tr>
+        </table>
+
+        <table class="content-table">
+            <tr>
+                <td class="label">Telah Diterima dari</td>
+                <td class="colon">:</td>
+                <td>{{ optional($tagihan->santri)->nama_santri ?? 'N/A' }} (ID: {{ optional($tagihan->santri)->id_santri ?? 'N/A' }})</td>
+            </tr>
+            <tr>
+                <td class="label">Uang Sejumlah</td>
+                <td class="colon">:</td>
+                <td class="terbilang">{{ \Terbilang::make($tagihan->jenisTagihan->jumlah_tagihan) }} Rupiah</td>
+            </tr>
+            <tr>
+                <td class="label">Untuk Pembayaran</td>
+                <td class="colon">:</td>
+                <td>
+                    {{ $tagihan->jenisTagihan->nama_jenis_tagihan }}
+                    <br>
+                    <small>
+                        (ID Tagihan: {{ $tagihan->jenisTagihan->id_jenis_tagihan }}
+                        @if ($tagihan->jenisTagihan->bulan && $tagihan->jenisTagihan->tahun)
+                            - Periode: {{ \Carbon\Carbon::create()->month($tagihan->jenisTagihan->bulan)->isoFormat('MMMM') }} {{ $tagihan->jenisTagihan->tahun }}
+                        @endif
+                        )
+                    </small>
+                </td>
+            </tr>
+            <tr>
+                <td class="label">Waktu Pelunasan</td>
+                <td class="colon">:</td>
+                <td>{{ $tagihan->tanggal_bayar ? \Carbon\Carbon::parse($tagihan->tanggal_bayar)->isoFormat('D MMMM YYYY, HH:mm:ss') : '-' }}</td>
+            </tr>
+        </table>
+        
+        <div class="amount-box">
+            Rp {{ number_format($tagihan->jenisTagihan->jumlah_tagihan, 0, ',', '.') }},-
         </div>
+
+        <table class="footer-table">
+            <tr>
+                <td></td>
+                <td>
+                    <p>Berbek, {{ now()->isoFormat('D MMMM YYYY') }}</p>
+                    {{-- INI PERUBAHANNYA --}}
+                    <p>Bendahara,</p>
+                    <div class="signature">
+                        ( {{ optional($tagihan->user)->name ?? 'N/A' }} )
+                    </div>
+                </td>
+            </tr>
+        </table>
     </div>
 </body>
 </html>

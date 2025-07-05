@@ -27,6 +27,15 @@
                             </div>
                         </div>
 
+                        {{-- --- AWAL PERUBAHAN --- --}}
+                        {{-- Menambahkan Field Edit Keperluan --}}
+                        <div>
+                            <x-input-label for="keperluan" :value="__('Keperluan Izin (Wajib)')" />
+                            <textarea id="keperluan" name="keperluan" class="block mt-1 w-full border-gray-300 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-300 rounded-md shadow-sm" rows="3" required>{{ old('keperluan', $perizinan->keperluan) }}</textarea>
+                            <x-input-error :messages="$errors->get('keperluan')" class="mt-2" />
+                        </div>
+                        {{-- --- AKHIR PERUBAHAN --- --}}
+
                         {{-- Form Manajemen --}}
                         <div class="space-y-3">
                             <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Manajemen Izin</h3>

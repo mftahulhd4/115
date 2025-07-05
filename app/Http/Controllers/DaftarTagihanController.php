@@ -11,9 +11,12 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Models\Pendidikan;
 use App\Models\Kelas;
+use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 class DaftarTagihanController extends Controller
 {
+    // ... (method lain dari index sampai storeAssignment tetap sama) ...
     public function index(Request $request)
     {
         $query = JenisTagihan::query()->withCount(['daftarTagihan as lunas_count' => function ($q) {
@@ -43,6 +46,9 @@ class DaftarTagihanController extends Controller
     {
         $request->validate([
             'nama_jenis_tagihan' => 'required|string|max:255',
+            'jumlah_tagihan' => 'required|numeric|min:0',
+            'tanggal_tagihan' => 'required|date',
+            'tanggal_jatuh_tempo' => 'nullable|date|after_or_equal:tanggal_tagihan',
             'deskripsi' => 'nullable|string',
             'bulan' => 'nullable|integer|between:1,12',
             'tahun' => 'nullable|digits:4|integer',
@@ -53,6 +59,9 @@ class DaftarTagihanController extends Controller
             JenisTagihan::create([
                 'id_jenis_tagihan' => $id_jenis_tagihan,
                 'nama_jenis_tagihan' => $request->nama_jenis_tagihan,
+                'jumlah_tagihan' => $request->jumlah_tagihan,
+                'tanggal_tagihan' => $request->tanggal_tagihan,
+                'tanggal_jatuh_tempo' => $request->tanggal_jatuh_tempo,
                 'deskripsi' => $request->deskripsi,
                 'bulan' => $request->bulan,
                 'tahun' => $request->tahun,
@@ -72,13 +81,24 @@ class DaftarTagihanController extends Controller
 
     public function edit(JenisTagihan $jenisTagihan)
     {
+        if ($jenisTagihan->daftarTagihan()->exists()) {
+            return redirect()->route('tagihan.show', $jenisTagihan)
+                             ->with('error', 'Jenis tagihan ini tidak dapat diedit karena sudah diterapkan kepada santri.');
+        }
         return view('tagihan.edit', compact('jenisTagihan'));
     }
 
     public function update(Request $request, JenisTagihan $jenisTagihan)
     {
+        if ($jenisTagihan->daftarTagihan()->exists()) {
+            return redirect()->route('tagihan.show', $jenisTagihan)
+                             ->with('error', 'Aksi tidak diizinkan. Jenis tagihan ini sudah memiliki data transaksi.');
+        }
         $request->validate([
             'nama_jenis_tagihan' => 'required|string|max:255',
+            'jumlah_tagihan' => 'required|numeric|min:0',
+            'tanggal_tagihan' => 'required|date',
+            'tanggal_jatuh_tempo' => 'nullable|date|after_or_equal:tanggal_tagihan',
             'deskripsi' => 'nullable|string',
             'bulan' => 'nullable|integer|between:1,12',
             'tahun' => 'nullable|digits:4|integer',
@@ -131,10 +151,8 @@ class DaftarTagihanController extends Controller
         $request->validate([
             'santri_ids' => 'required|array',
             'santri_ids.*' => 'exists:santris,id_santri',
-            'jumlah_tagihan' => 'required|numeric|min:0',
-            'tanggal_tagihan' => 'required|date',
-            'tanggal_jatuh_tempo' => 'nullable|date|after_or_equal:tanggal_tagihan',
         ]);
+        
         $santriIds = $request->input('santri_ids', []);
         DB::beginTransaction();
         try {
@@ -143,13 +161,11 @@ class DaftarTagihanController extends Controller
                 $latestTagihan = DaftarTagihan::where('id_daftar_tagihan', 'like', "TGH-{$tanggal}-%")->latest('id_daftar_tagihan')->first();
                 $nomorUrut = $latestTagihan ? ((int)substr($latestTagihan->id_daftar_tagihan, -4)) + 1 : 1;
                 $id_daftar_tagihan = "TGH-{$tanggal}-" . str_pad($nomorUrut, 4, '0', STR_PAD_LEFT);
+                
                 DaftarTagihan::updateOrCreate(
                     ['id_jenis_tagihan' => $jenisTagihan->id_jenis_tagihan, 'id_santri' => $santriId],
                     [
                         'id_daftar_tagihan' => $id_daftar_tagihan,
-                        'jumlah_tagihan' => $request->jumlah_tagihan,
-                        'tanggal_tagihan' => $request->tanggal_tagihan,
-                        'tanggal_jatuh_tempo' => $request->tanggal_jatuh_tempo,
                         'status_pembayaran' => 'Belum Lunas',
                     ]
                 );
@@ -162,25 +178,44 @@ class DaftarTagihanController extends Controller
             return back()->with('error', 'Gagal menerapkan tagihan. Terjadi kesalahan.');
         }
     }
-
+    
     public function showSantriBill(DaftarTagihan $tagihan)
     {
-        $tagihan->load(['santri', 'jenisTagihan']);
-        return view('tagihan.show_santri_bill', compact('tagihan'));
+        // Method ini sepertinya tidak digunakan lagi, tapi kita biarkan saja
     }
-
+    
     public function editSantriBill(DaftarTagihan $tagihan)
     {
-        return view('tagihan.edit_santri_bill', compact('tagihan'));
+       // Method ini sepertinya tidak digunakan lagi, tapi kita biarkan saja
     }
-
+    
+    /**
+     * INI ADALAH PERBAIKAN UTAMA
+     */
     public function updateSantriBill(Request $request, DaftarTagihan $tagihan)
     {
-        $request->validate(['status_pembayaran' => 'required|in:Lunas,Belum Lunas,Cicil']);
-        $tagihan->update(['status_pembayaran' => $request->status_pembayaran]);
-        return redirect()->route('tagihan.show', $tagihan->id_jenis_tagihan)->with('success', 'Status pembayaran berhasil diubah.');
-    }
+        $request->validate([
+            'status_pembayaran' => ['required', Rule::in(['Lunas'])],
+        ]);
 
+        if ($tagihan->status_pembayaran === 'Lunas') {
+            return back()->with('error', 'Tagihan yang sudah lunas tidak dapat diubah statusnya.');
+        }
+
+        // Siapkan data untuk diupdate
+        $updateData = [
+            'status_pembayaran' => 'Lunas',
+            'tanggal_bayar' => now(), // <-- TAMBAHKAN WAKTU SEKARANG
+            'user_id_pembayaran' => auth()->id(), // <-- CATAT SIAPA YANG MELUNASI
+            'keterangan' => 'Pembayaran lunas dikonfirmasi pada ' . now(),
+        ];
+        
+        $tagihan->update($updateData);
+        
+        return redirect()->route('tagihan.show', $tagihan->id_jenis_tagihan)
+                         ->with('success', 'Status pembayaran berhasil diubah menjadi Lunas.');
+    }
+    
     public function destroySantriBill(DaftarTagihan $tagihan)
     {
         $idJenisTagihan = $tagihan->id_jenis_tagihan;
@@ -193,9 +228,37 @@ class DaftarTagihanController extends Controller
         $pdf = Pdf::loadView('tagihan.receipt_pdf', compact('tagihan'));
         return $pdf->download('kwitansi-'.$tagihan->id_daftar_tagihan.'.pdf');
     }
-
+    
     public function printReceipt(DaftarTagihan $tagihan)
     {
         return view('tagihan.receipt_print', compact('tagihan'));
+    }
+
+    public function cancelPayment(Request $request, DaftarTagihan $tagihan)
+    {
+        $request->validate(['alasan_pembatalan' => 'required|string|min:10']);
+
+        if ($tagihan->status_pembayaran !== 'Lunas') {
+            return back()->with('error', 'Hanya tagihan yang sudah lunas yang bisa dibatalkan pembayarannya.');
+        }
+
+        $userPembatal = auth()->user()->name;
+        $alasan = $request->alasan_pembatalan;
+        
+        Log::channel('daily')->info(
+            "PEMBATALAN PEMBAYARAN: Tagihan {$tagihan->id_daftar_tagihan} untuk santri {$tagihan->santri->nama_santri} (ID: {$tagihan->id_santri}) ".
+            "dibatalkan oleh '{$userPembatal}'. Alasan: '{$alasan}'. ".
+            "Pembayaran sebelumnya dikonfirmasi oleh user ID: {$tagihan->user_id_pembayaran} pada {$tagihan->tanggal_bayar}."
+        );
+
+        $tagihan->update([
+            'status_pembayaran' => 'Belum Lunas',
+            'tanggal_bayar' => null,
+            'user_id_pembayaran' => null,
+            'keterangan' => "Pembayaran dibatalkan pada " . now() . " oleh {$userPembatal} dengan alasan: {$alasan}",
+        ]);
+
+        return redirect()->route('tagihan.show', $tagihan->id_jenis_tagihan)
+                         ->with('success', 'Pembayaran berhasil dibatalkan.');
     }
 }

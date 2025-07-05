@@ -19,11 +19,10 @@ class DaftarTagihan extends Model
         'id_daftar_tagihan',
         'id_santri',
         'id_jenis_tagihan',
-        'jumlah_tagihan',
-        'tanggal_tagihan',
-        'tanggal_jatuh_tempo',
         'status_pembayaran',
         'keterangan',
+        'tanggal_bayar',
+        'user_id_pembayaran',
     ];
 
     public function santri(): BelongsTo

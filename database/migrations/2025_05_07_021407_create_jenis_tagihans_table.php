@@ -6,6 +6,9 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    /**
+     * Run the migrations.
+     */
     public function up(): void
     {
         Schema::create('jenis_tagihans', function (Blueprint $table) {
@@ -13,14 +16,21 @@ return new class extends Migration
             $table->string('nama_jenis_tagihan');
             $table->text('deskripsi')->nullable();
             
-            // PENAMBAHAN KOLOM BULAN DAN TAHUN
-            $table->string('bulan')->nullable();
+            // --- KOLOM BARU YANG DIPINDAHKAN ---
+            $table->decimal('jumlah_tagihan', 10, 2)->default(0);
+            $table->date('tanggal_tagihan')->nullable();
+            $table->date('tanggal_jatuh_tempo')->nullable();
+            // --- AKHIR KOLOM BARU ---
+
+            $table->tinyInteger('bulan')->nullable();
             $table->year('tahun')->nullable();
-            
             $table->timestamps();
         });
     }
 
+    /**
+     * Reverse the migrations.
+     */
     public function down(): void
     {
         Schema::dropIfExists('jenis_tagihans');
