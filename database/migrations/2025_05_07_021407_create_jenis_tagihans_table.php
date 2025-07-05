@@ -6,24 +6,21 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('jenis_tagihans', function (Blueprint $table) {
-            $table->id('id_jenis_tagihan'); // Primary Key kustom
-            $table->string('nama_tagihan');
-            $table->decimal('nominal', 10, 2);
-            $table->string('bulan');
-            $table->year('tahun');
+            $table->string('id_jenis_tagihan')->primary();
+            $table->string('nama_jenis_tagihan');
+            $table->text('deskripsi')->nullable();
+            
+            // PENAMBAHAN KOLOM BULAN DAN TAHUN
+            $table->string('bulan')->nullable();
+            $table->year('tahun')->nullable();
+            
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('jenis_tagihans');

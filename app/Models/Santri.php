@@ -9,78 +9,44 @@ class Santri extends Model
 {
     use HasFactory;
 
-    // Menentukan primary key kustom
     protected $primaryKey = 'id_santri';
-
-    // Memberitahu Laravel bahwa primary key bukan auto-incrementing integer
     public $incrementing = false;
-
-    // Memberitahu Laravel bahwa tipe data primary key adalah string
     protected $keyType = 'string';
 
-    // PERBAIKAN: Menyesuaikan semua nama kolom agar cocok dengan migrasi
     protected $fillable = [
-        'id_santri',
-        'nama_santri',
-        'tempat_lahir',
-        'tanggal_lahir',
-        'jenis_kelamin',
-        'alamat',
-        'nama_ayah',
-        'nama_ibu',
-        'nomor_hp_wali',
-        'tahun_masuk',
-        'id_pendidikan', // Menggunakan foreign key
-        'id_kelas',      // Menggunakan foreign key
-        'id_status',     // Menggunakan foreign key
-        'foto',
+        'id_santri', 'nama_santri', 'tempat_lahir', 'tanggal_lahir', 'jenis_kelamin', 'alamat',
+        'nama_ayah', 'nama_ibu', 'nomor_hp_wali', 'tahun_masuk', 'id_pendidikan',
+        'id_kelas', 'id_status', 'foto',
     ];
 
-    // Untuk memastikan kolom tanggal terbaca sebagai objek Carbon
-    protected $casts = [
-        'tanggal_lahir' => 'date',
-    ];
+    protected $casts = ['tanggal_lahir' => 'date'];
 
-    /**
-     * FUNGSI RELASI YANG SEBELUMNYA HILANG
-     * Relasi many-to-one ke Pendidikan
-     */
     public function pendidikan()
     {
         return $this->belongsTo(Pendidikan::class, 'id_pendidikan', 'id_pendidikan');
     }
 
-    /**
-     * FUNGSI RELASI YANG SEBELUMNYA HILANG
-     * Relasi many-to-one ke Kelas
-     */
     public function kelas()
     {
         return $this->belongsTo(Kelas::class, 'id_kelas', 'id_kelas');
     }
 
-    /**
-     * FUNGSI RELASI YANG SEBELUMNYA HILANG
-     * Relasi many-to-one ke Status
-     */
     public function status()
     {
         return $this->belongsTo(Status::class, 'id_status', 'id_status');
     }
     
-    /**
-     * Relasi one-to-many ke Perizinan
-     */
     public function perizinans()
     {
         return $this->hasMany(Perizinan::class, 'id_santri', 'id_santri');
     }
 
     /**
-     * Relasi one-to-many ke Tagihan
+     * PERBAIKAN: Mengubah nama relasi dan menunjuk ke model yang benar.
      */
-    public function tagihans()
+    public function daftarTagihan()
     {
-        return $this->hasMany(Tagihan::class, 'id_santri', 'id_santri');
+        // Sebelumnya: public function tagihans() & return $this->hasMany(Tagihan::class, ...);
+        return $this->hasMany(DaftarTagihan::class, 'id_santri', 'id_santri');
     }
 }

@@ -6,58 +6,56 @@
     </x-slot>
 
     <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+        <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900 dark:text-gray-100">
-                    <h3 class="text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-4">Formulir Jenis Tagihan</h3>
+                <div class="p-6 md:p-8 text-gray-900 dark:text-gray-100">
+                    <h3 class="text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-6">Formulir Jenis Tagihan</h3>
                     
-                    <form action="{{ route('tagihan.store') }}" method="POST">
+                    <form action="{{ route('tagihan.store') }}" method="POST" class="space-y-6">
                         @csrf
 
                         <div>
-                            <label for="nama_tagihan" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nama Tagihan</label>
-                            <input type="text" id="nama_tagihan" name="nama_tagihan" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" placeholder="Contoh: SPP Bulan Agustus" value="{{ old('nama_tagihan') }}" required>
-                            @error('nama_tagihan')
-                                <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ $message }}</p>
-                            @enderror
+                            <x-input-label for="nama_jenis_tagihan" :value="__('Nama Tagihan (Wajib)')" />
+                            <x-text-input id="nama_jenis_tagihan" name="nama_jenis_tagihan" type="text" class="mt-1 block w-full"
+                                          placeholder="Contoh: SPP Bulanan, Uang Gedung, Laundry" value="{{ old('nama_jenis_tagihan') }}" required autofocus />
+                            <x-input-error :messages="$errors->get('nama_jenis_tagihan')" class="mt-2" />
+                        </div>
+                        
+                        {{-- KODE BARU: TAMBAHKAN INPUT BULAN DAN TAHUN --}}
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <x-input-label for="bulan" :value="__('Untuk Bulan (Opsional)')" />
+                                <select id="bulan" name="bulan" class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 rounded-md shadow-sm">
+                                    <option value="">-- Pilih Bulan --</option>
+                                    @for ($i = 1; $i <= 12; $i++)
+                                        <option value="{{ $i }}" {{ old('bulan') == $i ? 'selected' : '' }}>
+                                            {{ \Carbon\Carbon::create()->month($i)->isoFormat('MMMM') }}
+                                        </option>
+                                    @endfor
+                                </select>
+                                <x-input-error :messages="$errors->get('bulan')" class="mt-2" />
+                            </div>
+                            <div>
+                                <x-input-label for="tahun" :value="__('Untuk Tahun (Opsional)')" />
+                                <x-text-input id="tahun" class="block mt-1 w-full" type="number" name="tahun" placeholder="{{ date('Y') }}" value="{{ old('tahun') }}" />
+                                <x-input-error :messages="$errors->get('tahun')" class="mt-2" />
+                            </div>
                         </div>
 
-                        <div class="mt-4">
-                            <label for="nominal" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nominal</label>
-                            <input type="number" id="nominal" name="nominal" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" placeholder="500000" value="{{ old('nominal') }}" required>
-                             @error('nominal')
-                                <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ $message }}</p>
-                            @enderror
+                        <div>
+                            <x-input-label for="deskripsi" :value="__('Deskripsi (Opsional)')" />
+                            <textarea id="deskripsi" name="deskripsi" class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 rounded-md shadow-sm"
+                                      rows="4" placeholder="Jelaskan secara singkat mengenai tagihan ini...">{{ old('deskripsi') }}</textarea>
+                            <x-input-error :messages="$errors->get('deskripsi')" class="mt-2" />
                         </div>
 
-                         <div class="mt-4">
-                            <label for="bulan" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Bulan (Opsional)</label>
-                            <select id="bulan" name="bulan" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white">
-                                <option value="">-- Pilih Bulan --</option>
-                                @for ($i = 1; $i <= 12; $i++)
-                                    <option value="{{ $i }}" {{ old('bulan') == $i ? 'selected' : '' }}>{{ \Carbon\Carbon::create()->month($i)->isoFormat('MMMM') }}</option>
-                                @endfor
-                            </select>
-                             @error('bulan')
-                                <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        <div class="mt-4">
-                            <label for="tahun" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Tahun (Opsional)</label>
-                            <input type="number" id="tahun" name="tahun" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" placeholder="{{ date('Y') }}" value="{{ old('tahun') }}">
-                             @error('tahun')
-                                <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        <div class="flex items-center justify-end mt-6 gap-x-4">
-                            <a href="{{ route('tagihan.index') }}" class="text-sm font-medium text-gray-600 dark:text-gray-400 hover:underline">
+                        <div class="flex items-center justify-end mt-6 pt-6 border-t border-gray-200 dark:border-gray-700 gap-x-4">
+                            <a href="{{ route('tagihan.index') }}" class="text-sm underline">
                                 {{ __('Batal') }}
                             </a>
-                            <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
-                                {{ __('Simpan') }}
-                            </button>
+                            <x-primary-button>
+                                {{ __('Simpan Jenis Tagihan') }}
+                            </x-primary-button>
                         </div>
                     </form>
                 </div>

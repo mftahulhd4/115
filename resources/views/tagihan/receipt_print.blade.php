@@ -2,7 +2,8 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Cetak Kuitansi - {{ optional($tagihan->santri)->nama_lengkap }}</title>
+    {{-- PERBAIKAN: Menggunakan nama relasi & atribut yang benar --}}
+    <title>Cetak Kuitansi - {{ optional($tagihan->santri)->nama_santri }}</title>
     <style>
         body{ font-family: 'Helvetica', 'Arial', sans-serif; font-size: 14px; color: #333; }
         .container{ max-width: 800px; margin: 20px auto; padding: 20px; border: 1px solid #ccc; }
@@ -31,15 +32,20 @@
             <table class="details-table">
                 <tr>
                     <td width="20%"><strong>No. Kuitansi</strong></td>
-                    <td width="80%">: TAG-{{ $tagihan->id_tagihan }}</td>
+                    {{-- PERBAIKAN: Menggunakan ID dari daftar tagihan --}}
+                    <td width="80%">: {{ $tagihan->id_daftar_tagihan }}</td>
                 </tr>
                  <tr>
                     <td><strong>Diterima dari</strong></td>
-                    <td>: {{ optional($tagihan->santri)->nama_lengkap }} ({{ optional($tagihan->santri)->id_santri }})</td>
+                    {{-- PERBAIKAN: Menggunakan atribut nama_santri --}}
+                    <td>: {{ optional($tagihan->santri)->nama_santri }} ({{ optional($tagihan->santri)->id_santri }})</td>
                 </tr>
                 <tr>
                     <td><strong>Tanggal Bayar</strong></td>
-                    <td>: {{ optional($tagihan->tanggal_pembayaran)->isoFormat('dddd, D MMMM Y') ?? 'Belum Lunas' }}</td>
+                    <td_>
+                        {{-- PERBAIKAN: Menggunakan tanggal tagihan, atau bisa disesuaikan jika ada kolom tanggal lunas --}}
+                        : {{ $tagihan->status_pembayaran == 'Lunas' ? \Carbon\Carbon::parse($tagihan->updated_at)->isoFormat('dddd, D MMMM Y') : 'Belum Lunas' }}
+                    </td>
                 </tr>
             </table>
 
@@ -52,18 +58,19 @@
                 </thead>
                 <tbody>
                     <tr>
-                        <td>{{ $tagihan->jenisTagihan->nama_tagihan }}</td>
-                        <td>Rp {{ number_format($tagihan->jenisTagihan->nominal, 0, ',', '.') }}</td>
+                        {{-- PERBAIKAN: Menggunakan nama relasi & atribut yang benar --}}
+                        <td>{{ $tagihan->jenisTagihan->nama_jenis_tagihan }}</td>
+                        <td>Rp {{ number_format($tagihan->jumlah_tagihan, 0, ',', '.') }}</td>
                     </tr>
                     <tr class="total">
                         <td style="text-align:right;">Total</td>
-                        <td>Rp {{ number_format($tagihan->jenisTagihan->nominal, 0, ',', '.') }}</td>
+                        <td>Rp {{ number_format($tagihan->jumlah_tagihan, 0, ',', '.') }}</td>
                     </tr>
                 </tbody>
             </table>
 
             <div class="signature-section">
-                <p>Probolinggo, {{ now()->isoFormat('D MMMM Y') }}</p>
+                <p>Besuki, {{ now()->isoFormat('D MMMM Y') }}</p>
                 <p>Bendahara,</p>
                 <br><br><br>
                 <p style="text-decoration: underline;">(.........................)</p>

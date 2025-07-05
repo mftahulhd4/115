@@ -12,35 +12,47 @@
                      <a href="{{ route('tagihan.show', $jenisTagihan->id_jenis_tagihan) }}" class="text-sm font-medium text-blue-600 dark:text-blue-500 hover:underline mb-4 block">
                         &larr; Kembali ke Detail Tagihan
                     </a>
-                    <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-200">{{ $jenisTagihan->nama_tagihan }}</h3>
-                    <p class="text-sm text-gray-600 dark:text-gray-400">Periode: {{ \Carbon\Carbon::create()->month($jenisTagihan->bulan)->isoFormat('MMMM') }} {{ $jenisTagihan->tahun }}</p>
-                    <p class="mt-1 text-2xl font-bold text-green-600 dark:text-green-400">Rp {{ number_format($jenisTagihan->nominal, 0, ',', '.') }}</p>
+                    <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-200">{{ $jenisTagihan->nama_jenis_tagihan }}</h3>
+                    @if ($jenisTagihan->bulan && $jenisTagihan->tahun)
+                        <p class="text-sm text-gray-600 dark:text-gray-400">Periode: {{ \Carbon\Carbon::create()->month($jenisTagihan->bulan)->isoFormat('MMMM') }} {{ $jenisTagihan->tahun }}</p>
+                    @endif
                 </div>
             </div>
 
             <div x-data="{ selectAll: false, selected: [] }" class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
+                    
                     <form action="{{ route('tagihan.assign', $jenisTagihan->id_jenis_tagihan) }}" method="GET" class="mb-6 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
                         <h4 class="font-semibold mb-2 dark:text-gray-200">Filter Santri</h4>
                         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                             <div>
-                                <label for="pendidikan" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Pendidikan</label>
-                                <select id="pendidikan" name="pendidikan" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:bg-gray-900 dark:border-gray-600 dark:text-gray-300">
+                                <label for="jenis_kelamin" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Jenis Kelamin</label>
+                                <select id="jenis_kelamin" name="jenis_kelamin" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:bg-gray-900 dark:border-gray-600 dark:text-gray-300">
                                     <option value="">Semua</option>
-                                    <option value="Mts Nurul Amin" {{ request('pendidikan') == 'Mts Nurul Amin' ? 'selected' : '' }}>Mts Nurul Amin</option>
-                                    <option value="MA Nurul Amin" {{ request('pendidikan') == 'MA Nurul Amin' ? 'selected' : '' }}>MA Nurul Amin</option>
+                                    <option value="Laki-laki" {{ request('jenis_kelamin') == 'Laki-laki' ? 'selected' : '' }}>Laki-laki</option>
+                                    <option value="Perempuan" {{ request('jenis_kelamin') == 'Perempuan' ? 'selected' : '' }}>Perempuan</option>
                                 </select>
                             </div>
                             <div>
-                                <label for="kelas" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Kelas</label>
-                                <select id="kelas" name="kelas" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:bg-gray-900 dark:border-gray-600 dark:text-gray-300">
+                                <label for="id_pendidikan" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Pendidikan</label>
+                                <select id="id_pendidikan" name="id_pendidikan" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:bg-gray-900 dark:border-gray-600 dark:text-gray-300">
                                     <option value="">Semua</option>
-                                    <option value="VII" {{ request('kelas') == 'VII' ? 'selected' : '' }}>VII</option>
-                                    <option value="VIII" {{ request('kelas') == 'VIII' ? 'selected' : '' }}>VIII</option>
-                                    <option value="IX" {{ request('kelas') == 'IX' ? 'selected' : '' }}>IX</option>
-                                    <option value="X" {{ request('kelas') == 'X' ? 'selected' : '' }}>X</option>
-                                    <option value="XI" {{ request('kelas') == 'XI' ? 'selected' : '' }}>XI</option>
-                                    <option value="XII" {{ request('kelas') == 'XII' ? 'selected' : '' }}>XII</option>
+                                    @foreach ($pendidikans as $pendidikan)
+                                        <option value="{{ $pendidikan->id_pendidikan }}" {{ request('id_pendidikan') == $pendidikan->id_pendidikan ? 'selected' : '' }}>
+                                            {{ $pendidikan->nama_pendidikan }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div>
+                                <label for="id_kelas" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Kelas</label>
+                                <select id="id_kelas" name="id_kelas" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:bg-gray-900 dark:border-gray-600 dark:text-gray-300">
+                                    <option value="">Semua</option>
+                                    @foreach ($kelases as $kelas)
+                                        <option value="{{ $kelas->id_kelas }}" {{ request('id_kelas') == $kelas->id_kelas ? 'selected' : '' }}>
+                                            {{ $kelas->nama_kelas }}
+                                        </option>
+                                    @endforeach
                                 </select>
                             </div>
                             <div class="self-end">
@@ -49,18 +61,37 @@
                         </div>
                     </form>
 
-                    {{-- PERBAIKAN FINAL: Menggunakan nama route snake_case yang benar --}}
+                    {{-- PERBAIKAN FINAL DI SINI --}}
                     <form action="{{ route('tagihan.store_assignment', $jenisTagihan->id_jenis_tagihan) }}" method="POST">
                         @csrf
+                        <div class="mb-4">
+                            <x-input-label for="jumlah_tagihan" :value="__('Jumlah Tagihan (Rp)')" />
+                            <x-text-input id="jumlah_tagihan" name="jumlah_tagihan" type="number" class="mt-1 block w-full md:w-1/2" placeholder="Contoh: 50000" required />
+                            <x-input-error :messages="$errors->get('jumlah_tagihan')" class="mt-2" />
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                             <div>
+                                <x-input-label for="tanggal_tagihan" :value="__('Tanggal Tagihan')" />
+                                <x-text-input id="tanggal_tagihan" name="tanggal_tagihan" type="date" class="mt-1 block w-full" value="{{ date('Y-m-d') }}" required />
+                                <x-input-error :messages="$errors->get('tanggal_tagihan')" class="mt-2" />
+                            </div>
+                            <div>
+                                <x-input-label for="tanggal_jatuh_tempo" :value="__('Tanggal Jatuh Tempo (Opsional)')" />
+                                <x-text-input id="tanggal_jatuh_tempo" name="tanggal_jatuh_tempo" type="date" class="mt-1 block w-full" />
+                                <x-input-error :messages="$errors->get('tanggal_jatuh_tempo')" class="mt-2" />
+                            </div>
+                        </div>
+
                         <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
                             <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
                                 <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                                     <tr>
                                         <th scope="col" class="p-4">
-                                            <input type="checkbox" x-model="selectAll" @click="$el.checked ? selected = @json($santris->pluck('id_santri')->diff($existingSantriIds)) : selected = []" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                            <input type="checkbox" x-model="selectAll" @click="$el.checked ? selected = @json($santris->pluck('id_santri')->diff($existingSantriIds)->values()) : selected = []" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
                                         </th>
                                         <th scope="col" class="px-6 py-3">Nama Santri</th>
-                                        <th scope="col" class="px-6 py-3">Kelas / Pendidikan</th>
+                                        <th scope="col" class="px-6 py-3">Pendidikan</th>
+                                        <th scope="col" class="px-6 py-3">Kelas</th>
                                         <th scope="col" class="px-6 py-3">Status</th>
                                     </tr>
                                 </thead>
@@ -75,10 +106,11 @@
                                                 @endif
                                             </td>
                                             <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                                {{ $santri->nama_lengkap }}
+                                                {{ $santri->nama_santri }}
                                                 <p class="font-normal text-gray-500 dark:text-gray-400">{{ $santri->id_santri }}</p>
                                             </th>
-                                            <td class="px-6 py-4">{{ $santri->kelas }} / {{ $santri->pendidikan }}</td>
+                                            <td class="px-6 py-4">{{ optional($santri->pendidikan)->nama_pendidikan }}</td>
+                                            <td class="px-6 py-4">{{ optional($santri->kelas)->nama_kelas }}</td>
                                             <td class="px-6 py-4">
                                                  @if(in_array($santri->id_santri, $existingSantriIds))
                                                     <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">Sudah Ditagih</span>
@@ -89,18 +121,20 @@
                                         </tr>
                                     @empty
                                         <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                                            <td colspan="4" class="px-6 py-4 text-center">Tidak ada data santri yang cocok dengan filter.</td>
+                                            <td colspan="5" class="px-6 py-4 text-center">Tidak ada data santri yang cocok dengan filter.</td>
                                         </tr>
                                     @endforelse
                                 </tbody>
                             </table>
                         </div>
+                        
                         <div class="mt-6 flex justify-end">
                              <button type="submit" class="inline-flex items-center px-6 py-3 bg-blue-800 border border-transparent rounded-md font-semibold text-white uppercase tracking-widest hover:bg-blue-700" :disabled="selected.length === 0">
                                 Terapkan Tagihan ke Santri Terpilih (<span x-text="selected.length"></span>)
                             </button>
                         </div>
                     </form>
+
                 </div>
             </div>
         </div>
