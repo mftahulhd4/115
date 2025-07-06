@@ -2,21 +2,18 @@
 
 namespace App\Providers;
 
-// Pastikan semua use statement ini ada dan benar
+use App\Models\User;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
-use App\Models\User; // Pastikan path ke User model Anda benar
-use Illuminate\Support\Facades\Log; // Pastikan Log di-import
 
 class AuthServiceProvider extends ServiceProvider
 {
     /**
-     * The policy mappings for the application.
+     * The model to policy mappings for the application.
      *
      * @var array<class-string, class-string>
      */
     protected $policies = [
-        // Biasanya ada mapping policy di sini jika Anda menggunakan policy
         // 'App\Models\Model' => 'App\Policies\ModelPolicy',
     ];
 
@@ -24,17 +21,32 @@ class AuthServiceProvider extends ServiceProvider
      * Register any authentication / authorization services.
      */
     public function boot(): void
-{
-    // Log::info('============================================================');
-    // Log::info('[AuthServiceProvider] METODE BOOT() AuthServiceProvider DIPANGGIL.');
-    // Log::info('============================================================');
+    {
+        $this->registerPolicies();
 
-    $this->registerPolicies();
+        // PERBAIKAN NAMA: Gate untuk hak akses tertinggi (hanya admin)
+        Gate::define('is-admin', function (User $user) {
+            return $user->role === 'admin';
+        });
 
-    Gate::define('manage-users', function (User $user) {
-        $isAdmin = $user->isAdmin();
-        // Log::info('[AuthServiceProvider] Gate "manage-users" dievaluasi untuk user: ' . $user->email . '. Peran: ' . $user->role . '. Method isAdmin() mengembalikan: ' . ($isAdmin ? 'Ya' : 'Tidak'));
-        return $isAdmin;
-    });
-}
+        // Gate untuk CRUD data Santri (admin dan pengurus)
+        Gate::define('manage-santri', function (User $user) {
+            return in_array($user->role, ['admin', 'pengurus']);
+        });
+
+        // Gate untuk CRUD data Perizinan (admin, pengurus, dan asatid)
+        Gate::define('manage-perizinan', function (User $user) {
+            return in_array($user->role, ['admin', 'pengurus', 'asatid']);
+        });
+        
+        // Gate untuk CRUD data Tagihan (admin dan pengurus)
+        Gate::define('manage-tagihan-full', function (User $user) {
+            return in_array($user->role, ['admin', 'pengurus']);
+        });
+        
+        // Gate untuk HANYA MELIHAT data Tagihan (semua role)
+        Gate::define('view-tagihan', function (User $user) {
+            return in_array($user->role, ['admin', 'pengurus', 'asatid']);
+        });
+    }
 }

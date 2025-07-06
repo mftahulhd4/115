@@ -16,7 +16,6 @@
                     @if ($jenisTagihan->bulan && $jenisTagihan->tahun)
                         <p class="text-sm text-gray-600 dark:text-gray-400">Periode: {{ \Carbon\Carbon::create()->month($jenisTagihan->bulan)->isoFormat('MMMM') }} {{ $jenisTagihan->tahun }}</p>
                     @endif
-                    {{-- Detail jumlah dan tanggal dihapus dari halaman ini --}}
                 </div>
             </div>
 
@@ -25,7 +24,29 @@
                     
                     {{-- Form Filter --}}
                     <form action="{{ route('tagihan.assign', $jenisTagihan->id_jenis_tagihan) }}" method="GET" class="mb-6 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                        <h4 class="font-semibold mb-2 dark:text-gray-200">Filter Santri</h4>
+                        
+                        {{-- ========================================================== --}}
+                        {{--                KODE BARU FILTER STATUS SANTRI              --}}
+                        {{-- ========================================================== --}}
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Status Santri</label>
+                            <div class="mt-2 flex flex-wrap items-center gap-x-6 gap-y-2 border dark:border-gray-600 p-3 rounded-md">
+                                @foreach($statuses as $status)
+                                    <label for="status_{{ $status->id_status }}" class="inline-flex items-center">
+                                        <input type="checkbox" name="status_ids[]" id="status_{{ $status->id_status }}" value="{{ $status->id_status }}"
+                                               class="h-4 w-4 rounded border-gray-300 dark:bg-gray-900 dark:border-gray-500 text-indigo-600 focus:ring-indigo-500"
+                                               @if(is_array(request('status_ids')) && in_array($status->id_status, request('status_ids'))) checked @endif
+                                        >
+                                        <span class="ml-2 text-sm text-gray-700 dark:text-gray-200">{{ $status->nama_status }}</span>
+                                    </label>
+                                @endforeach
+                            </div>
+                        </div>
+                        {{-- ========================================================== --}}
+                        {{--                     AKHIR KODE BARU                        --}}
+                        {{-- ========================================================== --}}
+
+                        <h4 class="font-semibold mb-2 dark:text-gray-200">Filter Lainnya</h4>
                         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                             <div>
                                 <label for="jenis_kelamin" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Jenis Kelamin</label>
@@ -77,7 +98,7 @@
                                         <th scope="col" class="px-6 py-3">Nama Santri</th>
                                         <th scope="col" class="px-6 py-3">Pendidikan</th>
                                         <th scope="col" class="px-6 py-3">Kelas</th>
-                                        <th scope="col" class="px-6 py-3">Status</th>
+                                        <th scope="col" class="px-6 py-3">Status Tagihan</th>
                                     </tr>
                                 </thead>
                                 <tbody>

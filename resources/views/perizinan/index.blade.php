@@ -93,7 +93,6 @@
                                             {{ $izin->santri->nama_santri ?? 'Santri Dihapus' }}
                                         </th>
                                         <td class="px-6 py-4">
-                                            {{-- LOGIKA BARU UNTUK TAMPILAN STATUS --}}
                                             <span class="px-2 py-1 font-semibold leading-tight rounded-full
                                                 @if($izin->status_efektif == 'Diizinkan') bg-blue-100 text-blue-800 dark:bg-blue-700 dark:text-blue-100
                                                 @elseif($izin->status_efektif == 'Kembali') bg-green-100 text-green-800 dark:bg-green-700 dark:text-green-100
@@ -102,16 +101,12 @@
                                                 @else bg-yellow-100 text-yellow-800 dark:bg-yellow-700 dark:text-yellow-100 @endif">
                                                 
                                                 @if($izin->status_efektif == 'Terlambat')
-                                                    {{-- Cek status asli di database --}}
                                                     @if($izin->status == 'Terlambat')
-                                                        {{-- Jika sudah ditandai kembali, tampilkan durasi --}}
                                                         Terlambat ({{ $izin->durasi_keterlambatan }})
                                                     @else
-                                                        {{-- Jika belum kembali, tampilkan "Terlambat" saja --}}
                                                         Terlambat
                                                     @endif
                                                 @else
-                                                    {{-- Untuk status lain, tampilkan seperti biasa --}}
                                                     {{ $izin->status_efektif }}
                                                 @endif
                                             </span>
@@ -127,6 +122,12 @@
                             </tbody>
                         </table>
                     </div>
+                    
+                    {{-- Pagination --}}
+                    <div class="mt-4">
+                        {{ $perizinans->links() }}
+                    </div>
+
                 </div>
             </div>
         </div>

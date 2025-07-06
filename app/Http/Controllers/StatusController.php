@@ -8,6 +8,14 @@ use Illuminate\Http\Request;
 class StatusController extends Controller
 {
     /**
+     * Menerapkan Gate 'is-admin' ke semua method di controller ini.
+     */
+    public function __construct()
+    {
+        $this->middleware('can:is-admin');
+    }
+
+    /**
      * Menampilkan daftar semua data status.
      */
     public function index()

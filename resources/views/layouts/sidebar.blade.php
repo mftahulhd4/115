@@ -21,19 +21,46 @@
                     <span class="ml-4">Dashboard</span>
                 </a>
             </li>
+            
+            <li>
+                <a href="{{ route('santri.index') }}" class="flex items-center px-6 py-3 {{ request()->routeIs('santri.*') ? 'bg-gray-700' : '' }} hover:bg-gray-700 transition-colors duration-200">
+                    <i class="fas fa-users w-6 text-center"></i>
+                    <span class="ml-4">Data Santri</span>
+                </a>
+            </li>
+
+            @can('manage-perizinan')
+                <li>
+                    <a href="{{ route('perizinan.index') }}" class="flex items-center px-6 py-3 {{ request()->routeIs('perizinan.*') ? 'bg-gray-700' : '' }} hover:bg-gray-700 transition-colors duration-200">
+                        <i class="fas fa-file-alt w-6 text-center"></i>
+                        <span class="ml-4">Perizinan</span>
+                    </a>
+                </li>
+            @endcan
+            
+            @can('view-tagihan')
+                <li>
+                    <a href="{{ route('tagihan.index') }}" class="flex items-center px-6 py-3 {{ request()->routeIs('tagihan.*') ? 'bg-gray-700' : '' }} hover:bg-gray-700 transition-colors duration-200">
+                        <i class="fas fa-dollar-sign w-6 text-center"></i>
+                        <span class="ml-4">Tagihan</span>
+                    </a>
+                </li>
+            @endcan
 
             {{-- =============================================== --}}
-            {{--         MENU BARU: DATA MASTER (SIDEBAR)        --}}
+            {{--           FOKUS PERUBAHAN DI SINI              --}}
             {{-- =============================================== --}}
-            <li x-data="{ open: {{ request()->routeIs('master.*') ? 'true' : 'false' }} }">
-                <button @click="open = !open" class="w-full flex justify-between items-center px-6 py-3 hover:bg-gray-700 transition-colors duration-200">
+            @can('is-admin')
+            <span class="px-6 text-gray-400 text-xs uppercase mt-4 block">Admin</span>
+            <li class="mt-2" x-data="{ open: {{ request()->routeIs('master.*') ? 'true' : 'false' }} }">
+                <button @click="open = !open" class="w-full flex justify-between items-center px-6 py-3 hover:bg-gray-700 transition-colors duration-200 text-left">
                     <div class="flex items-center">
                         <i class="fas fa-database w-6 text-center"></i>
                         <span class="ml-4">Data Master</span>
                     </div>
                     <i class="fas" :class="open ? 'fa-chevron-down' : 'fa-chevron-right'"></i>
                 </button>
-                <ul x-show="open" class="pl-12 bg-gray-900/50">
+                <ul x-show="open" class="pl-12 bg-gray-900/50" x-collapse>
                     <li>
                         <a href="{{ route('master.pendidikan.index') }}" class="block px-4 py-2 text-sm {{ request()->routeIs('master.pendidikan.*') ? 'text-white font-bold' : 'text-gray-400' }} hover:text-white">
                             Pendidikan
@@ -51,47 +78,26 @@
                     </li>
                 </ul>
             </li>
-            {{-- =============================================== --}}
-            {{--              AKHIR DARI MENU BARU               --}}
-            {{-- =============================================== --}}
             
             <li>
-                <a href="{{ route('santri.index') }}" class="flex items-center px-6 py-3 {{ request()->routeIs('santri.*') ? 'bg-gray-700' : '' }} hover:bg-gray-700 transition-colors duration-200">
-                    <i class="fas fa-users w-6 text-center"></i>
-                    <span class="ml-4">Data Santri</span>
-                </a>
-            </li>
-            <li>
-                <a href="{{ route('perizinan.index') }}" class="flex items-center px-6 py-3 {{ request()->routeIs('perizinan.*') ? 'bg-gray-700' : '' }} hover:bg-gray-700 transition-colors duration-200">
-                    <i class="fas fa-file-alt w-6 text-center"></i>
-                    <span class="ml-4">Perizinan</span>
-                </a>
-            </li>
-            <li>
-                <a href="{{ route('tagihan.index') }}" class="flex items-center px-6 py-3 {{ request()->routeIs('tagihan.*') ? 'bg-gray-700' : '' }} hover:bg-gray-700 transition-colors duration-200">
-                    <i class="fas fa-dollar-sign w-6 text-center"></i>
-                    <span class="ml-4">Tagihan</span>
-                </a>
-            </li>
-
-            @if(auth()->user()->role == 'admin')
-            <span class="px-6 text-gray-400 text-xs uppercase mt-4 block">Admin</span>
-            <li class="mt-2">
                 <a href="{{ route('users.index') }}" class="flex items-center px-6 py-3 {{ request()->routeIs('users.*') ? 'bg-gray-700' : '' }} hover:bg-gray-700 transition-colors duration-200">
                     <i class="fas fa-user-cog w-6 text-center"></i>
                     <span class="ml-4">Manajemen User</span>
                 </a>
             </li>
-            @endif
+            @endcan
+            {{-- =============================================== --}}
+            {{--            AKHIR PERUBAHAN DI SINI             --}}
+            {{-- =============================================== --}}
         </ul>
     </nav>
 
-    <div class="w-full">
+    <div class="mt-auto">
          <form method="POST" action="{{ route('logout') }}">
             @csrf
             <a href="{{ route('logout') }}"
                onclick="event.preventDefault(); this.closest('form').submit();"
-               class="flex items-center px-6 py-3 text-red-400 hover:bg-gray-700 transition-colors duration-200">
+               class="flex items-center px-6 py-3 text-red-400 hover:bg-red-700 transition-colors duration-200">
                 <i class="fas fa-sign-out-alt w-6 text-center"></i>
                 <span class="ml-4">Logout</span>
             </a>

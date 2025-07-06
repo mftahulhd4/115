@@ -35,7 +35,6 @@
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Nama</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Email</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Role</th>
-                                    {{-- TAMBAHKAN HEADER KOLOM AKSI --}}
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Aksi</th>
                                 </tr>
                             </thead>
@@ -46,16 +45,17 @@
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">{{ $user->email }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                                            {{ $user->role == 'admin' ? 'bg-red-100 text-red-800' : 'bg-indigo-100 text-indigo-800' }}">
+                                            @if($user->role == 'admin') bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300
+                                            @elseif($user->role == 'pengurus') bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-300
+                                            @else bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300 @endif">
                                             {{ ucfirst($user->role) }}
                                         </span>
                                     </td>
-                                    {{-- TAMBAHKAN KOLOM AKSI DENGAN TOMBOL --}}
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                         <div class="flex items-center space-x-4">
-                                            {{-- <a href="{{ route('users.edit', $user->id) }}" class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-200" title="Edit">
+                                            <a href="{{ route('users.edit', $user->id) }}" class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-200" title="Edit">
                                                 <i class="fas fa-edit"></i>
-                                            </a> --}}
+                                            </a>
                                             
                                             {{-- Jangan tampilkan tombol hapus untuk diri sendiri --}}
                                             @if(auth()->id() !== $user->id)

@@ -9,9 +9,20 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\Paginator;
 
 class PerizinanController extends Controller
 {
+    /**
+     * Menerapkan Gate 'manage-perizinan' ke semua method di controller ini.
+     */
+    public function __construct()
+    {
+        // PERBAIKAN FINAL: Ini adalah cara yang benar untuk memanggil middleware.
+        $this->middleware('can:manage-perizinan');
+    }
+
     public function index(Request $request)
     {
         $query = Perizinan::with(['santri.kelas', 'santri.pendidikan'])->latest();
@@ -36,19 +47,28 @@ class PerizinanController extends Controller
         if ($request->filled('tahun')) {
             $query->whereYear('waktu_pergi', $request->tahun);
         }
-
-        $perizinans = $query->get();
+        
+        $allPerizinans = $query->get();
 
         if ($request->filled('status')) {
             $statusFilter = $request->status;
-            $perizinans = $perizinans->filter(function ($izin) use ($statusFilter) {
+            $allPerizinans = $allPerizinans->filter(function ($izin) use ($statusFilter) {
                 return $izin->status_efektif === $statusFilter;
             });
         }
+        
+        $perPage = 15;
+        $currentPage = Paginator::resolveCurrentPage('page') ?: 1;
+        $currentPageItems = $allPerizinans->slice(($currentPage - 1) * $perPage, $perPage)->values();
+        $perizinans = new LengthAwarePaginator($currentPageItems, count($allPerizinans), $perPage, $currentPage, [
+            'path' => Paginator::resolveCurrentPath(),
+            'query' => $request->query(),
+        ]);
 
         return view('perizinan.index', compact('perizinans'));
     }
 
+    // ... (sisa method dari create sampai print tidak perlu diubah)
     public function create()
     {
         return view('perizinan.create');
@@ -64,19 +84,18 @@ class PerizinanController extends Controller
         ]);
 
         $izinAktif = Perizinan::where('id_santri', $request->id_santri)
-                               ->whereNotIn('status', ['Kembali', 'Ditolak', 'Terlambat'])
+                               ->whereIn('status', ['Pengajuan', 'Diizinkan'])
                                ->exists();
         
         if ($izinAktif) {
             return back()
-                ->withErrors(['id_santri' => 'Santri ini masih memiliki izin yang belum selesai. Tidak dapat membuat izin baru.'])
+                ->withErrors(['id_santri' => 'Santri ini masih memiliki izin yang belum selesai (status Diajukan atau Diizinkan).'])
                 ->withInput();
         }
 
         $lastPermitToday = Perizinan::whereDate('created_at', Carbon::today())->orderBy('id_izin', 'desc')->first();
         
         $nextNumber = 1;
-
         if ($lastPermitToday) {
             $lastNumber = (int) substr($lastPermitToday->id_izin, -4);
             $nextNumber = $lastNumber + 1;
@@ -105,35 +124,32 @@ class PerizinanController extends Controller
 
     public function update(Request $request, Perizinan $perizinan)
     {
-        // --- AWAL PERUBAHAN ---
         $validated = $request->validate([
-            'keperluan' => 'required|string', // Ditambahkan
-            'estimasi_kembali' => 'required|date|after_or_equal:waktu_pergi',
+            'keperluan' => 'required|string',
+            'estimasi_kembali' => 'required|date',
             'status' => ['required', Rule::in(['Pengajuan', 'Diizinkan', 'Ditolak', 'Kembali'])],
             'waktu_kembali_aktual' => 'nullable|date',
         ]);
-        // --- AKHIR PERUBAHAN ---
-
+        
         $newStatus = $request->status;
         
+        $updateData = [
+            'keperluan' => $validated['keperluan'],
+            'estimasi_kembali' => $validated['estimasi_kembali'],
+        ];
+
         if ($newStatus == 'Kembali') {
             $waktuKembali = $request->waktu_kembali_aktual ? Carbon::parse($request->waktu_kembali_aktual) : now();
-            $estimasiKembali = Carbon::parse($request->estimasi_kembali);
-            $finalStatus = $waktuKembali->isAfter($estimasiKembali) ? 'Terlambat' : 'Kembali';
-
-            $perizinan->update([
-                'keperluan' => $validated['keperluan'], // Ditambahkan
-                'status' => $finalStatus,
-                'waktu_kembali_aktual' => $waktuKembali,
-                'estimasi_kembali' => $estimasiKembali,
-            ]);
+            $estimasiKembali = Carbon::parse($validated['estimasi_kembali']);
+            
+            $updateData['status'] = $waktuKembali->isAfter($estimasiKembali) ? 'Terlambat' : 'Kembali';
+            $updateData['waktu_kembali_aktual'] = $waktuKembali;
         } else {
-            $perizinan->update([
-                'keperluan' => $validated['keperluan'], // Ditambahkan
-                'status' => $newStatus,
-                'estimasi_kembali' => $request->estimasi_kembali,
-            ]);
+            $updateData['status'] = $newStatus;
+            $updateData['waktu_kembali_aktual'] = null;
         }
+
+        $perizinan->update($updateData);
 
         return redirect()->route('perizinan.show', $perizinan->id_izin)->with('success', 'Data perizinan berhasil diperbarui.');
     }
@@ -156,6 +172,7 @@ class PerizinanController extends Controller
             ->where('id_status', '!=', $statusAlumniId)
             ->limit(10)
             ->get();
+            
         $santris->transform(function ($santri) {
             $santri->foto_url = $santri->foto ? asset('storage/fotos/' . $santri->foto) : 'https://ui-avatars.com/api/?name=' . urlencode($santri->nama_santri) . '&background=random';
             $santri->nama_pendidikan = optional($santri->pendidikan)->nama_pendidikan ?? '-';

@@ -8,6 +8,14 @@ use Illuminate\Http\Request;
 class PendidikanController extends Controller
 {
     /**
+     * Menerapkan Gate 'is-admin' ke semua method di controller ini.
+     */
+    public function __construct()
+    {
+        $this->middleware('can:is-admin');
+    }
+
+    /**
      * Menampilkan daftar semua data pendidikan.
      */
     public function index()
@@ -35,7 +43,6 @@ class PendidikanController extends Controller
 
         Pendidikan::create($validated);
 
-        // PERBAIKAN DI SINI
         return redirect()->route('master.pendidikan.index')->with('success', 'Data pendidikan berhasil ditambahkan.');
     }
 
@@ -58,7 +65,6 @@ class PendidikanController extends Controller
 
         $pendidikan->update($validated);
 
-        // PERBAIKAN DI SINI
         return redirect()->route('master.pendidikan.index')->with('success', 'Data pendidikan berhasil diperbarui.');
     }
 
@@ -68,13 +74,11 @@ class PendidikanController extends Controller
     public function destroy(Pendidikan $pendidikan)
     {
         if ($pendidikan->santris()->exists()) {
-            // PERBAIKAN DI SINI
             return back()->with('error', 'Data pendidikan tidak dapat dihapus karena masih digunakan oleh santri.');
         }
 
         $pendidikan->delete();
 
-        // PERBAIKAN DI SINI
         return redirect()->route('master.pendidikan.index')->with('success', 'Data pendidikan berhasil dihapus.');
     }
 }

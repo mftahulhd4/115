@@ -1,52 +1,58 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Tambah User Baru') }}
+            {{ __('Tambah Pengguna Baru') }}
         </h2>
     </x-slot>
 
     <div class="py-12">
-        <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
-                    <form action="{{ route('users.store') }}" method="POST" class="space-y-6">
+                    <form method="POST" action="{{ route('users.store') }}">
                         @csrf
-                        
-                        <div>
-                            <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nama</label>
-                            <input type="text" name="name" id="name" value="{{ old('name') }}" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:bg-gray-700 dark:border-gray-600 focus:border-indigo-500 focus:ring-indigo-500">
-                            @error('name') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-                        </div>
-                        
-                        <div>
-                            <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
-                            <input type="email" name="email" id="email" value="{{ old('email') }}" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:bg-gray-700 dark:border-gray-600 focus:border-indigo-500 focus:ring-indigo-500">
-                            @error('email') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-                        </div>
 
                         <div>
-                            <label for="role" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Role</label>
-                            <select name="role" id="role" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:bg-gray-700 dark:border-gray-600 focus:border-indigo-500 focus:ring-indigo-500">
+                            <x-input-label for="name" :value="__('Nama')" />
+                            <x-text-input id="name" class="block mt-1 w-full" type="text" name="name" :value="old('name')" required autofocus />
+                            <x-input-error :messages="$errors->get('name')" class="mt-2" />
+                        </div>
+
+                        <div class="mt-4">
+                            <x-input-label for="email" :value="__('Email')" />
+                            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required />
+                            <x-input-error :messages="$errors->get('email')" class="mt-2" />
+                        </div>
+                        
+                        <div class="mt-4">
+                            <x-input-label for="role" :value="__('Role')" />
+                            <select name="role" id="role" class="block mt-1 w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm">
                                 <option value="pengurus" {{ old('role') == 'pengurus' ? 'selected' : '' }}>Pengurus</option>
+                                <option value="asatid" {{ old('role') == 'asatid' ? 'selected' : '' }}>Asatid</option>
                                 <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Admin</option>
                             </select>
-                            @error('role') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-                        </div>
-                        
-                        <div>
-                            <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Password</label>
-                            <input type="password" name="password" id="password" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:bg-gray-700 dark:border-gray-600 focus:border-indigo-500 focus:ring-indigo-500">
-                            @error('password') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                            <x-input-error :messages="$errors->get('role')" class="mt-2" />
                         </div>
 
-                        <div>
-                            <label for="password_confirmation" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Konfirmasi Password</label>
-                            <input type="password" name="password_confirmation" id="password_confirmation" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:bg-gray-700 dark:border-gray-600 focus:border-indigo-500 focus:ring-indigo-500">
+                        <div class="mt-4">
+                            <x-input-label for="password" :value="__('Password')" />
+                            <x-text-input id="password" class="block mt-1 w-full" type="password" name="password" required autocomplete="new-password" />
+                            <x-input-error :messages="$errors->get('password')" class="mt-2" />
                         </div>
 
-                        <div class="flex items-center justify-end space-x-4">
-                            <a href="{{ route('users.index') }}" class="inline-flex items-center px-4 py-2 bg-gray-300 dark:bg-gray-600 border border-transparent rounded-md font-semibold text-xs uppercase hover:bg-gray-400">Batal</a>
-                            <button type="submit" class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase hover:bg-blue-700">Simpan</button>
+                        <div class="mt-4">
+                            <x-input-label for="password_confirmation" :value="__('Konfirmasi Password')" />
+                            <x-text-input id="password_confirmation" class="block mt-1 w-full" type="password" name="password_confirmation" required />
+                            <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
+                        </div>
+
+                        <div class="flex items-center justify-end mt-4">
+                            <a href="{{ route('users.index') }}" class="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100">
+                                Batal
+                            </a>
+                            <x-primary-button class="ml-4">
+                                {{ __('Simpan Pengguna') }}
+                            </x-primary-button>
                         </div>
                     </form>
                 </div>

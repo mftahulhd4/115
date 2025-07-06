@@ -18,12 +18,14 @@
                              {{-- Tombol Aksi --}}
                              <a href="{{ route('santri.print', $santri->id_santri) }}" target="_blank" class="inline-flex items-center px-4 py-2 bg-gray-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-600">Cetak</a>
                              <a href="{{ route('santri.detailPdf', $santri->id_santri) }}" target="_blank" class="inline-flex items-center px-4 py-2 bg-red-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-900">PDF</a>
-                             <a href="{{ route('santri.edit', $santri->id_santri) }}" class="inline-flex items-center px-4 py-2 bg-yellow-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-yellow-600">Edit</a>
-                             <form action="{{ route('santri.destroy', $santri->id_santri) }}" method="POST" class="inline" onsubmit="return confirm('Apakah Anda yakin ingin menghapus data santri ini secara permanen?');">
-                                 @csrf
-                                 @method('DELETE')
-                                 <x-danger-button type="submit">Hapus</x-danger-button>
-                             </form>
+                             @can('manage-santri')
+                                 <a href="{{ route('santri.edit', $santri->id_santri) }}" class="inline-flex items-center px-4 py-2 bg-yellow-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-yellow-600">Edit</a>
+                                 <form action="{{ route('santri.destroy', $santri->id_santri) }}" method="POST" class="inline" onsubmit="return confirm('Apakah Anda yakin ingin menghapus data santri ini secara permanen?');">
+                                     @csrf
+                                     @method('DELETE')
+                                     <x-danger-button type="submit">Hapus</x-danger-button>
+                                 </form>
+                             @endcan
                         </div>
                     </div>
 
@@ -56,9 +58,8 @@
                                     <dt class="font-medium text-gray-500 dark:text-gray-400">Jenis Kelamin</dt>
                                     <dd>{{ $santri->jenis_kelamin }}</dd>
                                     
-                                    {{-- PERBAIKAN DI SINI: hapus sm:col-span-2 --}}
-                                    <dt class="font-medium text-gray-500 dark:text-gray-400">Alamat</dt>
-                                    <dd>{{ $santri->alamat }}</dd>
+                                    <dt class="font-medium text-gray-500 dark:text-gray-400 sm:col-span-2">Alamat</dt>
+                                    <dd class="sm:col-span-2">{{ $santri->alamat }}</dd>
                                 </dl>
                             </div>
                              <div>

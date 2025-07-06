@@ -38,7 +38,6 @@
                             </div>
                             <div>
                                 <label for="id_pendidikan" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Pendidikan</label>
-                                {{-- KODE YANG DIPERBAIKI: name="id_pendidikan" --}}
                                 <select id="id_pendidikan" name="id_pendidikan" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-900 dark:border-gray-600 dark:text-gray-300">
                                     <option value="">Semua</option>
                                      @foreach($pendidikans as $pendidikan)
@@ -50,7 +49,7 @@
                                 <label for="id_kelas" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Kelas</label>
                                 <select id="id_kelas" name="id_kelas" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-900 dark:border-gray-600 dark:text-gray-300">
                                     <option value="">Semua</option>
-                                    @foreach($kelas as $item)
+                                    @foreach($kelases as $item)
                                         <option value="{{ $item->id_kelas }}" {{ request('id_kelas') == $item->id_kelas ? 'selected' : '' }}>{{ $item->nama_kelas }}</option>
                                     @endforeach
                                 </select>
@@ -62,11 +61,13 @@
                         </div>
                     </form>
                     
-                    <div class="flex justify-end mb-4">
-                        <a href="{{ route('santri.create') }}" class="text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5">
-                            + Tambah Santri Baru
-                        </a>
-                    </div>
+                    @can('manage-santri')
+                        <div class="flex justify-end mb-4">
+                            <a href="{{ route('santri.create') }}" class="text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5">
+                                + Tambah Santri Baru
+                            </a>
+                        </div>
+                    @endcan
 
                     <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
                         <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
@@ -77,6 +78,7 @@
                                     <th scope="col" class="px-6 py-3">Nama Lengkap</th>
                                     <th scope="col" class="px-6 py-3">Status</th>
                                     <th scope="col" class="px-6 py-3">Pendidikan & Kelas</th>
+                                    <th scope="col" class="px-6 py-3"><span class="sr-only">Aksi</span></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -101,10 +103,13 @@
                                         </th>
                                         <td class="px-6 py-4">{{ $santri->status->nama_status ?? 'N/A' }}</td>
                                         <td class="px-6 py-4">{{ $santri->pendidikan->nama_pendidikan ?? 'N/A' }} - {{ $santri->kelas->nama_kelas ?? 'N/A' }}</td>
+                                        <td class="px-6 py-4 text-right">
+                                            <a href="{{ route('santri.show', $santri) }}" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">Detail</a>
+                                        </td>
                                     </tr>
                                 @empty
                                      <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                                        <td colspan="5" class="px-6 py-4 text-center">
+                                        <td colspan="6" class="px-6 py-4 text-center">
                                             Data santri tidak ditemukan.
                                         </td>
                                     </tr>

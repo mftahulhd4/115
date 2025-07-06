@@ -9,18 +9,22 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    // database/migrations/xxxx_xx_xx_xxxxxx_add_role_to_users_table.php
-public function up()
-{
-    Schema::table('users', function (Blueprint $table) {
-        $table->string('role')->default('pengurus')->after('email'); // Atur default sesuai kebutuhan
-    });
-}
+    public function up(): void
+    {
+        Schema::table('users', function (Blueprint $table) {
+            // Tambahkan kolom role setelah 'email'
+            // Default 'pengurus' agar user yang sudah ada tidak error
+            $table->string('role')->after('email')->default('pengurus');
+        });
+    }
 
-public function down()
-{
-    Schema::table('users', function (Blueprint $table) {
-        $table->dropColumn('role');
-    });
-}
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn('role');
+        });
+    }
 };

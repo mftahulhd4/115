@@ -1,93 +1,69 @@
-@extends('layouts.app')
+<x-app-layout>
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+            {{ __('Edit Pengguna: ') }} {{ $user->name }}
+        </h2>
+    </x-slot>
 
-@section('title', 'Edit Pengguna: ' . $user->name)
-
-@section('content')
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card shadow-sm">
-                <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0">Formulir Edit Pengguna: {{ $user->name }}</h4>
-                </div>
-                <div class="card-body">
-                    @if (session('error'))
-                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                            {{ session('error') }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    <div class="py-12">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 text-gray-900 dark:text-gray-100">
+                     @if(session('error'))
+                        <div class="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                           <strong class="font-bold">Error!</strong>
+                           <span class="block sm:inline">{{ session('error') }}</span>
                         </div>
                     @endif
-
-                    @if ($errors->any())
-                        <div class="alert alert-danger">
-                            <h5 class="alert-heading">Oops! Ada beberapa kesalahan:</h5>
-                            <ul class="mb-0">
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endif
-
                     <form method="POST" action="{{ route('users.update', $user->id) }}">
                         @csrf
                         @method('PUT')
 
-                        <div class="mb-3">
-                            <label for="name" class="form-label">{{ __('Nama Lengkap') }} <span class="text-danger">*</span></label>
-                            <input id="name" class="form-control @error('name') is-invalid @enderror" type="text" name="name" value="{{ old('name', $user->name) }}" required autofocus autocomplete="name">
-                            @error('name')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+                        <div>
+                            <x-input-label for="name" :value="__('Nama')" />
+                            <x-text-input id="name" class="block mt-1 w-full" type="text" name="name" :value="old('name', $user->name)" required autofocus />
+                            <x-input-error :messages="$errors->get('name')" class="mt-2" />
                         </div>
 
-                        <div class="mb-3">
-                            <label for="email" class="form-label">{{ __('Alamat Email') }} <span class="text-danger">*</span></label>
-                            <input id="email" class="form-control @error('email') is-invalid @enderror" type="email" name="email" value="{{ old('email', $user->email) }}" required autocomplete="username">
-                            @error('email')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="role" class="form-label">Peran Pengguna <span class="text-danger">*</span></label>
-                            <select name="role" id="role" class="form-select @error('role') is-invalid @enderror" required>
-                                <option value="admin" {{ old('role', $user->role) == 'admin' ? 'selected' : '' }}>Admin</option>
-                                <option value="pengurus" {{ old('role', $user->role) == 'pengurus' ? 'selected' : '' }}>Pengurus</option>
-                            </select>
-                            @error('role')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+                        <div class="mt-4">
+                            <x-input-label for="email" :value="__('Email')" />
+                            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email', $user->email)" required />
+                            <x-input-error :messages="$errors->get('email')" class="mt-2" />
                         </div>
                         
-                        <hr>
-                        <p class="text-muted">Kosongkan field password jika tidak ingin mengubah password.</p>
-
-                        <div class="mb-3">
-                            <label for="password" class="form-label">{{ __('Password Baru') }}</label>
-                            <input id="password" class="form-control @error('password') is-invalid @enderror" type="password" name="password" autocomplete="new-password" placeholder="Isi untuk mengubah password">
-                            @error('password')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+                        <div class="mt-4">
+                            <x-input-label for="role" :value="__('Role')" />
+                            <select name="role" id="role" class="block mt-1 w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm">
+                                <option value="pengurus" {{ old('role', $user->role) == 'pengurus' ? 'selected' : '' }}>Pengurus</option>
+                                <option value="asatid" {{ old('role', $user->role) == 'asatid' ? 'selected' : '' }}>Asatid</option>
+                                <option value="admin" {{ old('role', $user->role) == 'admin' ? 'selected' : '' }}>Admin</option>
+                            </select>
+                             <x-input-error :messages="$errors->get('role')" class="mt-2" />
                         </div>
 
-                        <div class="mb-3">
-                            <label for="password_confirmation" class="form-label">{{ __('Konfirmasi Password Baru') }}</label>
-                            <input id="password_confirmation" class="form-control" type="password" name="password_confirmation" autocomplete="new-password" placeholder="Ketik ulang password baru">
+                        <div class="mt-4">
+                            <x-input-label for="password" :value="__('Password Baru (Opsional)')" />
+                            <x-text-input id="password" class="block mt-1 w-full" type="password" name="password" autocomplete="new-password" />
+                            <x-input-error :messages="$errors->get('password')" class="mt-2" />
                         </div>
 
-                        <div class="d-flex justify-content-end mt-4">
-                            <a href="{{ route('users.index') }}" class="btn btn-outline-secondary me-2">
-                                <i class="bi bi-x-circle"></i> Batal
+                        <div class="mt-4">
+                            <x-input-label for="password_confirmation" :value="__('Konfirmasi Password Baru')" />
+                            <x-text-input id="password_confirmation" class="block mt-1 w-full" type="password" name="password_confirmation" />
+                             <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
+                        </div>
+
+                        <div class="flex items-center justify-end mt-4">
+                            <a href="{{ route('users.index') }}" class="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100">
+                                Batal
                             </a>
-                            <button type="submit" class="btn btn-primary">
-                                <i class="bi bi-save-fill"></i> Update Pengguna
-                            </button>
+                            <x-primary-button class="ml-4">
+                                {{ __('Simpan Perubahan') }}
+                            </x-primary-button>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
     </div>
-</div>
-@endsection
+</x-app-layout>

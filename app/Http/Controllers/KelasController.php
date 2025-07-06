@@ -8,6 +8,14 @@ use Illuminate\Http\Request;
 class KelasController extends Controller
 {
     /**
+     * Menerapkan Gate 'is-admin' ke semua method di controller ini.
+     */
+    public function __construct()
+    {
+        $this->middleware('can:is-admin');
+    }
+
+    /**
      * Menampilkan daftar semua data kelas.
      */
     public function index()
@@ -41,7 +49,7 @@ class KelasController extends Controller
     /**
      * Menampilkan form untuk mengedit data kelas.
      */
-    public function edit(Kelas $kela) // Laravel akan otomatis resolve 'kela' menjadi objek Kelas
+    public function edit(Kelas $kela)
     {
         return view('kelas.edit', ['kelas' => $kela]);
     }
@@ -65,7 +73,6 @@ class KelasController extends Controller
      */
     public function destroy(Kelas $kela)
     {
-        // Cek apakah kelas ini masih digunakan oleh santri
         if ($kela->santris()->exists()) {
             return back()->with('error', 'Data kelas tidak dapat dihapus karena masih digunakan oleh santri.');
         }
