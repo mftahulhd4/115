@@ -1,10 +1,8 @@
-import "./bootstrap";
-
 import Alpine from "alpinejs";
-
-// Impor file JS baru kita di sini
-// import "./perizinan-form.js";
+import Collapse from "@alpinejs/collapse"; // <-- 1. TAMBAHKAN BARIS INI
 
 window.Alpine = Alpine;
+
+Alpine.plugin(Collapse); // <-- 2. TAMBAHKAN BARIS INI
 
 Alpine.start();
