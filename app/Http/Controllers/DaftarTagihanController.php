@@ -22,7 +22,6 @@ class DaftarTagihanController extends Controller
      */
     public function __construct()
     {
-        // PERBAIKAN FINAL: Menggunakan middleware yang benar
         $this->middleware('can:view-tagihan')->only(['index', 'show', 'pdfReceipt', 'printReceipt']);
         $this->middleware('can:manage-tagihan-full')->except(['index', 'show', 'pdfReceipt', 'printReceipt']);
     }
@@ -69,11 +68,20 @@ class DaftarTagihanController extends Controller
         return redirect()->route('tagihan.index')->with('success', 'Jenis tagihan berhasil ditambahkan.');
     }
 
+    /**
+     * [MODIFIKASI] Menambahkan 'santri.pendidikan' pada with()
+     * untuk memuat data pendidikan santri secara efisien (Eager Loading).
+     */
     public function show(JenisTagihan $jenisTagihan)
     {
-        $daftarTagihan = $jenisTagihan->daftarTagihan()->with('santri.kelas')->latest('created_at')->paginate(15);
+        $daftarTagihan = $jenisTagihan->daftarTagihan()
+                                    ->with('santri.kelas', 'santri.pendidikan') // <-- PERUBAHAN DI SINI
+                                    ->latest('created_at')
+                                    ->paginate(15);
+                                    
         return view('tagihan.show', compact('jenisTagihan', 'daftarTagihan'));
     }
+
 
     public function edit(JenisTagihan $jenisTagihan)
     {

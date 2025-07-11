@@ -104,7 +104,10 @@
                         <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
                            <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                                 <tr>
+                                    {{-- [MODIFIKASI] Menambahkan kolom baru --}}
                                     <th scope="col" class="px-6 py-3">Santri</th>
+                                    <th scope="col" class="px-6 py-3">Alamat</th>
+                                    <th scope="col" class="px-6 py-3">Pendidikan</th>
                                     <th scope="col" class="px-6 py-3">Status Pembayaran</th>
                                     <th scope="col" class="px-6 py-3 text-right">Aksi</th>
                                 </tr>
@@ -121,6 +124,14 @@
                                                 </div>
                                             </div>
                                         </th>
+                                        {{-- [DITAMBAHKAN] Menampilkan data alamat --}}
+                                        <td class="px-6 py-4">
+                                            {{ optional($item->santri)->alamat ?? 'N/A' }}
+                                        </td>
+                                        {{-- [DITAMBAHKAN] Menampilkan data pendidikan --}}
+                                        <td class="px-6 py-4">
+                                            {{ optional(optional($item->santri)->pendidikan)->nama_pendidikan ?? 'N/A' }}
+                                        </td>
                                         <td class="px-6 py-4">
                                             @if ($item->status_pembayaran == 'Lunas')
                                                 <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">Lunas</span>
@@ -187,7 +198,7 @@
                                     @endcan
                                 @empty
                                     <tr>
-                                        <td colspan="3" class="px-6 py-4 text-center text-gray-500">
+                                        <td colspan="5" class="px-6 py-4 text-center text-gray-500">
                                             Belum ada santri yang diterapkan untuk tagihan ini.
                                         </td>
                                     </tr>

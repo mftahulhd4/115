@@ -63,7 +63,7 @@
                                 <x-input-label for="id_kelas" :value="__('Kelas')" />
                                 <select id="id_kelas" name="id_kelas" class="block mt-1 w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm" required>
                                     <option value="" disabled selected>Pilih Kelas</option>
-                                    @foreach ($kelas as $item)
+                                    @foreach ($kelases as $item)
                                         <option value="{{ $item->id_kelas }}" @if(old('id_kelas') == $item->id_kelas) selected @endif>{{ $item->nama_kelas }}</option>
                                     @endforeach
                                 </select>

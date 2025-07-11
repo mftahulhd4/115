@@ -19,10 +19,8 @@ class SantriController extends Controller
      */
     public function index(Request $request)
     {
-        // Mengambil data master untuk filter dropdown
         $pendidikans = Pendidikan::orderBy('nama_pendidikan')->get();
-        // Menggunakan nama variabel yang konsisten: $kelases
-        $kelases = Kelas::orderBy('nama_kelas')->get(); 
+        $kelases = Kelas::orderBy('nama_kelas')->get();
         $statuses = Status::orderBy('nama_status')->get();
 
         $query = Santri::with(['pendidikan', 'kelas', 'status']);
@@ -31,20 +29,26 @@ class SantriController extends Controller
             $query->where('nama_santri', 'like', '%' . $request->search . '%')
                   ->orWhere('id_santri', 'like', '%' . $request->search . '%');
         }
-        // Menggunakan 'id_status' sesuai name di form
-        if ($request->filled('id_status')) { 
+        
+        if ($request->filled('id_status')) {
             $query->where('id_status', $request->id_status);
         }
+
         if ($request->filled('id_pendidikan')) {
             $query->where('id_pendidikan', $request->id_pendidikan);
         }
+
         if ($request->filled('id_kelas')) {
             $query->where('id_kelas', $request->id_kelas);
+        }
+        
+        // [DITAMBAHKAN] Logika untuk filter jenis kelamin, sesuai permintaan baru
+        if ($request->filled('jenis_kelamin')) {
+            $query->where('jenis_kelamin', $request->jenis_kelamin);
         }
 
         $santris = $query->latest()->paginate(10)->withQueryString();
         
-        // Mengganti nama variabel 'kelas' menjadi 'kelases' agar konsisten
         return view('santri.index', compact('santris', 'pendidikans', 'kelases', 'statuses'));
     }
 
@@ -53,7 +57,7 @@ class SantriController extends Controller
      */
     public function create()
     {
-        $this->authorize('manage-santri'); // Proteksi Gate
+        $this->authorize('manage-santri');
 
         return view('santri.create', [
             'pendidikans' => Pendidikan::orderBy('nama_pendidikan')->get(),
@@ -67,7 +71,7 @@ class SantriController extends Controller
      */
     public function store(Request $request)
     {
-        $this->authorize('manage-santri'); // Proteksi Gate
+        $this->authorize('manage-santri');
 
         $validated = $request->validate([
             'nama_santri' => 'required|string|max:255',
@@ -114,7 +118,7 @@ class SantriController extends Controller
      */
     public function edit(Santri $santri)
     {
-        $this->authorize('manage-santri'); // Proteksi Gate
+        $this->authorize('manage-santri');
 
         return view('santri.edit', [
             'santri' => $santri,
@@ -129,7 +133,7 @@ class SantriController extends Controller
      */
     public function update(Request $request, Santri $santri)
     {
-        $this->authorize('manage-santri'); // Proteksi Gate
+        $this->authorize('manage-santri');
 
         $validated = $request->validate([
             'nama_santri' => 'required|string|max:255',
@@ -140,7 +144,6 @@ class SantriController extends Controller
             'nama_ayah' => 'required|string|max:255',
             'nama_ibu' => 'required|string|max:255',
             'nomor_hp_wali' => 'required|string|max:20',
-            // tahun_masuk sengaja tidak divalidasi karena readonly
             'id_pendidikan' => 'required|exists:pendidikans,id_pendidikan',
             'id_kelas' => 'required|exists:kelas,id_kelas',
             'id_status' => 'required|exists:statuses,id_status',
@@ -155,7 +158,6 @@ class SantriController extends Controller
             $validated['foto'] = basename($path);
         }
 
-        // Hapus tahun_masuk dari data yang akan diupdate untuk keamanan
         unset($validated['tahun_masuk']);
 
         $santri->update($validated);
@@ -168,7 +170,7 @@ class SantriController extends Controller
      */
     public function destroy(Santri $santri)
     {
-        $this->authorize('manage-santri'); // Proteksi Gate
+        $this->authorize('manage-santri');
 
         if ($santri->foto) {
             Storage::delete('public/fotos/' . $santri->foto);
@@ -198,20 +200,20 @@ class SantriController extends Controller
         return view('santri.print', compact('santri'));
     }
 
+    /**
+     * Mengekspor data ke Excel dengan mempertahankan filter.
+     * Nama fungsi disesuaikan dengan rute: exportExcel
+     */
+    public function exportExcel(Request $request)
+    {
+        $search = $request->get('search');
+        $statusId = $request->get('id_status');
+        $pendidikanId = $request->get('id_pendidikan');
+        $kelasId = $request->get('id_kelas');
+        $jenisKelamin = $request->get('jenis_kelamin');
 
-public function exportExcel(Request $request)
-{
-    // =================== PERBAIKAN ADA DI SINI ===================
-    // Mengambil parameter dengan nama yang BENAR sesuai form filter
-    $search = $request->get('search');
-    $statusId = $request->get('id_status');
-    $pendidikanId = $request->get('id_pendidikan');
-    $kelasId = $request->get('id_kelas');
-    // =============================================================
+        $fileName = 'daftar-santri-' . date('Y-m-d-His') . '.xlsx';
 
-    $fileName = 'daftar-santri-' . date('Y-m-d-His') . '.xlsx';
-
-    // Mengirim parameter dengan nama yang benar ke SantriExport
-    return Excel::download(new SantriExport($search, $statusId, $pendidikanId, $kelasId), $fileName);
-}
+        return Excel::download(new SantriExport($search, $statusId, $pendidikanId, $kelasId, $jenisKelamin), $fileName);
+    }
 }

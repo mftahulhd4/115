@@ -22,11 +22,24 @@
                     </div>
 
                     <form action="{{ route('santri.index') }}" method="GET" class="mb-6 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                        {{-- [MODIFIKASI] Grid diubah untuk mengakomodasi 6 kolom --}}
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
                             <div class="lg:col-span-2">
                                 <label for="search" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Cari Nama / ID</label>
                                 <input type="search" name="search" id="search" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-900 dark:border-gray-600" placeholder="Ketik di sini..." value="{{ request('search') }}">
                             </div>
+                            
+                            {{-- [DITAMBAHKAN] Filter untuk Jenis Kelamin --}}
+                            <div>
+                                <label for="jenis_kelamin" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Gender</label>
+                                <select id="jenis_kelamin" name="jenis_kelamin" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-900 dark:border-gray-600 dark:text-gray-300">
+                                    <option value="">Semua</option>
+                                    <option value="Laki-laki" {{ request('jenis_kelamin') == 'Laki-laki' ? 'selected' : '' }}>Laki-laki</option>
+                                    <option value="Perempuan" {{ request('jenis_kelamin') == 'Perempuan' ? 'selected' : '' }}>Perempuan</option>
+                                </select>
+                            </div>
+                            {{-- --- Akhir Penambahan --- --}}
+
                             <div>
                                 <label for="id_status" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
                                 <select id="id_status" name="id_status" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-900 dark:border-gray-600 dark:text-gray-300">
@@ -62,10 +75,11 @@
                     </form>
                     
                     @can('manage-santri')
-                        <div class="flex justify-end mb-4">
+                        <div class="flex justify-end mb-4 space-x-2">
                             <a href="{{ route('santri.create') }}" class="text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5">
                                 + Tambah Santri Baru
                             </a>
+                            {{-- Memastikan semua parameter filter ikut saat export --}}
                             <a href="{{ route('santri.export', request()->query()) }}" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5">
                                 Export ke Excel
                             </a>
@@ -79,6 +93,8 @@
                                     <th scope="col" class="px-6 py-3">ID Santri</th>
                                     <th scope="col" class="px-6 py-3">Foto</th>
                                     <th scope="col" class="px-6 py-3">Nama Lengkap</th>
+                                    {{-- [DITAMBAHKAN] Kolom Jenis Kelamin di tabel --}}
+                                    <th scope="col" class="px-6 py-3">Gender</th>
                                     <th scope="col" class="px-6 py-3">Status</th>
                                     <th scope="col" class="px-6 py-3">Pendidikan & Kelas</th>
                                     <th scope="col" class="px-6 py-3"><span class="sr-only">Aksi</span></th>
@@ -104,15 +120,14 @@
                                                 {{ $santri->nama_santri }}
                                             </a>
                                         </th>
+                                        {{-- [DITAMBAHKAN] Menampilkan data jenis kelamin --}}
+                                        <td class="px-6 py-4">{{ $santri->jenis_kelamin }}</td>
                                         <td class="px-6 py-4">{{ $santri->status->nama_status ?? 'N/A' }}</td>
                                         <td class="px-6 py-4">{{ $santri->pendidikan->nama_pendidikan ?? 'N/A' }} - {{ $santri->kelas->nama_kelas ?? 'N/A' }}</td>
-                                        <td class="px-6 py-4 text-right">
-                                            <a href="{{ route('santri.show', $santri) }}" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">Detail</a>
-                                        </td>
                                     </tr>
                                 @empty
                                      <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                                        <td colspan="6" class="px-6 py-4 text-center">
+                                        <td colspan="7" class="px-6 py-4 text-center">
                                             Data santri tidak ditemukan.
                                         </td>
                                     </tr>
@@ -122,7 +137,8 @@
                     </div>
                     
                     <div class="mt-4">
-                        {{ $santris->links() }}
+                        {{-- Memastikan semua parameter filter tetap ada saat paginasi --}}
+                        {{ $santris->withQueryString()->links() }}
                     </div>
 
                 </div>
