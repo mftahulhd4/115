@@ -66,6 +66,9 @@
                             <a href="{{ route('santri.create') }}" class="text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5">
                                 + Tambah Santri Baru
                             </a>
+                            <a href="{{ route('santri.export', request()->query()) }}" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5">
+                                Export ke Excel
+                            </a>
                         </div>
                     @endcan
 

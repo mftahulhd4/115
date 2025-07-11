@@ -9,6 +9,8 @@ use App\Models\Status;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Barryvdh\DomPDF\Facade\Pdf;
+use App\Exports\SantriExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class SantriController extends Controller
 {
@@ -195,4 +197,21 @@ class SantriController extends Controller
         $santri->load(['pendidikan', 'kelas', 'status']);
         return view('santri.print', compact('santri'));
     }
+
+
+public function exportExcel(Request $request)
+{
+    // =================== PERBAIKAN ADA DI SINI ===================
+    // Mengambil parameter dengan nama yang BENAR sesuai form filter
+    $search = $request->get('search');
+    $statusId = $request->get('id_status');
+    $pendidikanId = $request->get('id_pendidikan');
+    $kelasId = $request->get('id_kelas');
+    // =============================================================
+
+    $fileName = 'daftar-santri-' . date('Y-m-d-His') . '.xlsx';
+
+    // Mengirim parameter dengan nama yang benar ke SantriExport
+    return Excel::download(new SantriExport($search, $statusId, $pendidikanId, $kelasId), $fileName);
+}
 }

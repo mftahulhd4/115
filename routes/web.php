@@ -23,9 +23,18 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     // Rute untuk Manajemen Santri
-    Route::resource('santri', SantriController::class);
-    Route::get('/santri/{santri}/pdf', [SantriController::class, 'detailPdf'])->name('santri.detailPdf');
-    Route::get('/santri/{santri}/print', [SantriController::class, 'print'])->name('santri.print');
+    // routes/web.php
+
+// ... (kode di atasnya biarkan saja)
+
+// Rute untuk Manajemen Santri
+// PASTIKAN ROUTE 'export' BERADA DI ATAS 'resource'
+Route::get('/santri/export', [SantriController::class, 'exportExcel'])->name('santri.export');
+Route::get('/santri/{santri}/pdf', [SantriController::class, 'detailPdf'])->name('santri.detailPdf');
+Route::get('/santri/{santri}/print', [SantriController::class, 'print'])->name('santri.print');
+Route::resource('santri', SantriController::class);
+
+// ... (kode di bawahnya biarkan saja)
 
     // Rute untuk Manajemen Perizinan
     Route::get('/perizinan/search', [PerizinanController::class, 'searchSantri'])->name('perizinan.search');
