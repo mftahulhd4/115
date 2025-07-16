@@ -46,8 +46,9 @@
                             </div>
                         </div>
 
-                        <h3 class="text-lg font-semibold border-b border-gray-200 dark:border-gray-700 pb-2 pt-4">Data Akademik</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <h3 class="text-lg font-semibold border-b border-gray-200 dark:border-gray-700 pb-2 pt-4">Data Akademik & Domisili</h3>
+                        {{-- [MODIFIKASI] Grid menjadi 4 kolom untuk kamar --}}
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                             <div>
                                 <x-input-label for="id_pendidikan" :value="__('Pendidikan')" />
                                 <select id="id_pendidikan" name="id_pendidikan" class="block mt-1 w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm" required>
@@ -62,7 +63,6 @@
                             <div>
                                 <x-input-label for="id_kelas" :value="__('Kelas')" />
                                 <select id="id_kelas" name="id_kelas" class="block mt-1 w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm" required>
-                                    {{-- PERBAIKAN VARIABEL: $kelases (sesuai controller) --}}
                                     @foreach ($kelases as $item)
                                         <option value="{{ $item->id_kelas }}" {{ old('id_kelas', $santri->id_kelas) == $item->id_kelas ? 'selected' : '' }}>
                                             {{ $item->nama_kelas }}
@@ -71,18 +71,25 @@
                                 </select>
                                 <x-input-error :messages="$errors->get('id_kelas')" class="mt-2" />
                             </div>
-                            {{-- ============================================= --}}
-                            {{--           FOKUS PERUBAHAN DI SINI           --}}
-                            {{-- ============================================= --}}
+                            {{-- [DITAMBAHKAN] Dropdown untuk mengubah Kamar --}}
+                            <div>
+                                <x-input-label for="id_kamar" :value="__('Kamar')" />
+                                <select id="id_kamar" name="id_kamar" class="block mt-1 w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm">
+                                    <option value="">-- Tidak Ada --</option>
+                                    @foreach ($kamars as $item)
+                                        <option value="{{ $item->id_kamar }}" {{ old('id_kamar', $santri->id_kamar) == $item->id_kamar ? 'selected' : '' }}>
+                                            {{ $item->nama_kamar }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                <x-input-error :messages="$errors->get('id_kamar')" class="mt-2" />
+                            </div>
                             <div>
                                 <x-input-label for="tahun_masuk" :value="__('Tahun Masuk')" />
                                 <x-text-input id="tahun_masuk" class="block mt-1 w-full bg-gray-200 dark:bg-gray-700/50 cursor-not-allowed" type="number" name="tahun_masuk" :value="old('tahun_masuk', $santri->tahun_masuk)" readonly />
                                 <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Tidak dapat diubah.</p>
                                 <x-input-error :messages="$errors->get('tahun_masuk')" class="mt-2" />
                             </div>
-                            {{-- ============================================= --}}
-                            {{--             AKHIR FOKUS PERUBAHAN             --}}
-                            {{-- ============================================= --}}
                         </div>
 
                         <h3 class="text-lg font-semibold border-b border-gray-200 dark:border-gray-700 pb-2 pt-4">Data Orang Tua</h3>
@@ -125,7 +132,6 @@
                                 @if ($santri->foto)
                                     <div class="mt-4">
                                         <p class="text-sm text-gray-600 dark:text-gray-400">Foto Saat Ini:</p>
-                                        {{-- PERBAIKAN PATH FOTO: disesuaikan dengan controller --}}
                                         <img src="{{ asset('storage/fotos/' . $santri->foto) }}" alt="Foto Saat Ini" class="mt-2 w-32 h-32 rounded-md object-cover">
                                     </div>
                                 @endif
@@ -133,7 +139,6 @@
                         </div>
                         
                         <div class="flex items-center justify-end mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
-                            {{-- PERBAIKAN LINK BATAL: kembali ke halaman detail --}}
                             <a href="{{ route('santri.show', $santri->id_santri) }}" class="text-sm text-gray-700 dark:text-gray-300 underline hover:no-underline">
                                 Batal
                             </a>

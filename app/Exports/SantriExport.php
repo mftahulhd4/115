@@ -14,22 +14,25 @@ class SantriExport implements FromQuery, WithHeadings, WithMapping, ShouldAutoSi
     protected $statusId;
     protected $pendidikanId;
     protected $kelasId;
-    protected $jenisKelamin; // <-- [DITAMBAHKAN]
+    protected $jenisKelamin;
+    protected $kamarId; // Ditambahkan
 
-    public function __construct($search, $statusId, $pendidikanId, $kelasId, $jenisKelamin) // <-- [DITAMBAHKAN]
+    // [MODIFIKASI] Menambahkan $kamarId pada constructor
+    public function __construct($search, $statusId, $pendidikanId, $kelasId, $jenisKelamin, $kamarId)
     {
         $this->search = $search;
         $this->statusId = $statusId;
         $this->pendidikanId = $pendidikanId;
         $this->kelasId = $kelasId;
-        $this->jenisKelamin = $jenisKelamin; // <-- [DITAMBAHKAN]
+        $this->jenisKelamin = $jenisKelamin;
+        $this->kamarId = $kamarId; // Ditambahkan
     }
 
     public function query()
     {
-        $query = Santri::query();
+        // [MODIFIKASI] Menambahkan relasi 'kamar' ke eager loading
+        $query = Santri::query()->with(['pendidikan', 'kelas', 'status', 'kamar']);
 
-        // [MODIFIKASI] Menggunakan when() untuk semua filter agar lebih bersih
         $query->when($this->search, function ($q, $search) {
             return $q->where(function($sub) use ($search) {
                 $sub->where('nama_santri', 'like', '%' . $search . '%')
@@ -45,8 +48,12 @@ class SantriExport implements FromQuery, WithHeadings, WithMapping, ShouldAutoSi
         ->when($this->kelasId, function ($q, $kelasId) {
             return $q->where('id_kelas', $kelasId);
         })
-        ->when($this->jenisKelamin, function ($q, $jenisKelamin) { // <-- [DITAMBAHKAN]
+        ->when($this->jenisKelamin, function ($q, $jenisKelamin) {
             return $q->where('jenis_kelamin', $jenisKelamin);
+        })
+        // [DITAMBAHKAN] Menambahkan filter berdasarkan kamarId
+        ->when($this->kamarId, function ($q, $kamarId) {
+            return $q->where('id_kamar', $kamarId);
         });
 
         return $query;
@@ -57,6 +64,7 @@ class SantriExport implements FromQuery, WithHeadings, WithMapping, ShouldAutoSi
      */
     public function headings(): array
     {
+        // [MODIFIKASI] Menambahkan header kolom 'Kamar'
         return [
             'ID Santri',
             'Nama Lengkap',
@@ -65,6 +73,7 @@ class SantriExport implements FromQuery, WithHeadings, WithMapping, ShouldAutoSi
             'Alamat',
             'Pendidikan',
             'Kelas',
+            'Kamar', // Ditambahkan
             'Tahun Masuk',
             'Status Santri',
             'Nama Ayah',
@@ -79,6 +88,7 @@ class SantriExport implements FromQuery, WithHeadings, WithMapping, ShouldAutoSi
      */
     public function map($santri): array
     {
+        // [MODIFIKASI] Menambahkan data kamar ke array
         return [
             $santri->id_santri,
             $santri->nama_santri,
@@ -87,6 +97,7 @@ class SantriExport implements FromQuery, WithHeadings, WithMapping, ShouldAutoSi
             $santri->alamat,
             $santri->pendidikan->nama_pendidikan ?? 'N/A',
             $santri->kelas->nama_kelas ?? 'N/A',
+            $santri->kamar->nama_kamar ?? 'N/A', // Ditambahkan
             $santri->tahun_masuk,
             $santri->status->nama_status ?? 'N/A',
             $santri->nama_ayah,

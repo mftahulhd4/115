@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Santri extends Model
 {
@@ -16,7 +17,7 @@ class Santri extends Model
     protected $fillable = [
         'id_santri', 'nama_santri', 'tempat_lahir', 'tanggal_lahir', 'jenis_kelamin', 'alamat',
         'nama_ayah', 'nama_ibu', 'nomor_hp_wali', 'tahun_masuk', 'id_pendidikan',
-        'id_kelas', 'id_status', 'foto',
+        'id_kelas', 'id_status', 'id_kamar', 'foto', // <-- PENAMBAHAN 'id_kamar'
     ];
 
     protected $casts = ['tanggal_lahir' => 'date'];
@@ -48,5 +49,14 @@ class Santri extends Model
     {
         // Sebelumnya: public function tagihans() & return $this->hasMany(Tagihan::class, ...);
         return $this->hasMany(DaftarTagihan::class, 'id_santri', 'id_santri');
+    }
+
+    /**
+     * Mendefinisikan relasi BelongsTo ke Kamar.
+     * Satu Santri hanya menempati satu Kamar.
+     */
+    public function kamar(): BelongsTo
+    {
+        return $this->belongsTo(Kamar::class, 'id_kamar', 'id_kamar');
     }
 }

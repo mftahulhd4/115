@@ -15,7 +15,6 @@
 
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
-
                     <div class="mb-6">
                         <h3 class="text-2xl font-semibold text-gray-800 dark:text-gray-200">Daftar Perizinan</h3>
                         <p class="text-sm text-gray-600 dark:text-gray-400">Kelola dan pantau semua perizinan santri.</p>
@@ -23,8 +22,8 @@
 
                     {{-- Form Filter --}}
                     <form action="{{ route('perizinan.index') }}" method="GET" class="mb-6 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
-                            <div class="md:col-span-2">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                            <div class="lg:col-span-2">
                                 <label for="search" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Cari Nama Santri / ID Izin</label>
                                 <input type="search" name="search" id="search" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:bg-gray-900 dark:border-gray-600" placeholder="Ketik..." value="{{ request('search') }}">
                             </div>
@@ -37,7 +36,7 @@
                                 </select>
                             </div>
                              <div>
-                                <label for="bulan" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Bulan</label>
+                                <label for="bulan" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Bulan Izin</label>
                                 <select name="bulan" id="bulan" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:bg-gray-900 dark:border-gray-600 dark:text-gray-300">
                                     <option value="">Semua</option>
                                     @for ($i=1; $i<=12; $i++)
@@ -46,12 +45,20 @@
                                 </select>
                             </div>
                             <div>
-                                <label for="tahun" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tahun</label>
+                                <label for="tahun" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tahun Izin</label>
                                 <input type="number" name="tahun" id="tahun" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:bg-gray-900 dark:border-gray-600" placeholder="Contoh: {{ date('Y') }}" value="{{ request('tahun') }}">
                             </div>
-                        </div>
-                        <div class="mt-4 flex items-center justify-between">
                             <div>
+                                <label for="id_kamar" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Kamar</label>
+                                <select name="id_kamar" id="id_kamar" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:bg-gray-900 dark:border-gray-600 dark:text-gray-300">
+                                    <option value="">Semua Kamar</option>
+                                    @foreach($kamars as $kamar)
+                                        <option value="{{ $kamar->id_kamar }}" {{ request('id_kamar') == $kamar->id_kamar ? 'selected' : '' }}>{{ $kamar->nama_kamar }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div class="lg:col-span-3">
                                 <label for="status" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Status Izin (Tampilan)</label>
                                 <select id="status" name="status" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:bg-gray-900 dark:border-gray-600 dark:text-gray-300">
                                     <option value="">Semua Status</option>
@@ -62,26 +69,35 @@
                                     <option value="Terlambat" {{ request('status') == 'Terlambat' ? 'selected' : '' }}>Terlambat</option>
                                 </select>
                             </div>
-                            <div class="flex items-center justify-end gap-x-4 self-end">
-                                <a href="{{ route('perizinan.index') }}" class="text-sm font-medium text-gray-600 dark:text-gray-400 hover:underline">Reset</a>
-                                <button type="submit" class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700">Filter</button>
+
+                            <div class="flex items-end justify-start lg:justify-end">
+                                <div class="flex items-center gap-x-4 w-full">
+                                    <a href="{{ route('perizinan.index') }}" class="text-sm font-medium text-gray-600 dark:text-gray-400 hover:underline">Reset</a>
+                                    <button type="submit" class="w-full inline-flex justify-center items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700">Filter</button>
+                                </div>
                             </div>
                         </div>
                     </form>
-
+                    
+                    {{-- =============================================== --}}
+                    {{--           FOKUS PERBAIKAN TAMPILAN            --}}
+                    {{-- =============================================== --}}
                     <div class="flex justify-end mb-4">
                         <a href="{{ route('perizinan.create') }}" class="text-white bg-green-700 hover:bg-green-800 font-medium rounded-lg text-sm px-5 py-2.5">
                             + Buat Izin Baru
                         </a>
                     </div>
+                    {{-- =============================================== --}}
+                    {{--           AKHIR PERBAIKAN TAMPILAN            --}}
+                    {{-- =============================================== --}}
 
-                    {{-- Tabel Daftar Perizinan --}}
                     <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
                         <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
                             <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                                 <tr>
                                     <th scope="col" class="px-6 py-3">ID Izin</th>
                                     <th scope="col" class="px-6 py-3">Nama Santri</th>
+                                    <th scope="col" class="px-6 py-3">Kamar</th>
                                     <th scope="col" class="px-6 py-3">Status</th>
                                 </tr>
                             </thead>
@@ -90,8 +106,9 @@
                                     <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 cursor-pointer" onclick="window.location='{{ route('perizinan.show', $izin->id_izin) }}';">
                                         <td class="px-6 py-4 font-mono">{{ $izin->id_izin }}</td>
                                         <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                            {{ $izin->santri->nama_santri ?? 'Santri Dihapus' }}
+                                            {{ optional($izin->santri)->nama_santri ?? 'Santri Dihapus' }}
                                         </th>
+                                        <td class="px-6 py-4">{{ optional(optional($izin->santri)->kamar)->nama_kamar ?? 'N/A' }}</td>
                                         <td class="px-6 py-4">
                                             <span class="px-2 py-1 font-semibold leading-tight rounded-full
                                                 @if($izin->status_efektif == 'Diizinkan') bg-blue-100 text-blue-800 dark:bg-blue-700 dark:text-blue-100
@@ -114,7 +131,7 @@
                                     </tr>
                                 @empty
                                      <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                                        <td colspan="3" class="px-6 py-4 text-center">
+                                        <td colspan="4" class="px-6 py-4 text-center">
                                             Data perizinan tidak ditemukan.
                                         </td>
                                     </tr>
@@ -123,7 +140,6 @@
                         </table>
                     </div>
                     
-                    {{-- Pagination --}}
                     <div class="mt-4">
                         {{ $perizinans->links() }}
                     </div>

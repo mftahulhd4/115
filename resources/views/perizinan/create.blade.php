@@ -32,9 +32,6 @@
                                     <select id="id_santri_select" class="block w-full mt-1" name="id_santri_dummy" disabled></select>
                                     <input type="hidden" name="id_santri" id="id_santri" required>
                                     <x-input-error :messages="$errors->get('id_santri')" class="mt-2" />
-                                    
-                                    {{-- [DITAMBAHKAN] Catatan informatif untuk pengguna --}}
-                                   
                                 </div>
                             </div>
                         </div>
@@ -43,18 +40,28 @@
                         <div class="space-y-3">
                              <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Detail Santri Terpilih</h3>
                              <div class="mt-2 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                                {{-- =============================================== --}}
+                                {{--           FOKUS PERBAIKAN TAMPILAN            --}}
+                                {{-- =============================================== --}}
                                 <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 text-sm">
                                     <dt class="font-medium text-gray-500 dark:text-gray-400">Nama Lengkap</dt>
-                                    <dd id="info-nama" class="font-semibold dark:text-gray-200">-</dd>
+                                    <dd id="info-nama" class="font-semibold dark:text-gray-200 sm:col-span-1">-</dd>
+                                    
                                     <dt class="font-medium text-gray-500 dark:text-gray-400">ID Santri</dt>
-                                    <dd id="info-id" class="font-mono dark:text-gray-300">-</dd>
-                                    <dt class="font-medium text-gray-500 dark:text-gray-400">Tempat, Tgl Lahir</dt>
-                                    <dd id="info-ttl" class="dark:text-gray-300">-</dd>
+                                    <dd id="info-id" class="font-mono dark:text-gray-300 sm:col-span-1">-</dd>
+                                    
                                     <dt class="font-medium text-gray-500 dark:text-gray-400">Pendidikan</dt>
-                                    <dd id="info-pendidikan" class="dark:text-gray-300">-</dd>
+                                    <dd id="info-pendidikan" class="dark:text-gray-300 sm:col-span-1">-</dd>
+                                    
                                     <dt class="font-medium text-gray-500 dark:text-gray-400">Kelas</dt>
-                                    <dd id="info-kelas" class="dark:text-gray-300">-</dd>
+                                    <dd id="info-kelas" class="dark:text-gray-300 sm:col-span-1">-</dd>
+                                    
+                                    <dt class="font-medium text-gray-500 dark:text-gray-400">Kamar</dt>
+                                    <dd id="info-kamar" class="dark:text-gray-300 sm:col-span-1">-</dd>
                                 </dl>
+                                {{-- =============================================== --}}
+                                {{--           AKHIR PERBAIKAN TAMPILAN            --}}
+                                {{-- =============================================== --}}
                             </div>
                         </div>
 
@@ -99,6 +106,7 @@
     @push('scripts')
         <script>
             $(document).ready(function() {
+                // ... (Fungsi JavaScript lainnya tetap sama) ...
                 function formatSantri (santri) {
                     if (santri.loading) { return santri.text; }
                     var $container = $(`<div class='select2-result-santri'><div class='select2-result-santri__avatar'><img src='${santri.foto_url}' /></div><div class='select2-result-santri__meta'><div class='select2-result-santri__title'></div><div class='select2-result-santri__id'></div></div></div>`);
@@ -140,7 +148,7 @@
 
                     santriSelect.val(null).trigger('change');
                     $('#id_santri').val('');
-                    $('#info-nama, #info-id, #info-ttl, #info-pendidikan, #info-kelas').text('-');
+                    $('#info-nama, #info-id, #info-pendidikan, #info-kelas, #info-kamar').text('-');
                     
                     if (statusId) {
                         santriSelect.prop('disabled', false);
@@ -157,17 +165,7 @@
                     $('#info-id').text(data.id_santri || '-');
                     $('#info-kelas').text(data.nama_kelas || '-');
                     $('#info-pendidikan').text(data.nama_pendidikan || '-');
-                    
-                    let ttl = '-';
-                    if (data.tempat_lahir) {
-                        ttl = data.tempat_lahir;
-                        if (data.tanggal_lahir) {
-                            const tgl = new Date(data.tanggal_lahir);
-                            const options = { day: '2-digit', month: 'long', year: 'numeric' };
-                            ttl += ', ' + tgl.toLocaleDateString('id-ID', options);
-                        }
-                    }
-                    $('#info-ttl').text(ttl);
+                    $('#info-kamar').text(data.nama_kamar || '-');
                 });
             });
         </script>

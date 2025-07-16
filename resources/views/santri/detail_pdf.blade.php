@@ -41,8 +41,8 @@
             margin-bottom: 30px;
         }
         .profile-pic {
-            width: 113px; /* Lebar untuk pas foto 3x4 */
-            height: 151px; /* Tinggi untuk pas foto 3x4 */
+            width: 113px;
+            height: 151px;
             border: 1px solid #ddd;
             padding: 3px;
             margin: auto;
@@ -98,7 +98,6 @@
         </div>
 
         <div class="profile-section">
-            {{-- Menggunakan public_path() untuk dompdf --}}
             <img class="profile-pic" src="{{ $santri->foto ? public_path('storage/fotos/' . $santri->foto) : public_path('images/default-avatar.png') }}" alt="Foto {{ $santri->nama_santri }}">
         </div>
 
@@ -110,6 +109,8 @@
             <tr><td class="label">Alamat</td><td class="separator">:</td><td class="value">{{ $santri->alamat }}</td></tr>
             <tr><td class="label">Pendidikan</td><td class="separator">:</td><td class="value">{{ $santri->pendidikan->nama_pendidikan ?? 'N/A' }}</td></tr>
             <tr><td class="label">Kelas</td><td class="separator">:</td><td class="value">{{ $santri->kelas->nama_kelas ?? 'N/A' }}</td></tr>
+            {{-- [DITAMBAHKAN] Menampilkan data Kamar --}}
+            <tr><td class="label">Kamar</td><td class="separator">:</td><td class="value">{{ $santri->kamar->nama_kamar ?? 'N/A' }}</td></tr>
             <tr><td class="label">Tahun Masuk</td><td class="separator">:</td><td class="value">{{ $santri->tahun_masuk }}</td></tr>
             <tr><td class="label">Status Santri</td><td class="separator">:</td><td class="value">{{ $santri->status->nama_status ?? 'N/A' }}</td></tr>
             <tr><td class="label">Nama Ayah</td><td class="separator">:</td><td class="value">{{ $santri->nama_ayah }}</td></tr>

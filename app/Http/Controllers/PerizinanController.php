@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Kamar;
 use App\Models\Perizinan;
 use App\Models\Santri;
 use App\Models\Status;
@@ -22,7 +23,7 @@ class PerizinanController extends Controller
 
     public function index(Request $request)
     {
-        $query = Perizinan::with(['santri.kelas', 'santri.pendidikan'])->latest();
+        $query = Perizinan::with(['santri.kelas', 'santri.pendidikan', 'santri.kamar'])->latest();
 
         if ($request->filled('search')) {
             $search = $request->input('search');
@@ -35,6 +36,12 @@ class PerizinanController extends Controller
         if ($request->filled('jenis_kelamin')) {
             $query->whereHas('santri', function ($q) use ($request) {
                 $q->where('jenis_kelamin', $request->jenis_kelamin);
+            });
+        }
+
+        if ($request->filled('id_kamar')) {
+            $query->whereHas('santri', function ($q) use ($request) {
+                $q->where('id_kamar', $request->id_kamar);
             });
         }
 
@@ -62,7 +69,9 @@ class PerizinanController extends Controller
             'query' => $request->query(),
         ]);
 
-        return view('perizinan.index', compact('perizinans'));
+        $kamars = Kamar::orderBy('nama_kamar')->get();
+
+        return view('perizinan.index', compact('perizinans', 'kamars'));
     }
 
     public function create()
@@ -71,9 +80,6 @@ class PerizinanController extends Controller
         return view('perizinan.create', compact('statuses'));
     }
     
-    /**
-     * Logika pencegahan izin ganda ada di sini.
-     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -83,19 +89,16 @@ class PerizinanController extends Controller
             'estimasi_kembali' => 'required|date|after_or_equal:waktu_pergi',
         ]);
 
-        // [LOGIKA PENTING] Mengecek apakah santri sudah punya izin aktif
         $izinAktif = Perizinan::where('id_santri', $request->id_santri)
                                ->whereIn('status', ['Pengajuan', 'Diizinkan'])
                                ->exists();
         
-        // Jika izin aktif ditemukan, kembalikan dengan pesan error
         if ($izinAktif) {
             return back()
                 ->withErrors(['id_santri' => 'Gagal! Santri ini masih memiliki izin yang sedang aktif (status Pengajuan atau Diizinkan) dan belum kembali.'])
                 ->withInput();
         }
 
-        // Jika tidak ada izin aktif, lanjutkan proses pembuatan izin baru
         $lastPermitToday = Perizinan::whereDate('created_at', Carbon::today())->orderBy('id_izin', 'desc')->first();
         
         $nextNumber = 1;
@@ -114,7 +117,7 @@ class PerizinanController extends Controller
 
     public function show(Perizinan $perizinan)
     {
-        $perizinan->load(['santri.pendidikan', 'santri.kelas', 'santri.status']);
+        $perizinan->load(['santri.pendidikan', 'santri.kelas', 'santri.status', 'santri.kamar']);
         return view('perizinan.show', compact('perizinan'));
     }
 
@@ -154,10 +157,6 @@ class PerizinanController extends Controller
         return redirect()->route('perizinan.index')->with('success', 'Data perizinan berhasil dihapus.');
     }
     
-    /**
-     * [PERBAIKAN] Filter untuk menyembunyikan santri yang sudah izin Dihapus.
-     * Sekarang semua santri akan muncul di pencarian.
-     */
     public function searchSantri(Request $request)
     {
         $validated = $request->validate([
@@ -168,7 +167,8 @@ class PerizinanController extends Controller
         $searchTerm = $validated['q'] ?? null;
         $id_status = $validated['id_status'];
 
-        $query = Santri::with(['pendidikan', 'kelas'])->where('id_status', $id_status);
+        // [MODIFIKASI] Menambahkan relasi 'kamar' ke eager loading
+        $query = Santri::with(['pendidikan', 'kelas', 'kamar'])->where('id_status', $id_status);
 
         if ($searchTerm) {
             $query->where(function($subQuery) use ($searchTerm) {
@@ -179,10 +179,12 @@ class PerizinanController extends Controller
 
         $santris = $query->limit(10)->get();
             
+        // [MODIFIKASI] Menambahkan 'nama_kamar' ke data JSON yang dikirim
         $santris->transform(function ($santri) {
             $santri->foto_url = $santri->foto ? asset('storage/fotos/' . $santri->foto) : 'https://ui-avatars.com/api/?name=' . urlencode($santri->nama_santri) . '&background=random';
             $santri->nama_pendidikan = optional($santri->pendidikan)->nama_pendidikan ?? '-';
             $santri->nama_kelas = optional($santri->kelas)->nama_kelas ?? '-';
+            $santri->nama_kamar = optional($santri->kamar)->nama_kamar ?? 'N/A'; // Ditambahkan
             return $santri;
         });
         
@@ -191,14 +193,14 @@ class PerizinanController extends Controller
 
     public function detailPdf(Perizinan $perizinan)
     {
-        $perizinan->load(['santri.pendidikan', 'santri.kelas']);
+        $perizinan->load(['santri.pendidikan', 'santri.kelas', 'santri.kamar']);
         $pdf = Pdf::loadView('perizinan.detail_pdf', compact('perizinan'));
-        return $pdf->stream('surat-izin-' . $perizinan->santri->nama_santri . '.pdf');
+        return $pdf->stream('surat-izin-' . optional($perizinan->santri)->nama_santri . '.pdf');
     }
 
     public function print(Perizinan $perizinan)
     {
-        $perizinan->load(['santri.pendidikan', 'santri.kelas']);
+        $perizinan->load(['santri.pendidikan', 'santri.kelas', 'santri.kamar']);
         return view('perizinan.print', compact('perizinan'));
     }
 }

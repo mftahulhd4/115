@@ -15,7 +15,6 @@
                             &larr; Kembali ke Daftar Santri
                         </a>
                         <div class="flex flex-wrap gap-2">
-                             {{-- Tombol Aksi --}}
                              <a href="{{ route('santri.print', $santri->id_santri) }}" target="_blank" class="inline-flex items-center px-4 py-2 bg-gray-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-600">Cetak</a>
                              <a href="{{ route('santri.detailPdf', $santri->id_santri) }}" target="_blank" class="inline-flex items-center px-4 py-2 bg-red-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-900">PDF</a>
                              @can('manage-santri')
@@ -30,7 +29,6 @@
                     </div>
 
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                        {{-- Foto Santri --}}
                         <div class="lg:col-span-1">
                              @if ($santri->foto)
                                 <img src="{{ asset('storage/fotos/' . $santri->foto) }}" alt="{{ $santri->nama_santri }}" class="w-full h-auto rounded-lg object-cover shadow-md">
@@ -41,7 +39,6 @@
                             @endif
                         </div>
 
-                        {{-- Detail Informasi --}}
                         <div class="lg:col-span-2 space-y-6">
                              <div>
                                 <h3 class="text-lg font-semibold border-b border-gray-200 dark:border-gray-700 pb-2 mb-3">Data Diri</h3>
@@ -58,17 +55,19 @@
                                     <dt class="font-medium text-gray-500 dark:text-gray-400">Jenis Kelamin</dt>
                                     <dd>{{ $santri->jenis_kelamin }}</dd>
                                     
-                                    <dt class="font-medium text-gray-500 dark:text-gray-400 sm:col-span-2">Alamat</dt>
-                                    <dd class="sm:col-span-2">{{ $santri->alamat }}</dd>
+                                    <dt class="font-medium text-gray-500 dark:text-gray-400">Alamat</dt>
+                                    <dd>{{ $santri->alamat }}</dd>
                                 </dl>
                             </div>
                              <div>
-                                <h3 class="text-lg font-semibold border-b border-gray-200 dark:border-gray-700 pb-2 mb-3">Data Akademik & Status</h3>
+                                <h3 class="text-lg font-semibold border-b border-gray-200 dark:border-gray-700 pb-2 mb-3">Data Akademik & Domisili</h3>
                                 <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2">
                                     <dt class="font-medium text-gray-500 dark:text-gray-400">Pendidikan</dt>
                                     <dd>{{ $santri->pendidikan->nama_pendidikan ?? 'N/A' }}</dd>
                                     <dt class="font-medium text-gray-500 dark:text-gray-400">Kelas</dt>
                                     <dd>{{ $santri->kelas->nama_kelas ?? 'N/A' }}</dd>
+                                    <dt class="font-medium text-gray-500 dark:text-gray-400">Kamar</dt>
+                                    <dd>{{ $santri->kamar->nama_kamar ?? 'N/A' }}</dd>
                                     <dt class="font-medium text-gray-500 dark:text-gray-400">Tahun Masuk</dt>
                                     <dd>{{ $santri->tahun_masuk }}</dd>
                                     <dt class="font-medium text-gray-500 dark:text-gray-400">Status Santri</dt>

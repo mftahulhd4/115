@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Kamar;
 use App\Models\Kelas;
 use App\Models\Pendidikan;
 use App\Models\Santri;
@@ -22,8 +23,9 @@ class SantriController extends Controller
         $pendidikans = Pendidikan::orderBy('nama_pendidikan')->get();
         $kelases = Kelas::orderBy('nama_kelas')->get();
         $statuses = Status::orderBy('nama_status')->get();
+        $kamars = Kamar::orderBy('nama_kamar')->get();
 
-        $query = Santri::with(['pendidikan', 'kelas', 'status']);
+        $query = Santri::with(['pendidikan', 'kelas', 'status', 'kamar']);
 
         if ($request->filled('search')) {
             $query->where('nama_santri', 'like', '%' . $request->search . '%')
@@ -42,14 +44,17 @@ class SantriController extends Controller
             $query->where('id_kelas', $request->id_kelas);
         }
         
-        // [DITAMBAHKAN] Logika untuk filter jenis kelamin, sesuai permintaan baru
         if ($request->filled('jenis_kelamin')) {
             $query->where('jenis_kelamin', $request->jenis_kelamin);
+        }
+        
+        if ($request->filled('id_kamar')) {
+            $query->where('id_kamar', $request->id_kamar);
         }
 
         $santris = $query->latest()->paginate(10)->withQueryString();
         
-        return view('santri.index', compact('santris', 'pendidikans', 'kelases', 'statuses'));
+        return view('santri.index', compact('santris', 'pendidikans', 'kelases', 'statuses', 'kamars'));
     }
 
     /**
@@ -63,6 +68,7 @@ class SantriController extends Controller
             'pendidikans' => Pendidikan::orderBy('nama_pendidikan')->get(),
             'kelases' => Kelas::orderBy('nama_kelas')->get(),
             'statuses' => Status::orderBy('nama_status')->get(),
+            'kamars' => Kamar::orderBy('nama_kamar')->get(),
         ]);
     }
 
@@ -86,6 +92,7 @@ class SantriController extends Controller
             'id_pendidikan' => 'required|exists:pendidikans,id_pendidikan',
             'id_kelas' => 'required|exists:kelas,id_kelas',
             'id_status' => 'required|exists:statuses,id_status',
+            'id_kamar' => 'nullable|exists:kamars,id_kamar',
             'foto' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
@@ -109,7 +116,7 @@ class SantriController extends Controller
      */
     public function show(Santri $santri)
     {
-        $santri->load(['pendidikan', 'kelas', 'status']);
+        $santri->load(['pendidikan', 'kelas', 'status', 'kamar']);
         return view('santri.show', compact('santri'));
     }
 
@@ -125,6 +132,7 @@ class SantriController extends Controller
             'pendidikans' => Pendidikan::orderBy('nama_pendidikan')->get(),
             'kelases' => Kelas::orderBy('nama_kelas')->get(),
             'statuses' => Status::orderBy('nama_status')->get(),
+            'kamars' => Kamar::orderBy('nama_kamar')->get(),
         ]);
     }
 
@@ -147,6 +155,7 @@ class SantriController extends Controller
             'id_pendidikan' => 'required|exists:pendidikans,id_pendidikan',
             'id_kelas' => 'required|exists:kelas,id_kelas',
             'id_status' => 'required|exists:statuses,id_status',
+            'id_kamar' => 'nullable|exists:kamars,id_kamar',
             'foto' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
@@ -161,8 +170,14 @@ class SantriController extends Controller
         unset($validated['tahun_masuk']);
 
         $santri->update($validated);
-
-        return redirect()->route('santri.show', $santri->id_santri)->with('success', 'Data santri berhasil diperbarui.');
+        
+        // ==========================================================
+        //                  PERUBAHAN ADA DI SINI
+        // ==========================================================
+        return redirect()->route('santri.index')->with('success', 'Data santri berhasil diperbarui.');
+        // ==========================================================
+        //                  AKHIR PERUBAHAN
+        // ==========================================================
     }
 
     /**
@@ -186,7 +201,7 @@ class SantriController extends Controller
      */
     public function detailPdf(Santri $santri)
     {
-        $santri->load(['pendidikan', 'kelas', 'status']);
+        $santri->load(['pendidikan', 'kelas', 'status', 'kamar']);
         $pdf = Pdf::loadView('santri.detail_pdf', compact('santri'));
         return $pdf->stream('biodata-santri-' . $santri->nama_santri . '.pdf');
     }
@@ -196,13 +211,12 @@ class SantriController extends Controller
      */
     public function print(Santri $santri)
     {
-        $santri->load(['pendidikan', 'kelas', 'status']);
+        $santri->load(['pendidikan', 'kelas', 'status', 'kamar']);
         return view('santri.print', compact('santri'));
     }
 
     /**
      * Mengekspor data ke Excel dengan mempertahankan filter.
-     * Nama fungsi disesuaikan dengan rute: exportExcel
      */
     public function exportExcel(Request $request)
     {
@@ -211,9 +225,10 @@ class SantriController extends Controller
         $pendidikanId = $request->get('id_pendidikan');
         $kelasId = $request->get('id_kelas');
         $jenisKelamin = $request->get('jenis_kelamin');
+        $kamarId = $request->get('id_kamar');
 
         $fileName = 'daftar-santri-' . date('Y-m-d-His') . '.xlsx';
 
-        return Excel::download(new SantriExport($search, $statusId, $pendidikanId, $kelasId, $jenisKelamin), $fileName);
+        return Excel::download(new SantriExport($search, $statusId, $pendidikanId, $kelasId, $jenisKelamin, $kamarId), $fileName);
     }
 }

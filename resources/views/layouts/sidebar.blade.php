@@ -47,9 +47,6 @@
                 </li>
             @endcan
 
-            {{-- =============================================== --}}
-            {{--           FOKUS PERUBAHAN DI SINI              --}}
-            {{-- =============================================== --}}
             @can('is-admin')
             <span class="px-6 text-gray-400 text-xs uppercase mt-4 block">Admin</span>
             <li class="mt-2" x-data="{ open: {{ request()->routeIs('master.*') ? 'true' : 'false' }} }">
@@ -76,6 +73,13 @@
                             Status
                         </a>
                     </li>
+                    {{-- PENAMBAHAN MENU KAMAR --}}
+                    <li>
+                        <a href="{{ route('master.kamar.index') }}" class="block px-4 py-2 text-sm {{ request()->routeIs('master.kamar.*') ? 'text-white font-bold' : 'text-gray-400' }} hover:text-white">
+                            Kamar
+                        </a>
+                    </li>
+                    {{-- AKHIR PENAMBAHAN --}}
                 </ul>
             </li>
             
@@ -86,9 +90,6 @@
                 </a>
             </li>
             @endcan
-            {{-- =============================================== --}}
-            {{--            AKHIR PERUBAHAN DI SINI             --}}
-            {{-- =============================================== --}}
         </ul>
     </nav>
 

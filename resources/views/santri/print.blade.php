@@ -96,6 +96,8 @@
             <tr><td class="label">Alamat</td><td class="separator">:</td><td class="value">{{ $santri->alamat }}</td></tr>
             <tr><td class="label">Pendidikan</td><td class="separator">:</td><td class="value">{{ $santri->pendidikan->nama_pendidikan ?? 'N/A' }}</td></tr>
             <tr><td class="label">Kelas</td><td class="separator">:</td><td class="value">{{ $santri->kelas->nama_kelas ?? 'N/A' }}</td></tr>
+            {{-- [DITAMBAHKAN] Menampilkan data Kamar --}}
+            <tr><td class="label">Kamar</td><td class="separator">:</td><td class="value">{{ $santri->kamar->nama_kamar ?? 'N/A' }}</td></tr>
             <tr><td class="label">Tahun Masuk</td><td class="separator">:</td><td class="value">{{ $santri->tahun_masuk }}</td></tr>
             <tr><td class="label">Status Santri</td><td class="separator">:</td><td class="value">{{ $santri->status->nama_status ?? 'N/A' }}</td></tr>
             <tr><td class="label">Nama Ayah</td><td class="separator">:</td><td class="value">{{ $santri->nama_ayah }}</td></tr>

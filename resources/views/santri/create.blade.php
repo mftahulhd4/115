@@ -10,7 +10,6 @@
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
                     
-                    {{-- FORM CREATE YANG DIPERBARUI --}}
                     <form action="{{ route('santri.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
                         @csrf
                         
@@ -48,7 +47,8 @@
                         </div>
 
                         <h3 class="text-lg font-semibold border-b border-gray-200 dark:border-gray-700 pb-2 pt-4">Data Akademik & Domisili</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {{-- [MODIFIKASI] Grid menjadi 4 kolom untuk kamar --}}
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                             <div>
                                 <x-input-label for="id_pendidikan" :value="__('Pendidikan')" />
                                 <select id="id_pendidikan" name="id_pendidikan" class="block mt-1 w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm" required>
@@ -68,6 +68,17 @@
                                     @endforeach
                                 </select>
                                 <x-input-error :messages="$errors->get('id_kelas')" class="mt-2" />
+                            </div>
+                            {{-- [DITAMBAHKAN] Dropdown untuk memilih Kamar --}}
+                            <div>
+                                <x-input-label for="id_kamar" :value="__('Kamar')" />
+                                <select id="id_kamar" name="id_kamar" class="block mt-1 w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm">
+                                    <option value="">pilih Kamar</option>
+                                    @foreach ($kamars as $item)
+                                        <option value="{{ $item->id_kamar }}" @if(old('id_kamar') == $item->id_kamar) selected @endif>{{ $item->nama_kamar }}</option>
+                                    @endforeach
+                                </select>
+                                <x-input-error :messages="$errors->get('id_kamar')" class="mt-2" />
                             </div>
                              <div>
                                 <x-input-label for="tahun_masuk" :value="__('Tahun Masuk')" />
