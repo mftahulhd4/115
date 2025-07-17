@@ -11,15 +11,13 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Models\Pendidikan;
 use App\Models\Kelas;
+use App\Models\Kamar;
 use App\Models\Status;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
 class DaftarTagihanController extends Controller
 {
-    /**
-     * Terapkan Gate ke semua method di controller ini
-     */
     public function __construct()
     {
         $this->middleware('can:view-tagihan')->only(['index', 'show', 'pdfReceipt', 'printReceipt']);
@@ -68,20 +66,16 @@ class DaftarTagihanController extends Controller
         return redirect()->route('tagihan.index')->with('success', 'Jenis tagihan berhasil ditambahkan.');
     }
 
-    /**
-     * [MODIFIKASI] Menambahkan 'santri.pendidikan' pada with()
-     * untuk memuat data pendidikan santri secara efisien (Eager Loading).
-     */
-    public function show(JenisTagihan $jenisTagihan)
+    public function show(Request $request, JenisTagihan $jenisTagihan)
     {
-        $daftarTagihan = $jenisTagihan->daftarTagihan()
-                                    ->with('santri.kelas', 'santri.pendidikan') // <-- PERUBAHAN DI SINI
-                                    ->latest('created_at')
-                                    ->paginate(15);
-                                    
+        // [MODIFIKASI] Tetap memuat data kamar, tapi hapus logika filter
+        $query = $jenisTagihan->daftarTagihan()
+                              ->with(['santri.kelas', 'santri.pendidikan', 'santri.kamar']);
+        
+        $daftarTagihan = $query->latest('created_at')->paginate(15)->withQueryString();
+
         return view('tagihan.show', compact('jenisTagihan', 'daftarTagihan'));
     }
-
 
     public function edit(JenisTagihan $jenisTagihan)
     {
@@ -128,23 +122,25 @@ class DaftarTagihanController extends Controller
         $pendidikans = Pendidikan::orderBy('nama_pendidikan')->get();
         $kelases = Kelas::orderBy('nama_kelas')->get();
         $statuses = Status::orderBy('nama_status')->get();
+        $kamars = Kamar::orderBy('nama_kamar')->get();
 
         $santris = collect();
 
-        $isFiltered = $request->filled('status_ids') || $request->filled('id_pendidikan') || $request->filled('id_kelas') || $request->filled('jenis_kelamin');
+        $isFiltered = $request->filled('status_ids') || $request->filled('id_pendidikan') || $request->filled('id_kelas') || $request->filled('jenis_kelamin') || $request->filled('id_kamar');
 
         if ($isFiltered) {
-            $query = Santri::with(['pendidikan', 'kelas', 'status']);
+            $query = Santri::with(['pendidikan', 'kelas', 'status', 'kamar']);
             if ($request->filled('status_ids')) $query->whereIn('id_status', $request->status_ids);
             if ($request->filled('id_pendidikan')) $query->where('id_pendidikan', $request->id_pendidikan);
             if ($request->filled('id_kelas')) $query->where('id_kelas', $request->id_kelas);
             if ($request->filled('jenis_kelamin')) $query->where('jenis_kelamin', $request->jenis_kelamin);
+            if ($request->filled('id_kamar')) $query->where('id_kamar', $request->id_kamar);
             $santris = $query->get();
         }
 
         $existingSantriIds = DaftarTagihan::where('id_jenis_tagihan', $jenisTagihan->id_jenis_tagihan)->pluck('id_santri')->toArray();
             
-        return view('tagihan.assign', compact('jenisTagihan', 'santris', 'existingSantriIds', 'pendidikans', 'kelases', 'statuses'));
+        return view('tagihan.assign', compact('jenisTagihan', 'santris', 'existingSantriIds', 'pendidikans', 'kelases', 'statuses', 'kamars'));
     }
 
     public function storeAssignment(Request $request, JenisTagihan $jenisTagihan)

@@ -22,12 +22,7 @@
             <div x-data="{ selectAll: false, selected: @json(collect(old('santri_ids')) ?? []) }" class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
                     
-                    {{-- Form Filter --}}
                     <form action="{{ route('tagihan.assign', $jenisTagihan->id_jenis_tagihan) }}" method="GET" class="mb-6 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                        
-                        {{-- ========================================================== --}}
-                        {{--                KODE BARU FILTER STATUS SANTRI              --}}
-                        {{-- ========================================================== --}}
                         <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Status Santri</label>
                             <div class="mt-2 flex flex-wrap items-center gap-x-6 gap-y-2 border dark:border-gray-600 p-3 rounded-md">
@@ -42,12 +37,10 @@
                                 @endforeach
                             </div>
                         </div>
-                        {{-- ========================================================== --}}
-                        {{--                     AKHIR KODE BARU                        --}}
-                        {{-- ========================================================== --}}
 
                         <h4 class="font-semibold mb-2 dark:text-gray-200">Filter Lainnya</h4>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                        {{-- [MODIFIKASI] Grid diubah jadi 5 kolom --}}
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
                             <div>
                                 <label for="jenis_kelamin" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Jenis Kelamin</label>
                                 <select id="jenis_kelamin" name="jenis_kelamin" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:bg-gray-900 dark:border-gray-600 dark:text-gray-300">
@@ -78,13 +71,22 @@
                                     @endforeach
                                 </select>
                             </div>
+                            {{-- [DITAMBAHKAN] Filter untuk Kamar --}}
+                            <div>
+                                <label for="id_kamar" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Kamar</label>
+                                <select id="id_kamar" name="id_kamar" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:bg-gray-900 dark:border-gray-600 dark:text-gray-300">
+                                    <option value="">Semua</option>
+                                    @foreach ($kamars as $kamar)
+                                        <option value="{{ $kamar->id_kamar }}" {{ request('id_kamar') == $kamar->id_kamar ? 'selected' : '' }}>{{ $kamar->nama_kamar }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
                             <div class="self-end">
                                 <button type="submit" class="w-full inline-flex justify-center items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700">Filter</button>
                             </div>
                         </div>
                     </form>
 
-                    {{-- Form untuk Menerapkan Tagihan --}}
                     <form action="{{ route('tagihan.store_assignment', $jenisTagihan->id_jenis_tagihan) }}" method="POST">
                         @csrf
                         
@@ -96,6 +98,7 @@
                                             <input type="checkbox" x-model="selectAll" @click="$el.checked ? selected = @json($santris->pluck('id_santri')->diff($existingSantriIds)->values()) : selected = []" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
                                         </th>
                                         <th scope="col" class="px-6 py-3">Nama Santri</th>
+                                        <th scope="col" class="px-6 py-3">Kamar</th> {{-- Ditambahkan --}}
                                         <th scope="col" class="px-6 py-3">Pendidikan</th>
                                         <th scope="col" class="px-6 py-3">Kelas</th>
                                         <th scope="col" class="px-6 py-3">Status Tagihan</th>
@@ -115,6 +118,7 @@
                                                 {{ $santri->nama_santri }}
                                                 <p class="font-normal text-gray-500 dark:text-gray-400">{{ $santri->id_santri }}</p>
                                             </th>
+                                            <td class="px-6 py-4">{{ optional($santri->kamar)->nama_kamar ?? 'N/A' }}</td> {{-- Ditambahkan --}}
                                             <td class="px-6 py-4">{{ optional($santri->pendidikan)->nama_pendidikan }}</td>
                                             <td class="px-6 py-4">{{ optional($santri->kelas)->nama_kelas }}</td>
                                             <td class="px-6 py-4">
@@ -127,7 +131,8 @@
                                         </tr>
                                     @empty
                                         <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                                            <td colspan="5" class="px-6 py-4 text-center">Tidak ada data santri yang cocok dengan filter.</td>
+                                            {{-- [MODIFIKASI] colspan menjadi 6 --}}
+                                            <td colspan="6" class="px-6 py-4 text-center">Tidak ada data santri yang cocok dengan filter.</td>
                                         </tr>
                                     @endforelse
                                 </tbody>

@@ -12,7 +12,9 @@
         "laravel/sanctum": "^3.3",
         "laravel/tinker": "^2.8",
         "maatwebsite/excel": "^3.1",
-        "riskihajar/terbilang": "^2.0"
+        "opcodesio/log-viewer": "^3.18",
+        "riskihajar/terbilang": "^2.0",
+        "spatie/laravel-activitylog": "^4.10"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^3.1",

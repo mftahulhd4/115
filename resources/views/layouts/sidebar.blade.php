@@ -73,13 +73,11 @@
                             Status
                         </a>
                     </li>
-                    {{-- PENAMBAHAN MENU KAMAR --}}
                     <li>
                         <a href="{{ route('master.kamar.index') }}" class="block px-4 py-2 text-sm {{ request()->routeIs('master.kamar.*') ? 'text-white font-bold' : 'text-gray-400' }} hover:text-white">
                             Kamar
                         </a>
                     </li>
-                    {{-- AKHIR PENAMBAHAN --}}
                 </ul>
             </li>
             
@@ -89,6 +87,20 @@
                     <span class="ml-4">Manajemen User</span>
                 </a>
             </li>
+
+            {{-- =============================================== --}}
+            {{--           MENU LOG VIEWER DITAMBAHKAN DI SINI     --}}
+            {{-- =============================================== --}}
+            <li>
+                <a href="/log-viewer" class="flex items-center px-6 py-3 {{ request()->is('log-viewer*') ? 'bg-gray-700' : '' }} hover:bg-gray-700 transition-colors duration-200">
+                    <i class="fas fa-bug w-6 text-center"></i>
+                    <span class="ml-4">Log Viewer</span>
+                </a>
+            </li>
+            {{-- =============================================== --}}
+            {{--           AKHIR PENAMBAHAN MENU                 --}}
+            {{-- =============================================== --}}
+
             @endcan
         </ul>
     </nav>

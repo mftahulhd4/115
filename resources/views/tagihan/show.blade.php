@@ -99,15 +99,20 @@
 
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
-                    <h3 class="text-lg font-semibold mb-4">Daftar Santri dengan Tagihan Ini</h3>
+                    <div class="mb-4">
+                        <h3 class="text-lg font-semibold">Daftar Santri dengan Tagihan Ini</h3>
+                    </div>
+
                     <div class="overflow-x-auto">
                         <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                           {{-- =============================================== --}}
+                           {{--           FOKUS PERBAIKAN URUTAN DI SINI      --}}
+                           {{-- =============================================== --}}
                            <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                                 <tr>
-                                    {{-- [MODIFIKASI] Menambahkan kolom baru --}}
                                     <th scope="col" class="px-6 py-3">Santri</th>
-                                    <th scope="col" class="px-6 py-3">Alamat</th>
-                                    <th scope="col" class="px-6 py-3">Pendidikan</th>
+                                    <th scope="col" class="px-6 py-3">Pendidikan & Kelas</th>
+                                    <th scope="col" class="px-6 py-3">Kamar</th>
                                     <th scope="col" class="px-6 py-3">Status Pembayaran</th>
                                     <th scope="col" class="px-6 py-3 text-right">Aksi</th>
                                 </tr>
@@ -124,14 +129,11 @@
                                                 </div>
                                             </div>
                                         </th>
-                                        {{-- [DITAMBAHKAN] Menampilkan data alamat --}}
-                                        <td class="px-6 py-4">
-                                            {{ optional($item->santri)->alamat ?? 'N/A' }}
-                                        </td>
-                                        {{-- [DITAMBAHKAN] Menampilkan data pendidikan --}}
                                         <td class="px-6 py-4">
                                             {{ optional(optional($item->santri)->pendidikan)->nama_pendidikan ?? 'N/A' }}
+                                            <p class="font-normal text-gray-500 dark:text-gray-400">Kelas: {{ optional(optional($item->santri)->kelas)->nama_kelas ?? 'N/A' }}</p>
                                         </td>
+                                        <td class="px-6 py-4">{{ optional(optional($item->santri)->kamar)->nama_kamar ?? 'N/A' }}</td>
                                         <td class="px-6 py-4">
                                             @if ($item->status_pembayaran == 'Lunas')
                                                 <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">Lunas</span>
@@ -165,6 +167,7 @@
                                     </tr>
                                     
                                     @can('manage-tagihan-full')
+                                        {{-- Modal Batalkan Pembayaran --}}
                                         <x-modal name="cancel-payment-{{ $item->id_daftar_tagihan }}" focusable>
                                             <form method="post" action="{{ route('tagihan.cancelPayment', $item) }}" class="p-6">
                                                 @csrf
@@ -183,6 +186,7 @@
                                             </form>
                                         </x-modal>
                                         
+                                        {{-- Modal Hapus Tagihan Santri --}}
                                         <x-modal name="delete-tagihan-{{ $item->id_daftar_tagihan }}" focusable>
                                             <form method="post" action="{{ route('tagihan.destroySantriBill', $item) }}" class="p-6">
                                                 @csrf
@@ -205,9 +209,12 @@
                                 @endforelse
                             </tbody>
                         </table>
+                        {{-- =============================================== --}}
+                        {{--           AKHIR FOKUS PERBAIKAN URUTAN        --}}
+                        {{-- =============================================== --}}
                     </div>
                     <div class="mt-4">
-                        {{ $daftarTagihan->links() }}
+                        {{ $daftarTagihan->appends(request()->query())->links() }}
                     </div>
                 </div>
             </div>

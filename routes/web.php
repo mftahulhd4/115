@@ -19,6 +19,9 @@ Route::get('/', function () {
 Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
+
+
+    
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
@@ -64,6 +67,19 @@ Route::middleware('auth')->group(function () {
     // Rute untuk Manajemen User dilindungi oleh Gate 'is-admin'
     Route::middleware('can:is-admin')->group(function () {
         Route::resource('users', UserController::class);
+    });
+
+
+    Route::get('/tes-log', function () {
+        try {
+            activity()
+                ->causedBy(auth()->user())
+                ->log('PERCOBAAN LOG DARI RUTE TES');
+            
+            return 'Berhasil mencoba mencatat log! Silakan cek file activity.log di Log Viewer.';
+        } catch (\Exception $e) {
+            return 'Gagal mencatat log. Error: ' . $e->getMessage();
+        }
     });
 });
 

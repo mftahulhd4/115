@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Santri extends Model
 {
-    use HasFactory;
+    use HasFactory; // Hanya gunakan HasFactory
 
     protected $primaryKey = 'id_santri';
     public $incrementing = false;
@@ -17,10 +17,12 @@ class Santri extends Model
     protected $fillable = [
         'id_santri', 'nama_santri', 'tempat_lahir', 'tanggal_lahir', 'jenis_kelamin', 'alamat',
         'nama_ayah', 'nama_ibu', 'nomor_hp_wali', 'tahun_masuk', 'id_pendidikan',
-        'id_kelas', 'id_status', 'id_kamar', 'foto', // <-- PENAMBAHAN 'id_kamar'
+        'id_kelas', 'id_status', 'id_kamar', 'foto',
     ];
 
     protected $casts = ['tanggal_lahir' => 'date'];
+
+    // Fungsi getActivitylogOptions() kita hapus untuk sementara
 
     public function pendidikan()
     {
@@ -42,19 +44,11 @@ class Santri extends Model
         return $this->hasMany(Perizinan::class, 'id_santri', 'id_santri');
     }
 
-    /**
-     * PERBAIKAN: Mengubah nama relasi dan menunjuk ke model yang benar.
-     */
     public function daftarTagihan()
     {
-        // Sebelumnya: public function tagihans() & return $this->hasMany(Tagihan::class, ...);
         return $this->hasMany(DaftarTagihan::class, 'id_santri', 'id_santri');
     }
 
-    /**
-     * Mendefinisikan relasi BelongsTo ke Kamar.
-     * Satu Santri hanya menempati satu Kamar.
-     */
     public function kamar(): BelongsTo
     {
         return $this->belongsTo(Kamar::class, 'id_kamar', 'id_kamar');
