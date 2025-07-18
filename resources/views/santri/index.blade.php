@@ -22,7 +22,6 @@
                     </div>
 
                     <form action="{{ route('santri.index') }}" method="GET" class="mb-6 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                        {{-- [MODIFIKASI] Grid diubah untuk mengakomodasi filter baru --}}
                         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                             <div class="lg:col-span-2">
                                 <label for="search" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Cari Nama / ID</label>
@@ -33,8 +32,8 @@
                                 <label for="jenis_kelamin" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Gender</label>
                                 <select id="jenis_kelamin" name="jenis_kelamin" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-900 dark:border-gray-600 dark:text-gray-300">
                                     <option value="">Semua</option>
-                                    <option value="Laki-laki" {{ request('jenis_kelamin') == 'Laki-laki' ? 'selected' : '' }}>Laki-laki</option>
-                                    <option value="Perempuan" {{ request('jenis_kelamin') == 'Perempuan' ? 'selected' : '' }}>Perempuan</option>
+                                    <option value="Laki-laki" @if(request('jenis_kelamin') == 'Laki-laki') selected @endif>Laki-laki</option>
+                                    <option value="Perempuan" @if(request('jenis_kelamin') == 'Perempuan') selected @endif>Perempuan</option>
                                 </select>
                             </div>
 
@@ -43,7 +42,7 @@
                                 <select id="id_status" name="id_status" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-900 dark:border-gray-600 dark:text-gray-300">
                                     <option value="">Semua Status</option>
                                     @foreach($statuses as $status)
-                                        <option value="{{ $status->id_status }}" {{ request('id_status') == $status->id_status ? 'selected' : '' }}>{{ $status->nama_status }}</option>
+                                        <option value="{{ $status->id_status }}" @if(request('id_status') == $status->id_status) selected @endif>{{ $status->nama_status }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -52,7 +51,7 @@
                                 <select id="id_pendidikan" name="id_pendidikan" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-900 dark:border-gray-600 dark:text-gray-300">
                                     <option value="">Semua</option>
                                      @foreach($pendidikans as $pendidikan)
-                                        <option value="{{ $pendidikan->id_pendidikan }}" {{ request('id_pendidikan') == $pendidikan->id_pendidikan ? 'selected' : '' }}>{{ $pendidikan->nama_pendidikan }}</option>
+                                        <option value="{{ $pendidikan->id_pendidikan }}" @if(request('id_pendidikan') == $pendidikan->id_pendidikan) selected @endif>{{ $pendidikan->nama_pendidikan }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -61,18 +60,17 @@
                                 <select id="id_kelas" name="id_kelas" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-900 dark:border-gray-600 dark:text-gray-300">
                                     <option value="">Semua</option>
                                     @foreach($kelases as $item)
-                                        <option value="{{ $item->id_kelas }}" {{ request('id_kelas') == $item->id_kelas ? 'selected' : '' }}>{{ $item->nama_kelas }}</option>
+                                        <option value="{{ $item->id_kelas }}" @if(request('id_kelas') == $item->id_kelas) selected @endif>{{ $item->nama_kelas }}</option>
                                     @endforeach
                                 </select>
                             </div>
                             
-                            {{-- [DITAMBAHKAN] Filter untuk Kamar --}}
                             <div class="lg:col-span-1">
                                 <label for="id_kamar" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Kamar</label>
                                 <select id="id_kamar" name="id_kamar" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-900 dark:border-gray-600 dark:text-gray-300">
                                     <option value="">Semua</option>
                                     @foreach($kamars as $item)
-                                        <option value="{{ $item->id_kamar }}" {{ request('id_kamar') == $item->id_kamar ? 'selected' : '' }}>{{ $item->nama_kamar }}</option>
+                                        <option value="{{ $item->id_kamar }}" @if(request('id_kamar') == $item->id_kamar) selected @endif>{{ $item->nama_kamar }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -98,17 +96,19 @@
                         <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
                             <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                                 <tr>
+                                    {{-- URUTAN BARU --}}
                                     <th scope="col" class="px-6 py-3">ID Santri</th>
                                     <th scope="col" class="px-6 py-3">Foto</th>
                                     <th scope="col" class="px-6 py-3">Nama Lengkap</th>
-                                    <th scope="col" class="px-6 py-3">Gender</th>
-                                    <th scope="col" class="px-6 py-3">Kamar</th> {{-- Ditambahkan --}}
+                                    <th scope="col" class="px-6 py-3">Jenis Kelamin</th>
                                     <th scope="col" class="px-6 py-3">Pendidikan & Kelas</th>
+                                    <th scope="col" class="px-6 py-3">Kamar</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @forelse ($santris as $santri)
                                     <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                                        {{-- URUTAN BARU --}}
                                         <td class="px-6 py-4">{{ $santri->id_santri }}</td>
                                         <td class="px-6 py-4">
                                             @if ($santri->foto)
@@ -125,18 +125,15 @@
                                             <a href="{{ route('santri.show', $santri) }}" class="hover:underline">
                                                 {{ $santri->nama_santri }}
                                             </a>
-                                            {{-- [MODIFIKASI] Menampilkan status di bawah nama --}}
                                             <p class="font-normal text-xs text-gray-500 dark:text-gray-400">{{ $santri->status->nama_status ?? 'N/A' }}</p>
                                         </th>
                                         <td class="px-6 py-4">{{ $santri->jenis_kelamin }}</td>
-                                        {{-- [DITAMBAHKAN] Menampilkan data kamar --}}
-                                        <td class="px-6 py-4">{{ $santri->kamar->nama_kamar ?? 'N/A' }}</td>
                                         <td class="px-6 py-4">{{ $santri->pendidikan->nama_pendidikan ?? 'N/A' }} - {{ $santri->kelas->nama_kelas ?? 'N/A' }}</td>
+                                        <td class="px-6 py-4">{{ $santri->kamar->nama_kamar ?? 'N/A' }}</td>
                                     </tr>
                                 @empty
                                      <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                                        {{-- [MODIFIKASI] colspan menjadi 7 --}}
-                                        <td colspan="7" class="px-6 py-4 text-center">
+                                        <td colspan="6" class="px-6 py-4 text-center">
                                             Data santri tidak ditemukan.
                                         </td>
                                     </tr>

@@ -79,24 +79,20 @@
                         </div>
                     </form>
                     
-                    {{-- =============================================== --}}
-                    {{--           FOKUS PERBAIKAN TAMPILAN            --}}
-                    {{-- =============================================== --}}
                     <div class="flex justify-end mb-4">
                         <a href="{{ route('perizinan.create') }}" class="text-white bg-green-700 hover:bg-green-800 font-medium rounded-lg text-sm px-5 py-2.5">
                             + Buat Izin Baru
                         </a>
                     </div>
-                    {{-- =============================================== --}}
-                    {{--           AKHIR PERBAIKAN TAMPILAN            --}}
-                    {{-- =============================================== --}}
 
                     <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
                         <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
                             <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                                 <tr>
+                                    {{-- URUTAN BARU --}}
                                     <th scope="col" class="px-6 py-3">ID Izin</th>
                                     <th scope="col" class="px-6 py-3">Nama Santri</th>
+                                    <th scope="col" class="px-6 py-3">Pendidikan & Kelas</th>
                                     <th scope="col" class="px-6 py-3">Kamar</th>
                                     <th scope="col" class="px-6 py-3">Status</th>
                                 </tr>
@@ -104,10 +100,12 @@
                             <tbody>
                                 @forelse ($perizinans as $izin)
                                     <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 cursor-pointer" onclick="window.location='{{ route('perizinan.show', $izin->id_izin) }}';">
+                                        {{-- URUTAN BARU --}}
                                         <td class="px-6 py-4 font-mono">{{ $izin->id_izin }}</td>
                                         <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                                             {{ optional($izin->santri)->nama_santri ?? 'Santri Dihapus' }}
                                         </th>
+                                        <td class="px-6 py-4">{{ optional(optional($izin->santri)->pendidikan)->nama_pendidikan ?? 'N/A' }} - {{ optional(optional($izin->santri)->kelas)->nama_kelas ?? 'N/A' }}</td>
                                         <td class="px-6 py-4">{{ optional(optional($izin->santri)->kamar)->nama_kamar ?? 'N/A' }}</td>
                                         <td class="px-6 py-4">
                                             <span class="px-2 py-1 font-semibold leading-tight rounded-full
@@ -131,7 +129,7 @@
                                     </tr>
                                 @empty
                                      <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                                        <td colspan="4" class="px-6 py-4 text-center">
+                                        <td colspan="5" class="px-6 py-4 text-center">
                                             Data perizinan tidak ditemukan.
                                         </td>
                                     </tr>
