@@ -77,8 +77,11 @@
                                             {{ $jenisTagihan->nama_jenis_tagihan }}
                                         </td>
                                         <td class="px-6 py-4">
-                                            @if ($jenisTagihan->bulan && $jenisTagihan->tahun)
-                                                {{ \Carbon\Carbon::create()->month($jenisTagihan->bulan)->isoFormat('MMMM') }} {{ $jenisTagihan->tahun }}
+                                            @php
+                                                $tgl = $jenisTagihan->tanggal_tagihan ?? $jenisTagihan->tanggal_jatuh_tempo;
+                                            @endphp
+                                            @if ($tgl)
+                                                {{ \Carbon\Carbon::parse($tgl)->isoFormat('MMMM YYYY') }}
                                             @else
                                                 -
                                             @endif

@@ -33,10 +33,10 @@ class DaftarTagihanController extends Controller
                   ->orWhere('id_jenis_tagihan', 'like', "%{$s}%");
         }
         if ($b = $request->bulan) {
-            $query->where('bulan', $b);
+            $query->whereRaw('(MONTH(tanggal_tagihan) = ? OR (tanggal_tagihan IS NULL AND MONTH(tanggal_jatuh_tempo) = ?))', [$b, $b]);
         }
         if ($t = $request->tahun) {
-            $query->where('tahun', $t);
+            $query->whereRaw('(YEAR(tanggal_tagihan) = ? OR (tanggal_tagihan IS NULL AND YEAR(tanggal_jatuh_tempo) = ?))', [$t, $t]);
         }
         
         $jenisTagihans = $query->latest()->paginate(10)->withQueryString();
@@ -126,11 +126,10 @@ class DaftarTagihanController extends Controller
 
         $santris = collect();
 
-        $isFiltered = $request->filled('status_ids') || $request->filled('id_pendidikan') || $request->filled('id_kelas') || $request->filled('jenis_kelamin') || $request->filled('id_kamar');
+        $isFiltered = $request->filled('id_pendidikan') || $request->filled('id_kelas') || $request->filled('jenis_kelamin') || $request->filled('id_kamar');
 
         if ($isFiltered) {
             $query = Santri::with(['pendidikan', 'kelas', 'status', 'kamar']);
-            if ($request->filled('status_ids')) $query->whereIn('id_status', $request->status_ids);
             if ($request->filled('id_pendidikan')) $query->where('id_pendidikan', $request->id_pendidikan);
             if ($request->filled('id_kelas')) $query->where('id_kelas', $request->id_kelas);
             if ($request->filled('jenis_kelamin')) $query->where('jenis_kelamin', $request->jenis_kelamin);

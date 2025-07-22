@@ -42,6 +42,11 @@ class Perizinan extends Model
         return $this->belongsTo(JenisPerizinan::class, 'id_jenis_perizinan', 'id_jenis_perizinan');
     }
 
+    public function statusHistories()
+    {
+        return $this->hasMany(PerizinanStatusHistory::class, 'perizinan_id');
+    }
+
     protected function statusEfektif(): Attribute
     {
         return Attribute::make(

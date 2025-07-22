@@ -48,23 +48,6 @@
                                 </div>
                             </div>
 
-                            {{-- Bulan & Tahun --}}
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div>
-                                    <x-input-label for="bulan" :value="__('Untuk Bulan (Opsional)')" />
-                                    <select id="bulan" name="bulan" class="block mt-1 w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm">
-                                        <option value="">-- Pilih Bulan --</option>
-                                        @for ($i = 1; $i <= 12; $i++)
-                                            <option value="{{ $i }}" {{ old('bulan', $jenisTagihan->bulan) == $i ? 'selected' : '' }}>{{ \Carbon\Carbon::create()->month($i)->isoFormat('MMMM') }}</option>
-                                        @endfor
-                                    </select>
-                                </div>
-                                <div>
-                                    <x-input-label for="tahun" :value="__('Untuk Tahun (Opsional)')" />
-                                    <x-text-input id="tahun" class="block mt-1 w-full" type="number" name="tahun" :value="old('tahun', $jenisTagihan->tahun)" placeholder="Contoh: 2025" />
-                                </div>
-                            </div>
-
                             {{-- Deskripsi --}}
                             <div>
                                 <x-input-label for="deskripsi" :value="__('Deskripsi (Opsional)')" />

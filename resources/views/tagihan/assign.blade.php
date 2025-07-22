@@ -23,21 +23,7 @@
                 <div class="p-6 text-gray-900 dark:text-gray-100">
                     
                     <form action="{{ route('tagihan.assign', $jenisTagihan->id_jenis_tagihan) }}" method="GET" class="mb-6 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Status Santri</label>
-                            <div class="mt-2 flex flex-wrap items-center gap-x-6 gap-y-2 border dark:border-gray-600 p-3 rounded-md">
-                                @foreach($statuses as $status)
-                                    <label for="status_{{ $status->id_status }}" class="inline-flex items-center">
-                                        <input type="checkbox" name="status_ids[]" id="status_{{ $status->id_status }}" value="{{ $status->id_status }}"
-                                               class="h-4 w-4 rounded border-gray-300 dark:bg-gray-900 dark:border-gray-500 text-indigo-600 focus:ring-indigo-500"
-                                               @if(is_array(request('status_ids')) && in_array($status->id_status, request('status_ids'))) checked @endif
-                                        >
-                                        <span class="ml-2 text-sm text-gray-700 dark:text-gray-200">{{ $status->nama_status }}</span>
-                                    </label>
-                                @endforeach
-                            </div>
-                        </div>
-
+                        {{-- Hapus blok Status Santri --}}
                         <h4 class="font-semibold mb-2 dark:text-gray-200">Filter Lainnya</h4>
                         {{-- [MODIFIKASI] Grid diubah jadi 5 kolom --}}
                         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
@@ -95,7 +81,7 @@
                                 <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                                     <tr>
                                         <th scope="col" class="p-4">
-                                            <input type="checkbox" x-model="selectAll" @click="$el.checked ? selected = @json($santris->pluck('id_santri')->diff($existingSantriIds)->values()) : selected = []" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                            
                                         </th>
                                         <th scope="col" class="px-6 py-3">Nama Santri</th>
                                         <th scope="col" class="px-6 py-3">Kamar</th> {{-- Ditambahkan --}}

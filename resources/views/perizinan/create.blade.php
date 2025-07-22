@@ -15,18 +15,10 @@
                         <div class="space-y-3">
                             <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">1. Pilih Santri</h3>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div>
-                                    <x-input-label for="filter_status" :value="__('Langkah 1: Pilih Status Santri')" />
-                                    <select id="filter_status" class="mt-1 block w-full border-gray-300 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-300 rounded-md shadow-sm">
-                                        <option value="" selected>-- Pilih Status Dahulu --</option>
-                                        @foreach($statuses as $status)
-                                            <option value="{{ $status->id_status }}">{{ $status->nama_status }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                                <div>
-                                    <x-input-label for="id_santri_select" :value="__('Langkah 2: Cari Nama atau ID Santri')" />
-                                    <select id="id_santri_select" class="block w-full mt-1" name="id_santri_dummy" disabled></select>
+                                <div class="hidden"> {{-- Dropdown status dihapus --}} </div>
+                                <div class="col-span-2">
+                                    <x-input-label for="id_santri_select" :value="__('Cari Nama atau ID Santri')" />
+                                    <select id="id_santri_select" class="block w-full mt-1" name="id_santri_dummy"></select>
                                     <input type="hidden" name="id_santri" id="id_santri" required>
                                     <x-input-error :messages="$errors->get('id_santri')" class="mt-2" />
                                 </div>
@@ -111,7 +103,7 @@
                 }
 
                 $('#id_santri_select').select2({
-                    placeholder: 'Pilih status dahulu...',
+                    placeholder: 'Ketik nama atau ID santri...',
                     theme: 'bootstrap-5',
                     minimumInputLength: 1, 
                     ajax: {
@@ -120,8 +112,7 @@
                         delay: 250,
                         data: function (params) {
                             return {
-                                q: params.term,
-                                id_status: $('#filter_status').val()
+                                q: params.term
                             };
                         },
                         processResults: function (data) {
@@ -133,22 +124,7 @@
                     escapeMarkup: function (markup) { return markup; }
                 });
 
-                $('#filter_status').on('change', function() {
-                    const statusId = $(this).val();
-                    const santriSelect = $('#id_santri_select');
-
-                    santriSelect.val(null).trigger('change');
-                    $('#id_santri').val('');
-                    $('#info-nama, #info-id, #info-pendidikan, #info-kelas, #info-kamar').text('-');
-                    
-                    if (statusId) {
-                        santriSelect.prop('disabled', false);
-                        santriSelect.select2('open');
-                    } else {
-                        santriSelect.prop('disabled', true);
-                    }
-                });
-
+                // Hapus event handler filter_status dan enable/disable select santri
                 $('#id_santri_select').on('select2:select', function (e) {
                     var data = e.params.data;
                     $('#id_santri').val(data.id_santri);
