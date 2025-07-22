@@ -20,21 +20,26 @@
                              <div class="mt-2 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
                                 <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 text-sm">
                                     <dt class="font-medium text-gray-500 dark:text-gray-400">Nama Santri</dt>
-                                    <dd class="font-semibold dark:text-gray-200">{{ $perizinan->santri->nama_santri ?? 'N/A' }}</dd>
+                                    <dd class="font-semibold dark:text-gray-200">{{ optional($perizinan->santri)->nama_santri ?? 'N/A' }}</dd>
                                     <dt class="font-medium text-gray-500 dark:text-gray-400">ID Santri</dt>
-                                    <dd class="font-mono dark:text-gray-300">{{ $perizinan->santri->id_santri ?? 'N/A' }}</dd>
+                                    <dd class="font-mono dark:text-gray-300">{{ optional($perizinan->santri)->id_santri ?? 'N/A' }}</dd>
                                 </dl>
                             </div>
                         </div>
 
-                        {{-- --- AWAL PERUBAHAN --- --}}
-                        {{-- Menambahkan Field Edit Keperluan --}}
+                        {{-- Jenis Perizinan --}}
                         <div>
-                            <x-input-label for="keperluan" :value="__('Keperluan Izin (Wajib)')" />
-                            <textarea id="keperluan" name="keperluan" class="block mt-1 w-full border-gray-300 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-300 rounded-md shadow-sm" rows="3" required>{{ old('keperluan', $perizinan->keperluan) }}</textarea>
-                            <x-input-error :messages="$errors->get('keperluan')" class="mt-2" />
+                            <x-input-label for="id_jenis_perizinan" :value="__('Jenis Perizinan (Wajib)')" />
+                            <select name="id_jenis_perizinan" id="id_jenis_perizinan" class="block mt-1 w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm" required>
+                                <option value="">-- Pilih Jenis Izin --</option>
+                                @foreach($jenisPerizinans as $jenis)
+                                    <option value="{{ $jenis->id_jenis_perizinan }}" {{ old('id_jenis_perizinan', $perizinan->id_jenis_perizinan) == $jenis->id_jenis_perizinan ? 'selected' : '' }}>
+                                        {{ $jenis->nama }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            <x-input-error :messages="$errors->get('id_jenis_perizinan')" class="mt-2" />
                         </div>
-                        {{-- --- AKHIR PERUBAHAN --- --}}
 
                         {{-- Form Manajemen --}}
                         <div class="space-y-3">

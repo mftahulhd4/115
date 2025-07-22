@@ -42,13 +42,12 @@
             <table>
                 <tr><td class="label">Nama Lengkap</td><td>: {{ optional($perizinan->santri)->nama_santri ?? 'N/A' }}</td></tr>
                 <tr><td class="label">Alamat</td><td>: {{ optional($perizinan->santri)->alamat ?? 'N/A' }}</td></tr>
-                {{-- [DITAMBAHKAN] Menampilkan data Kamar --}}
                 <tr><td class="label">Kamar</td><td>: {{ optional(optional($perizinan->santri)->kamar)->nama_kamar ?? 'N/A' }}</td></tr>
                 <tr><td class="label">Pendidikan</td><td>: {{ optional(optional($perizinan->santri)->pendidikan)->nama_pendidikan ?? 'N/A' }}</td></tr>
             </table>
             <br>
             <p>
-                Untuk keperluan <strong>{{ $perizinan->keperluan }}</strong>, terhitung sejak tanggal 
+                Untuk keperluan <strong>{{ optional($perizinan->jenisPerizinan)->nama ?? 'N/A' }}</strong>, terhitung sejak tanggal 
                 <strong>{{ \Carbon\Carbon::parse($perizinan->waktu_pergi)->isoFormat('D MMMM Y') }}</strong> 
                 sampai dengan tanggal 
                 <strong>{{ \Carbon\Carbon::parse($perizinan->estimasi_kembali)->isoFormat('D MMMM Y') }}</strong>.

@@ -78,6 +78,19 @@
                             Kamar
                         </a>
                     </li>
+                    
+                    {{-- =============================================== --}}
+                    {{--           LINK BARU DITAMBAHKAN DI SINI         --}}
+                    {{-- =============================================== --}}
+                    <li>
+                        <a href="{{ route('master.jenis-perizinan.index') }}" class="block px-4 py-2 text-sm {{ request()->routeIs('master.jenis-perizinan.*') ? 'text-white font-bold' : 'text-gray-400' }} hover:text-white">
+                            Jenis Izin
+                        </a>
+                    </li>
+                    {{-- =============================================== --}}
+                    {{--           AKHIR PENAMBAHAN LINK               --}}
+                    {{-- =============================================== --}}
+
                 </ul>
             </li>
             

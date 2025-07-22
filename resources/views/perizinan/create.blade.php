@@ -9,14 +9,11 @@
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 md:p-8 text-gray-900 dark:text-gray-100">
-
                     <form action="{{ route('perizinan.store') }}" method="POST" class="space-y-8">
                         @csrf
-
                         {{-- BAGIAN 1: PILIH SANTRI --}}
                         <div class="space-y-3">
                             <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">1. Pilih Santri</h3>
-                            
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                     <x-input-label for="filter_status" :value="__('Langkah 1: Pilih Status Santri')" />
@@ -40,28 +37,18 @@
                         <div class="space-y-3">
                              <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Detail Santri Terpilih</h3>
                              <div class="mt-2 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                                {{-- =============================================== --}}
-                                {{--           FOKUS PERBAIKAN TAMPILAN            --}}
-                                {{-- =============================================== --}}
                                 <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 text-sm">
                                     <dt class="font-medium text-gray-500 dark:text-gray-400">Nama Lengkap</dt>
                                     <dd id="info-nama" class="font-semibold dark:text-gray-200 sm:col-span-1">-</dd>
-                                    
                                     <dt class="font-medium text-gray-500 dark:text-gray-400">ID Santri</dt>
                                     <dd id="info-id" class="font-mono dark:text-gray-300 sm:col-span-1">-</dd>
-                                    
                                     <dt class="font-medium text-gray-500 dark:text-gray-400">Pendidikan</dt>
                                     <dd id="info-pendidikan" class="dark:text-gray-300 sm:col-span-1">-</dd>
-                                    
                                     <dt class="font-medium text-gray-500 dark:text-gray-400">Kelas</dt>
                                     <dd id="info-kelas" class="dark:text-gray-300 sm:col-span-1">-</dd>
-                                    
                                     <dt class="font-medium text-gray-500 dark:text-gray-400">Kamar</dt>
                                     <dd id="info-kamar" class="dark:text-gray-300 sm:col-span-1">-</dd>
                                 </dl>
-                                {{-- =============================================== --}}
-                                {{--           AKHIR PERBAIKAN TAMPILAN            --}}
-                                {{-- =============================================== --}}
                             </div>
                         </div>
 
@@ -70,9 +57,16 @@
                             <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">2. Detail Perizinan</h3>
                             <div class="space-y-4">
                                 <div>
-                                    <x-input-label for="keperluan" :value="__('Keperluan Izin (Wajib)')" />
-                                    <textarea id="keperluan" name="keperluan" class="block mt-1 w-full border-gray-300 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-300 rounded-md shadow-sm" rows="3" required>{{ old('keperluan') }}</textarea>
-                                    <x-input-error :messages="$errors->get('keperluan')" class="mt-2" />
+                                    <x-input-label for="id_jenis_perizinan" :value="__('Jenis Perizinan (Wajib)')" />
+                                    <select name="id_jenis_perizinan" id="id_jenis_perizinan" class="block mt-1 w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm" required>
+                                        <option value="">-- Pilih Jenis Izin --</option>
+                                        @foreach($jenisPerizinans as $jenis)
+                                            <option value="{{ $jenis->id_jenis_perizinan }}" {{ old('id_jenis_perizinan') == $jenis->id_jenis_perizinan ? 'selected' : '' }}>
+                                                {{ $jenis->nama }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    <x-input-error :messages="$errors->get('id_jenis_perizinan')" class="mt-2" />
                                 </div>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div>
@@ -88,14 +82,9 @@
                                 </div>
                             </div>
                         </div>
-                        
                         <div class="flex items-center justify-end mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
-                            <a href="{{ route('perizinan.index') }}" class="text-sm text-gray-700 dark:text-gray-300 underline hover:no-underline">
-                                Batal
-                            </a>
-                            <x-primary-button class="ml-4">
-                                {{ __('Ajukan Izin') }}
-                            </x-primary-button>
+                            <a href="{{ route('perizinan.index') }}" class="text-sm text-gray-700 dark:text-gray-300 underline hover:no-underline">Batal</a>
+                            <x-primary-button class="ml-4">{{ __('Ajukan Izin') }}</x-primary-button>
                         </div>
                     </form>
                 </div>
@@ -103,10 +92,12 @@
         </div>
     </div>
 
+    {{-- =============================================== --}}
+    {{--           BAGIAN SCRIPT DIKEMBALIKAN            --}}
+    {{-- =============================================== --}}
     @push('scripts')
         <script>
             $(document).ready(function() {
-                // ... (Fungsi JavaScript lainnya tetap sama) ...
                 function formatSantri (santri) {
                     if (santri.loading) { return santri.text; }
                     var $container = $(`<div class='select2-result-santri'><div class='select2-result-santri__avatar'><img src='${santri.foto_url}' /></div><div class='select2-result-santri__meta'><div class='select2-result-santri__title'></div><div class='select2-result-santri__id'></div></div></div>`);

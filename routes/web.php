@@ -9,7 +9,8 @@ use App\Http\Controllers\PerizinanController;
 use App\Http\Controllers\StatusController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\DaftarTagihanController;
-use App\Http\Controllers\KamarController; // Tambahkan ini
+use App\Http\Controllers\KamarController;
+use App\Http\Controllers\JenisPerizinanController; // <-- TAMBAHKAN BARIS INI
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -61,7 +62,10 @@ Route::middleware('auth')->group(function () {
         Route::resource('pendidikan', PendidikanController::class)->except(['show']);
         Route::resource('kelas', KelasController::class)->except(['show']);
         Route::resource('status', StatusController::class)->except(['show']);
-        Route::resource('kamar', KamarController::class)->except(['show']); // <-- BARIS INI DITAMBAHKAN
+        Route::resource('kamar', KamarController::class)->except(['show']);
+        
+        // <-- RUTE BARU DITAMBAHKAN DI SINI
+        Route::resource('jenis-perizinan', JenisPerizinanController::class)->except(['show']);
     });
 
     // Rute untuk Manajemen User dilindungi oleh Gate 'is-admin'
