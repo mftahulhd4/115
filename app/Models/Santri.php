@@ -32,6 +32,29 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property-read int|null $perizinans_count
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\DaftarTagihan[] $daftarTagihan
  * @property-read int|null $daftar_tagihan_count
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @method static \Illuminate\Database\Eloquent\Builder|Santri newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Santri newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Santri query()
+ * @method static \Illuminate\Database\Eloquent\Builder|Santri whereAlamat($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Santri whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Santri whereFoto($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Santri whereIdKamar($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Santri whereIdKelas($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Santri whereIdPendidikan($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Santri whereIdSantri($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Santri whereIdStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Santri whereJenisKelamin($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Santri whereNamaAyah($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Santri whereNamaIbu($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Santri whereNamaSantri($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Santri whereNomorHpWali($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Santri whereTahunMasuk($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Santri whereTanggalLahir($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Santri whereTempatLahir($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Santri whereUpdatedAt($value)
+ * @mixin \Eloquent
  */
 class Santri extends Model
 {

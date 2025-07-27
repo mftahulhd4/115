@@ -14,7 +14,6 @@ use Carbon\Carbon;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
 class PerizinanController extends Controller
 {
@@ -127,12 +126,13 @@ class PerizinanController extends Controller
             'status' => ['required', Rule::in(['Pengajuan', 'Diizinkan', 'Ditolak', 'Kembali'])],
             'waktu_kembali_aktual' => 'nullable|date',
         ]);
-        $oldStatus = $perizinan->status;
+        
         $newStatus = $validated['status'];
         $updateData = [
             'id_jenis_perizinan' => $validated['id_jenis_perizinan'],
             'estimasi_kembali' => $validated['estimasi_kembali']
         ];
+
         if ($newStatus == 'Kembali') {
             $waktuKembali = $request->filled('waktu_kembali_aktual') ? Carbon::parse($request->input('waktu_kembali_aktual')) : now();
             $estimasiKembali = Carbon::parse($validated['estimasi_kembali']);
@@ -143,15 +143,6 @@ class PerizinanController extends Controller
             $updateData['waktu_kembali_aktual'] = null;
         }
         $perizinan->update($updateData);
-        // Log jika status berubah
-        if ($oldStatus !== $updateData['status']) {
-            $user = auth()->user();
-            $namaSantri = optional($perizinan->santri)->nama_santri ?? '-';
-            $idIzin = $perizinan->id_izin;
-            $waktu = now()->format('d-m-Y H:i');
-            $logMsg = "Status izin santri '$namaSantri' (ID: $idIzin) diubah dari '$oldStatus' menjadi '{$updateData['status']}' oleh {$user->name} pada $waktu.";
-            Log::info($logMsg);
-        }
         return redirect()->route('perizinan.show', $perizinan)->with('success', 'Data perizinan berhasil diperbarui.');
     }
 
@@ -163,15 +154,11 @@ class PerizinanController extends Controller
     
     public function searchSantri(Request $request)
     {
-        $validated = $request->validate([ 'q' => 'nullable|string|max:100' ]);
+        $validated = $request->validate([ 'q' => 'nullable|string|max:100', 'id_status' => 'required|exists:statuses,id_status', ]);
         $searchTerm = $validated['q'] ?? null;
-        $query = Santri::with(['pendidikan', 'kelas', 'kamar']);
-        if ($searchTerm) {
-            $query->where(function($subQuery) use ($searchTerm) {
-                $subQuery->where('nama_santri', 'like', '%' . $searchTerm . '%')
-                    ->orWhere('id_santri', 'like', '%' . $searchTerm . '%');
-            });
-        }
+        $id_status = $validated['id_status'];
+        $query = Santri::with(['pendidikan', 'kelas', 'kamar'])->where('id_status', $id_status);
+        if ($searchTerm) { $query->where(function($subQuery) use ($searchTerm) { $subQuery->where('nama_santri', 'like', '%' . $searchTerm . '%')->orWhere('id_santri', 'like', '%' . $searchTerm . '%'); }); }
         $santris = $query->limit(10)->get();
         $santris->transform(function ($santri) {
             $santri->foto_url = $santri->foto ? asset('storage/fotos/' . $santri->foto) : 'https://ui-avatars.com/api/?name=' . urlencode($santri->nama_santri) . '&background=random';

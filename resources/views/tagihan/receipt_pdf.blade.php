@@ -54,13 +54,22 @@
                 <td class="colon">:</td>
                 <td>
                     {{ $tagihan->jenisTagihan->nama_jenis_tagihan }}
+                    @php
+                        $bulan = $tagihan->jenisTagihan->bulan;
+                        $tahun = $tagihan->jenisTagihan->tahun;
+                        $tanggal_tagihan = $tagihan->jenisTagihan->tanggal_tagihan;
+                        $tanggal_jatuh_tempo = $tagihan->jenisTagihan->tanggal_jatuh_tempo;
+                    @endphp
+                    @if ($bulan && $tahun)
+                        <br><strong>Periode: {{ \Carbon\Carbon::create()->month($bulan)->isoFormat('MMMM YYYY') }}</strong>
+                    @elseif ($tanggal_tagihan)
+                        <br><strong>Periode: {{ \Carbon\Carbon::parse($tanggal_tagihan)->isoFormat('MMMM YYYY') }}</strong>
+                    @elseif ($tanggal_jatuh_tempo)
+                        <br><strong>Periode: {{ \Carbon\Carbon::parse($tanggal_jatuh_tempo)->isoFormat('MMMM YYYY') }}</strong>
+                    @endif
                     <br>
                     <small>
-                        (ID Tagihan: {{ $tagihan->jenisTagihan->id_jenis_tagihan }}
-                        @if ($tagihan->jenisTagihan->bulan && $tagihan->jenisTagihan->tahun)
-                            - Periode: {{ \Carbon\Carbon::create()->month($tagihan->jenisTagihan->bulan)->isoFormat('MMMM') }} {{ $tagihan->jenisTagihan->tahun }}
-                        @endif
-                        )
+                        (ID Tagihan: {{ $tagihan->jenisTagihan->id_jenis_tagihan }})
                     </small>
                 </td>
             </tr>

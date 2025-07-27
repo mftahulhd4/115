@@ -67,7 +67,9 @@ class UserController extends Controller
         $user->role = $request->role;
 
         if ($request->filled('password')) {
-            $user->password = Hash::make($request->password);
+            /** @var string $hashedPassword */
+            $hashedPassword = Hash::make($request->password);
+            $user->password = $hashedPassword; // @phpstan-ignore-line
         }
 
         $user->save();

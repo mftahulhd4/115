@@ -143,7 +143,7 @@
                     </div>
                     
                     <div class="mt-4">
-                        {{ $santris->withQueryString()->links() }}
+                        {{ $santris->appends(request()->query())->links() }}
                     </div>
 
                 </div>

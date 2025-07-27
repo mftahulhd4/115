@@ -92,7 +92,6 @@
                 <td></td>
                 <td>
                     <p>Berbek, {{ now()->isoFormat('D MMMM YYYY') }}</p>
-                    {{-- INI PERUBAHANNYA --}}
                     <p>Bendahara,</p>
                     <div class="signature">
                         ( {{ optional($tagihan->user)->name ?? 'N/A' }} )
@@ -102,4 +101,4 @@
         </table>
     </div>
 </body>
-</html>
+</html> 
